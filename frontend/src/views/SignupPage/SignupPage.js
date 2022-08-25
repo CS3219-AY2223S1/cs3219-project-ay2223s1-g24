@@ -65,7 +65,7 @@ function SignupPage() {
         <div className="textfields">
           <TextField
             label="Username"
-            variant="standard"
+            variant="outlined"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             sx={{ marginBottom: "1rem" }}
@@ -73,7 +73,7 @@ function SignupPage() {
           />
           <TextField
             label="Password"
-            variant="standard"
+            variant="outlined"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
