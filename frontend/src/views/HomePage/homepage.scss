@@ -1,0 +1,31 @@
+.homepage {
+    display: flex;
+    flex-direction: column;
+
+    .main-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .tagline {
+            span {
+                font-weight: bold;
+            }
+
+            font-size: 50px;
+            margin-bottom: 40px;
+        }
+
+        .description {
+            font-size: 20px;
+            padding: 0px 300px;
+            margin-bottom: 70px;
+            color: gray;
+            line-height: 25pt;
+        }
+
+        .signup-btn {
+            font-size: 30px;
+        }
+    }
+}
