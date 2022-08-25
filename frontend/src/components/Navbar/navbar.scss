@@ -1,0 +1,16 @@
+.navbar {
+    display: flex;
+    padding: 40px 100px;
+    justify-content: space-between;
+    align-items: center;
+
+    .logo {
+        img {
+            height: 100px;
+        }
+    }
+
+    .actions {
+        font-size: 20px;
+    }
+}
