@@ -14,11 +14,21 @@
     .textfields {
         display: flex;
         flex-direction: column;
-        margin-bottom: 30px;
+        margin-bottom: 60px;
 
-        >div {
-            margin-bottom: 30px;
+        .field {
+            margin-top: 30px;
         }
+
+        .error-msg {
+            margin-top: 5px;
+            color: red;
+        }
+
+        .hide {
+            display: none;
+        }
+
     }
 
     .signup-btn {
@@ -27,9 +37,22 @@
         font-size: 20px;
         background-color: rgb(44, 123, 229);
         color: white;
+        text-transform: none;
+        margin-bottom: 20px;
     }
 
     .signup-btn:hover {
         background-color: rgb(11, 108, 236);
+    }
+
+    .text-center {
+        font-size: 16px;
+        color: darkgray;
+        text-align: center;
+
+        a {
+            color: #2c7be5;
+            text-decoration: none;
+        }
     }
 }
