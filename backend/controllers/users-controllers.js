@@ -34,47 +34,26 @@ const signup = async (req, res, next) => {
     );
   }
 
-  const { name, email, password } = req.body;
-  let existingUser;
-  try {
-    existingUser = await User.findOne({ email: email });
-  } catch (err) {
-    console.log(err)
-    const error = new HttpError(
-      'Signing up failed, please try again later.',
-      500
-    );
-    return next(error);
-  }
-
-  if (existingUser) {
-    const error = new HttpError(
-      'User exists already, please login instead.',
-      422
-    );
-    return next(error);
-  }
-
-  bcrypt.hash(password, 10).then(hashedPassword => {
+  bcrypt.hash(req.body.password, 10).then(hashedPassword => {
     const createdUser = new User({
-      name,
-      email,
+      name: req.body.name,
+      email: req.body.email,
       password: hashedPassword
     });
 
-    createdUser.save().then((res => {
+    createdUser.save().then((retrievedResult => {
+      console.log(retrievedResult)
       res.status(201).json({ 
         message: "Signup done!",
-        result: res,
+        result: retrievedResult,
         user: createdUser.toObject({ getters: true })
       })
     }))
     .catch(err => {
-      const error = new HttpError(
-        'Signing up failed, please try again later.',
-        500
-      );
-      return next(error);
+      console.log(err)
+      res.status(500).json({ 
+        message: "This account already exists (likely) or network issue (unlikely)"
+      });
     })
   });
 };
