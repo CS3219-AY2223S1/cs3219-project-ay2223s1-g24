@@ -5,15 +5,12 @@ const User = require('../models/user');
 var server = require('../server');
 
 var expect = chai.expect;
-var should = chai.should();
-
+chai.should();
 chai.use(chaiHttp);
 
 
-
-
 before((done) => {
-  User.deleteMany({}, (err) => {
+  User.deleteMany({}).catch((err) => {
     console.log("Some error trying to clean up test database BEFORE tests")
     console.log(err)
   });
@@ -21,7 +18,7 @@ before((done) => {
 });
 
 after((done) => {
-  User.deleteMany({}, (err) => {
+  User.deleteMany({}).catch((err) => {
     console.log("Some error trying to clean up test database AFTER tests")
     console.log(err)
   });
@@ -29,9 +26,8 @@ after((done) => {
 })
 
 
-
 describe('Test API Routes', function () {
-  
+
   it('tests a welcome route to check routing works', (done) => {
     chai.request(server)
       .get('/api/users/welcome')
@@ -39,30 +35,25 @@ describe('Test API Routes', function () {
         res.should.have.status(200);
         res.body.should.be.a("object");
 
-        var actual = res.body.message
-        var expected = "welcome!"
-        expect(actual).to.be.equal(expected)
-        // console.log(res.body.message)
-        // console.log(array)
+        var actual = res.body.message;
+        var expected = "welcome!";
+        expect(actual).to.be.equal(expected);
         done();
       });
   });
-  
+
+
   // GET
   it('Verify that there are 0 users in the DB', (done) => {
     chai.request(server)
       .get('/api/users/getUsers')
       .end((err, res) => {
-        // console.log("The res.body is:");
-        // console.log(res.body);
-        // console.log(res.body["users"]);
         res.should.have.status(200);
         res.body["users"].should.be.a('array');
         res.body["users"].length.should.be.equal(0);
         done();
       });
   });
-
 
 
   // POST
@@ -78,9 +69,6 @@ describe('Test API Routes', function () {
       .post('/api/users/signup')
       .send(newUser)
       .end((err, res) => {
-        // console.log("The res.body is:");
-        // console.log(res.body);
-        // console.log(res.body["users"]);
         res.should.have.status(201);
         res.body["user"].should.be.a('object');
         res.body["user"]["name"].should.be.equal(newUser["name"]);
@@ -160,8 +148,6 @@ describe('Test API Routes', function () {
       });
   });
 
-  
-
 
   it('Verify that an existing user\'s password is updated', (done) => {
     const updatedUser = {
@@ -201,40 +187,25 @@ describe('Test API Routes', function () {
 
 
   it('Verify that delete works for existing user', (done) => {
-
-    User.findOne({ email: "valverdo@alberto.com" })
-      .then(existingUser => {
-        chai.request(server)
-          .delete(`/api/users/deleteUser/${existingUser.id}`)
-          .end((err, res) => {
-          
-            const msg = `Deleted: (name: ${existingUser.name}, email: ${existingUser.email})`
-          
-            res.should.have.status(200);
-            res.body.should.be.a('object');
-            res.body["message"].should.be.equal(msg);
-            done();
-          });
-      })
-
-      .catch(err => {
-        const error = new HttpError(
-          'This should not happen since user is in database.',
-          500
-        );
-        console.log(error)
-        return next(error);
-      })
+    const deleteUser = {
+      email: "valverdo@alberto.com"
+    };
+    chai.request(server)
+      .delete(`/api/users/deleteUser`)
+      .send(deleteUser)
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.equal(`Deleted: (email: ${deleteUser.email})`);
+        done();
+      });
   });
+
 
   // GET
   it('Verify that after deletion, there are 0 users in the database', (done) => {
     chai.request(server)
       .get('/api/users/getUsers')
       .end((err, res) => {
-        // console.log("The res.body is:");
-        // console.log(res.body);
-        // console.log(res.body["users"]);
         res.should.have.status(200);
         res.body["users"].should.be.a('array');
         res.body["users"].length.should.be.equal(0);
@@ -242,31 +213,21 @@ describe('Test API Routes', function () {
       });
   });
 
-  /** THIS IS NOT WORKING...
+
   // DELETE
-  it('Verify that delete throws an error if the user does not exist', (done) => {
-
-    User.findOne({ email: "valverdo@alberto.com" })
-      .then(result => {
-        if (result) {
-          const error = new HttpError(
-            'This should not happen since user is in database.',
-            500
-          );
-          console.log(error)
-          return next(error);
-        }
-
-        chai.end((err, res) => {
-          err.should.have.status(404);
-          err.body.should.be.equal("User does not exist in database!");
-          done();
-        });
-
-      })
+  it('Verify that delete returns 404 if the user does not exist', (done) => {
+    const deletedUser = {
+      email: "valverdo@alberto.com"
+    };
+    chai.request(server)
+      .delete(`/api/users/deleteUser`)
+      .send(deletedUser)
+      .end((err, res) => {
+        res.should.have.status(404);
+        res.body.should.be.equal('User does not exist in database.');
+        done();
+      });
   });
-  */
-
 });
 
 
