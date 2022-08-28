@@ -108,6 +108,9 @@ function SignupPage() {
             label="Username"
             error={isUserInputTouched && username === ""}
             variant="filled"
+            size="small"
+            InputProps={{ style: { fontSize: 10 } }}
+            InputLabelProps={{ style: { fontSize: 12 } }}
             value={username}
             onChange={(e) => {
               setUsername(e.target.value);
@@ -130,6 +133,9 @@ function SignupPage() {
             label="Email"
             error={isEmailInputTouched && email === ""}
             variant="filled"
+            size="small"
+            InputProps={{ style: { fontSize: 10 } }}
+            InputLabelProps={{ style: { fontSize: 12 } }}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -161,6 +167,9 @@ function SignupPage() {
             label="Password"
             error={isPasswordInputTouched && password === ""}
             variant="filled"
+            size="small"
+            InputProps={{ style: { fontSize: 10 } }}
+            InputLabelProps={{ style: { fontSize: 12 } }}
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -182,6 +191,9 @@ function SignupPage() {
             label="Confirm Password"
             error={isPasswordConfirmationTouched && confirmationPassword === ""}
             variant="filled"
+            size="small"
+            InputProps={{ style: { fontSize: 10 } }}
+            InputLabelProps={{ style: { fontSize: 12 } }}
             type="password"
             value={confirmationPassword}
             onChange={(e) => setConfirmationPassword(e.target.value)}
