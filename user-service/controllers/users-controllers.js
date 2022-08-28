@@ -19,7 +19,6 @@ const getUsers = async (req, res, next) => {
 };
 
 
-
 // POST
 const signup = async (req, res, next) => {
 
@@ -100,7 +99,6 @@ const updatePassword = async (req, res, next) => {
 };
 
 
-
 // GET
 const login = async (req, res, next) => {
 
@@ -137,7 +135,6 @@ const login = async (req, res, next) => {
 };
 
 
-
 // DELETE
 const deleteUser = async (req, res, next) => {
   const { email } = req.body;
@@ -152,8 +149,6 @@ const deleteUser = async (req, res, next) => {
     }
   });
 };
-
-
 
 
 exports.getUsers = getUsers;
