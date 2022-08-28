@@ -31,7 +31,7 @@ function HomePage() {
         <div className="signup-btn">
           <Button onClick={navigateSignup} text={"Sign Up Here"} />
           <Routes>
-            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/signup/*" element={<SignupPage />} />
           </Routes>
         </div>
       </div>
