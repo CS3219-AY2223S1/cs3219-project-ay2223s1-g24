@@ -68,7 +68,7 @@ describe('Test API Routes', function () {
   // POST
   it('Verify that signup works for new user', (done) => {
 
-    let newUser = {
+    const newUser = {
       name: "Valverdo",
       email: "valverdo@alberto.com", //note that any caps in email will be made small cap so for testing purposes, use small cap for email
       password: "Mohammed"
@@ -89,10 +89,9 @@ describe('Test API Routes', function () {
       });
   });
 
-  // POST
-  it('Verify that existing user cannot sign up again', (done) => {
 
-    let user = {
+  it('Verify that existing user cannot sign up again', (done) => {
+    const existingUser = {
       name: "Valverdo",
       email: "valverdo@alberto.com",
       password: "Mohammed"
@@ -100,18 +99,72 @@ describe('Test API Routes', function () {
 
     chai.request(server)
       .post('/api/users/signup')
-      .send(user)
+      .send(existingUser)
       .end((err, res) => {
-        res.should.have.status(500);
+        res.should.have.status(409);
         done();
       });
   });
 
 
-  // POST
-  it('Verify that an existing user\'s password is updated', (done) => {
+  it('Verify that existing user can log in', (done) => {
+    const existingUser = {
+      name: "Valverdo",
+      email: "valverdo@alberto.com",
+      password: "Mohammed"
+    }
 
-    let updatedUser = {
+    chai.request(server)
+      .post('/api/users/login')
+      .send(existingUser)
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body["message"].should.be.equal("Logged in!");
+        done();
+      });
+  });
+
+
+  it('Verify that existing user with wrong password cannot log in', (done) => {
+    const existingUser = {
+      name: "Valverdo",
+      email: "valverdo@alberto.com",
+      password: "Salah"
+    }
+
+    chai.request(server)
+      .post('/api/users/login')
+      .send(existingUser)
+      .end((err, res) => {
+        res.should.have.status(403);
+        res.body.should.be.equal('Wrong Password');
+        done();
+      });
+  });
+
+
+  it('Verify that non-existing user cannot log in', (done) => {
+    const existingUser = {
+      name: "Stamford",
+      email: "stamford@bridge.com",
+      password: "chelsea"
+    }
+
+    chai.request(server)
+      .post('/api/users/login')
+      .send(existingUser)
+      .end((err, res) => {
+        res.should.have.status(401);
+        res.body.should.be.equal("No such account.");
+        done();
+      });
+  });
+
+  
+
+
+  it('Verify that an existing user\'s password is updated', (done) => {
+    const updatedUser = {
       name: "Valverdo",
       email: "valverdo@alberto.com",
       password: "Alfredo"
@@ -127,28 +180,26 @@ describe('Test API Routes', function () {
       });
   });
 
-  // POST
-  it('Verify that if the user does not exist, the updatePassword adds a new user instead', (done) => {
 
-    let updatedUser = {
-      name: "Anderson",
-      email: "hans@christian.com",
-      password: "mermaid"
+  it('Verify that an if user does not exist in database, update password returns an error', (done) => {
+
+    const updatedUser = {
+      name: "Heather Swanson",
+      email: "strong@woman.com",
+      password: "notMan"
     }
 
     chai.request(server)
       .put('/api/users/updatePassword')
       .send(updatedUser)
       .end((err, res) => {
-        res.should.have.status(201);
-        res.body["user"].should.be.a('object');
-        res.body["user"]["name"].should.be.equal(updatedUser["name"]);
-        res.body["user"]["email"].should.be.equal(updatedUser["email"]);
+        res.should.have.status(404);
+        res.body.should.be.equal("User not found in database to update password.");
         done();
       });
   });
 
-  // DELETE
+
   it('Verify that delete works for existing user', (done) => {
 
     User.findOne({ email: "valverdo@alberto.com" })
@@ -176,9 +227,8 @@ describe('Test API Routes', function () {
       })
   });
 
-
   // GET
-  it('Verify that after deletion, there is still 1 user in the database', (done) => {
+  it('Verify that after deletion, there are 0 users in the database', (done) => {
     chai.request(server)
       .get('/api/users/getUsers')
       .end((err, res) => {
@@ -187,41 +237,10 @@ describe('Test API Routes', function () {
         // console.log(res.body["users"]);
         res.should.have.status(200);
         res.body["users"].should.be.a('array');
-        res.body["users"].length.should.be.equal(1);
+        res.body["users"].length.should.be.equal(0);
         done();
       });
   });
-
-  // DELETE
-  it('Verify that delete works for the last user', (done) => {
-
-    User.findOne({ email: "hans@christian.com" })
-      .then(existingUser => {
-        chai.request(server)
-          .delete(`/api/users/deleteUser/${existingUser.id}`)
-          .end((err, res) => {
-          
-            const msg = `Deleted: (name: ${existingUser.name}, email: ${existingUser.email})`
-          
-            res.should.have.status(200);
-            res.body.should.be.a('object');
-            res.body["message"].should.be.equal(msg);
-            done();
-          });
-      })
-
-      .catch(err => {
-        const error = new HttpError(
-          'This should not happen since user is in database.',
-          500
-        );
-        console.log(error)
-        return next(error);
-      })
-  });
-  
-
-
 
   /** THIS IS NOT WORKING...
   // DELETE
