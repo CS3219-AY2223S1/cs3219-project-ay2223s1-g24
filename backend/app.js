@@ -22,6 +22,13 @@ app.use((req, res, next) => {
 
 app.use('/api/users', usersRoutes);
 
+//Delete if not using
+app.get('/api/users/welcome', (req, res) => {
+  res.status(200).send({
+    message: "welcome!"
+  });
+});
+
 app.use((req, res, next) => {
   const error = new HttpError('Could not find this route.', 404);
   throw error;
@@ -35,14 +42,18 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || 'An unknown error occurred!' });
 });
 
-const mongodbUrl = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.ypl7pl9.mongodb.net/cluster0?retryWrites=true&w=majority`
-mongoose
-  .connect(
-    mongodbUrl
-  )
-  .then(() => {
-    app.listen(process.env.PORT || 3000);
-  })
-  .catch(err => {
+const mongodbUrl = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.ypl7pl9.mongodb.net/${process.env.MONGODB_CLUSTER}?retryWrites=true&w=majority`
+console.log(mongodbUrl)
+
+mongoose.connect(
+  mongodbUrl
+)
+.then(() => {
+    console.log("Successfully connected to MongoDB Atlas!")
+})
+.catch(err => {
+    console.log("Failed to log into MongoDB Atlas. Error below.")
     console.log(err);
-  });
+});
+
+module.exports = app;

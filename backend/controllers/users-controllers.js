@@ -13,11 +13,15 @@ const getUsers = async (req, res, next) => {
   try {
     users = await User.find({}, '-password');
   } catch (err) {
-    const error = new HttpError(
-      'Fetching users failed, please try again later.',
-      500
-    );
-    return next(error);
+
+    // const error = new HttpError(
+    //   'Fetching users failed, please try again later.',
+    //   500
+    // );
+    // return next(error);
+
+    res.status(503).json('Something went wrong (likely network issue). Could not delete user.');
+    return;
   }
   res.status(200).json({ users: users.map(user => user.toObject({ getters: true })) });
 };
@@ -29,9 +33,11 @@ const signup = async (req, res, next) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return next(
-      new HttpError('Invalid inputs passed, please check your data.', 422)
-    );
+    // return next(
+    //   new HttpError('Invalid inputs passed, please check your data.', 422)
+    // );
+    res.status(400).json('Invalid inputs passed, please check your data.');
+    return;
   }
 
   bcrypt.hash(req.body.password, 10).then(hashedPassword => {
@@ -51,41 +57,40 @@ const signup = async (req, res, next) => {
     }))
     .catch(err => {
       console.log(err)
-      res.status(500).json({ 
-        message: "This account already exists (likely) or network issue (unlikely)"
-      });
+      res.status(409).json("This account already exists (likely) or network issue (unlikely).");
     })
   });
 };
 
 
-// PUT. TODO: SHOULD NOT BE A PUT REQUEST FOR UPDATE PASSWORD. SINCE IF USER DOES NOT EXIST, U DO NOT JUST CREATE A NEW USER. THIS BEHAVIOUR IS FOR B1 PURPOSES ONLY
 const updatePassword = async (req, res, next) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return next(
-      new HttpError('Invalid inputs passed, please check your data.', 422)
-    );
+    res.status(400).json('Invalid inputs passed, please check your data.');
+    return;
   }
 
-  const { name, email, password } = req.body;
   let existingUser;
   try {
-    existingUser = await User.findOne({ email: email });
+    existingUser = await User.findOne({ email: req.body.email });
   } catch (err) {
+
+    // const error = new HttpError(
+    //   'updateUser failed due to some network or HTTP error?',
+    //   500
+    // );
+    // return next(error);
+
     console.log(err)
-    const error = new HttpError(
-      'updateUser failed due to some network or HTTP error?.',
-      500
-    );
-    return next(error);
+    res.status(503).json('Something went wrong (likely network issue). Could not delete user.');
+    return;
   }
 
   if (!existingUser) {
-    console.log("User does not exist in database yet. Creating user now")
-    signup(req, res, next)
-    return
+    console.log("User does not exist in database.")
+    res.status(404).json("User not found in database to update password.")
+    return;
   }
 
   bcrypt.hash(req.body.password, 10).then(hashedPassword => {
@@ -97,22 +102,22 @@ const updatePassword = async (req, res, next) => {
       email: existingUser.email,
       password: hashedPassword,
     });
+
     User.updateOne(
       {_id: existingUser.id, email: req.body.email},
       updatedUser
     ).then((result) => {
       if (!result) {
-        throw new Error("User password could not be updated!?");
+        res.status(503).json("Unable to update user password. Service unavailable.");
+        return;
       }
       res.status(200).json("User password updated!");
     });
   })
   .catch(err => {
-    const error = new HttpError(
-      'Error trying to hash password',
-      500
-    );
-    return next(error);
+    console.log(err)
+    res.status(503).json("Error trying to hash password");
+    return;
   })
 };
 
@@ -120,40 +125,30 @@ const updatePassword = async (req, res, next) => {
 
 // GET
 const login = async (req, res, next) => {
-  const { email, password } = req.body;
 
   let existingUser;
   try {
-    existingUser = await User.findOne({email: email});
+    existingUser = await User.findOne({email: req.body.email});
   } catch (err) {
-    const error = new HttpError(
-      'Login in failed, please try again later.',
-      500
-    );
-    return next(error);
+    res.status(503).json('Login in failed, likely due to network error. Please try again later.')
+    return;
   }
 
   if (!existingUser) {
-    const error = new HttpError(
-      'Invalid credentials, could not log you in.',
-      401
-    );
-    return next(error);
+    res.status(401).json('No such account.');
+    return;
   }
 
   try {
     comparisonResult = await bcrypt.compare(req.body.password, existingUser.password)
   } catch (error) {
-    res.status(404).json("Error hashing the password at login")
-    return next()
+    res.status(503).json("Error hashing the password at login")
+    return;
   }
 
   if (!comparisonResult) {
-    const error = new HttpError(
-      'WRONG PASSWORD',
-      500
-    );
-    return next(error);
+    res.status(403).json('Wrong Password');
+    return;
   }
 
   res.status(200).json({
@@ -170,12 +165,12 @@ const login = async (req, res, next) => {
 // DELETE
 const deleteUser = async (req, res, next) => {
 
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return next(
-      new HttpError('Invalid inputs passed, please check your data.', 422)
-    );
-  }
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   return next(
+  //     new HttpError('Invalid inputs passed, please check your data.', 422)
+  //   );
+  // }
 
   const userId = req.params.uid;
   const { name, email, password } = req.body;
@@ -184,19 +179,13 @@ const deleteUser = async (req, res, next) => {
   try {
     existingUser = await User.findById(userId);
   } catch (err) {
-    const error = new HttpError(
-      'Something went wrong, could not delete user.',
-      500
-    );
-    return next(error);
+    res.status(503).json('Something went wrong (likely network issue). Could not delete user.');
+    return;
   }
 
   if (!existingUser) {
-    const error = new HttpError(
-      'User does not exist in database!',
-      404
-    );
-    return next(error);
+    res.status(400).json('User does not exist in database.');
+    return;
   }
 
   try {
@@ -212,9 +201,8 @@ const deleteUser = async (req, res, next) => {
     return next(error);
   }
 
-  const msg = `Deleted: 
-  name: ${existingUser.name}
-  email: ${existingUser.email}`
+  const msg = `Deleted: (name: ${existingUser.name}, email: ${existingUser.email})`
+
   res.status(200).json({ message: msg});
 };
 
