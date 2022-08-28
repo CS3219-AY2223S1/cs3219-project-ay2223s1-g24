@@ -170,12 +170,12 @@ const login = async (req, res, next) => {
 // DELETE
 const deleteUser = async (req, res, next) => {
 
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return next(
-      new HttpError('Invalid inputs passed, please check your data.', 422)
-    );
-  }
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   return next(
+  //     new HttpError('Invalid inputs passed, please check your data.', 422)
+  //   );
+  // }
 
   const userId = req.params.uid;
   const { name, email, password } = req.body;
@@ -212,9 +212,8 @@ const deleteUser = async (req, res, next) => {
     return next(error);
   }
 
-  const msg = `Deleted: 
-  name: ${existingUser.name}
-  email: ${existingUser.email}`
+  const msg = `Deleted: (name: ${existingUser.name}, email: ${existingUser.email})`
+
   res.status(200).json({ message: msg});
 };
 

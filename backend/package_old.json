@@ -4,21 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r dotenv/config --exit",
-    "start": "nodemon server.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.19.0",
-    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
-    "chai": "^4.3.6",
-    "chai-http": "^4.3.0",
-    "dotenv": "^16.0.1",
     "express": "^4.17.1",
     "express-validator": "^6.2.0",
-    "http": "^0.0.1-security",
     "mocha": "^10.0.0",
     "mongoose": "^5.7.8",
     "mongoose-unique-validator": "^2.0.3",
