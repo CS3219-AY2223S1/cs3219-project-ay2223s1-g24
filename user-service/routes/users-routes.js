@@ -22,7 +22,7 @@ router.post(
 );
 
 router.post('/login', usersController.login);
-router.delete('/deleteUser/:uid', usersController.deleteUser);
+router.delete('/deleteUser', usersController.deleteUser);
 router.put('/updatePassword', usersController.updatePassword);
 
 module.exports = router;

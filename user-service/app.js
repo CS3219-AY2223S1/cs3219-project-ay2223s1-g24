@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const usersRoutes = require('./routes/users-routes');
-const HttpError = require('./models/http-error');
 
 const app = express();
 
@@ -29,11 +28,6 @@ app.get('/api/users/welcome', (req, res) => {
   });
 });
 
-app.use((req, res, next) => {
-  const error = new HttpError('Could not find this route.', 404);
-  throw error;
-});
-
 app.use((error, req, res, next) => {
   if (res.headerSent) {
     return next(error);
@@ -42,18 +36,16 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || 'An unknown error occurred!' });
 });
 
-const mongodbUrl = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.ypl7pl9.mongodb.net/${process.env.MONGODB_CLUSTER}?retryWrites=true&w=majority`
-console.log(mongodbUrl)
+const mongodbUrl = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.ypl7pl9.mongodb.net/${process.env.MONGODB_CLUSTER}?retryWrites=true&w=majority`;
+console.log(mongodbUrl);
 
-mongoose.connect(
-  mongodbUrl
-)
-.then(() => {
-    console.log("Successfully connected to MongoDB Atlas!")
-})
-.catch(err => {
-    console.log("Failed to log into MongoDB Atlas. Error below.")
+mongoose.connect(mongodbUrl, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
+  .then(() => {
+    console.log("Successfully connected to MongoDB Atlas!");
+  })
+  .catch(err => {
+    console.log("Failed to log into MongoDB Atlas. Error below.");
     console.log(err);
-});
+  });
 
 module.exports = app;
