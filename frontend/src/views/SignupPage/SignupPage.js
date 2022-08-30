@@ -109,7 +109,7 @@ function SignupPage() {
             error={isUserInputTouched && username === ""}
             variant="filled"
             size="small"
-            InputProps={{ style: { fontSize: 10 } }}
+            InputProps={{ style: { fontSize: 12 } }}
             InputLabelProps={{ style: { fontSize: 12 } }}
             value={username}
             onChange={(e) => {
@@ -134,7 +134,7 @@ function SignupPage() {
             error={isEmailInputTouched && email === ""}
             variant="filled"
             size="small"
-            InputProps={{ style: { fontSize: 10 } }}
+            InputProps={{ style: { fontSize: 12 } }}
             InputLabelProps={{ style: { fontSize: 12 } }}
             type="email"
             value={email}
@@ -168,7 +168,7 @@ function SignupPage() {
             error={isPasswordInputTouched && password === ""}
             variant="filled"
             size="small"
-            InputProps={{ style: { fontSize: 10 } }}
+            InputProps={{ style: { fontSize: 12 } }}
             InputLabelProps={{ style: { fontSize: 12 } }}
             type="password"
             value={password}
@@ -192,7 +192,7 @@ function SignupPage() {
             error={isPasswordConfirmationTouched && confirmationPassword === ""}
             variant="filled"
             size="small"
-            InputProps={{ style: { fontSize: 10 } }}
+            InputProps={{ style: { fontSize: 12 } }}
             InputLabelProps={{ style: { fontSize: 12 } }}
             type="password"
             value={confirmationPassword}
@@ -247,18 +247,22 @@ function SignupPage() {
           </Routes>
         </Box>
 
-        <Dialog open={isDialogOpen} onClose={closeDialog}>
-          <DialogTitle>{dialogTitle}</DialogTitle>
+        <Dialog open={isDialogOpen} onClose={closeDialog} className="modal">
+          <DialogTitle sx={{ fontSize: "18px" }}>{dialogTitle}</DialogTitle>
           <DialogContent>
-            <DialogContentText>{dialogMsg}</DialogContentText>
+            <DialogContentText sx={{ fontSize: "14px", height: "10px" }}>
+              {dialogMsg}
+            </DialogContentText>
           </DialogContent>
           <DialogActions>
             {isSignupSuccess ? (
-              <Button component={Link} to="/login">
+              <Button component={Link} to="/login" sx={{ fontSize: "12px" }}>
                 Log in
               </Button>
             ) : (
-              <Button onClick={closeDialog}>Done</Button>
+              <Button onClick={closeDialog} sx={{ fontSize: "12px" }}>
+                Done
+              </Button>
             )}
           </DialogActions>
         </Dialog>
