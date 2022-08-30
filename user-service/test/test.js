@@ -188,7 +188,8 @@ describe('Test API Routes', function () {
 
   it('Verify that delete works for existing user', (done) => {
     const deleteUser = {
-      email: "valverdo@alberto.com"
+      email: "valverdo@alberto.com",
+      password: "Alfredo"
     };
     chai.request(server)
       .delete(`/api/users/deleteUser`)

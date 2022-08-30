@@ -137,13 +137,15 @@ const login = async (req, res, next) => {
 
 // DELETE
 const deleteUser = async (req, res, next) => {
-  const { email } = req.body;
-  let existingUser;
-  User.exists({ email }).then(isPresent => {
-    if (isPresent) {
-      User.deleteOne({ email }).then(() => {
-        res.status(200).json(`Deleted: (email: ${email})`);
-      });
+  const { email, password } = req.body;
+  User.findOne({ email }).then(user => {
+    if (user) {
+      const isMatch = bcrypt.compare(password, user.password);
+      isMatch ?
+        User.deleteOne({ email }).then(() => {
+          res.status(200).json(`Deleted: (email: ${email})`);
+        }) :
+        res.status(400).json('User found but invalid password provided');
     } else {
       res.status(404).json('User does not exist in database.');
     }
