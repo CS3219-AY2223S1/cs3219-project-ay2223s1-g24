@@ -28,21 +28,6 @@ after((done) => {
 
 describe('Test API Routes', function () {
 
-  it('tests a welcome route to check routing works', (done) => {
-    chai.request(server)
-      .get('/api/users/welcome')
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.a("object");
-
-        var actual = res.body.message;
-        var expected = "welcome!";
-        expect(actual).to.be.equal(expected);
-        done();
-      });
-  });
-
-
   // GET
   it('Verify that there are 0 users in the DB', (done) => {
     chai.request(server)
@@ -103,7 +88,7 @@ describe('Test API Routes', function () {
     }
 
     chai.request(server)
-      .post('/api/users/login')
+      .get('/api/users/login')
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(200);
@@ -121,7 +106,7 @@ describe('Test API Routes', function () {
     }
 
     chai.request(server)
-      .post('/api/users/login')
+      .get('/api/users/login')
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(403);
@@ -139,7 +124,7 @@ describe('Test API Routes', function () {
     }
 
     chai.request(server)
-      .post('/api/users/login')
+      .get('/api/users/login')
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(401);

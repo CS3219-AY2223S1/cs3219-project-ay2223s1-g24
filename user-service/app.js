@@ -21,13 +21,6 @@ app.use((req, res, next) => {
 
 app.use('/api/users', usersRoutes);
 
-//Delete if not using
-app.get('/api/users/welcome', (req, res) => {
-  res.status(200).send({
-    message: "welcome!"
-  });
-});
-
 app.use((error, req, res, next) => {
   if (res.headerSent) {
     return next(error);

@@ -21,7 +21,7 @@ router.post(
   usersController.signup
 );
 
-router.post('/login', usersController.login);
+router.get('/login', usersController.login);
 router.delete('/deleteUser', usersController.deleteUser);
 router.put('/updatePassword', usersController.updatePassword);
 
