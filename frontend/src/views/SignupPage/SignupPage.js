@@ -17,7 +17,7 @@ import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "constants";
 import { Link } from "react-router-dom";
 import "./signup.scss";
 import mainLogo from "assets/logo.png";
-import HomePage from "views/HomePage/HomePage";
+import SigninPage from "views/SigninPage/SigninPage";
 
 function SignupPage() {
   const [username, setUsername] = useState("");
@@ -35,8 +35,8 @@ function SignupPage() {
   const [isSignupSuccess, setIsSignupSuccess] = useState(false);
 
   const navigate = useNavigate();
-  const navigateHome = () => {
-    navigate("/");
+  const navigateSignin = () => {
+    navigate("/signin");
   };
 
   const isValidEmail = (email) => {
@@ -109,7 +109,7 @@ function SignupPage() {
             error={isUserInputTouched && username === ""}
             variant="filled"
             size="small"
-            InputProps={{ style: { fontSize: 10 } }}
+            InputProps={{ style: { fontSize: 12 } }}
             InputLabelProps={{ style: { fontSize: 12 } }}
             value={username}
             onChange={(e) => {
@@ -134,7 +134,7 @@ function SignupPage() {
             error={isEmailInputTouched && email === ""}
             variant="filled"
             size="small"
-            InputProps={{ style: { fontSize: 10 } }}
+            InputProps={{ style: { fontSize: 12 } }}
             InputLabelProps={{ style: { fontSize: 12 } }}
             type="email"
             value={email}
@@ -168,7 +168,7 @@ function SignupPage() {
             error={isPasswordInputTouched && password === ""}
             variant="filled"
             size="small"
-            InputProps={{ style: { fontSize: 10 } }}
+            InputProps={{ style: { fontSize: 12 } }}
             InputLabelProps={{ style: { fontSize: 12 } }}
             type="password"
             value={password}
@@ -192,7 +192,7 @@ function SignupPage() {
             error={isPasswordConfirmationTouched && confirmationPassword === ""}
             variant="filled"
             size="small"
-            InputProps={{ style: { fontSize: 10 } }}
+            InputProps={{ style: { fontSize: 12 } }}
             InputLabelProps={{ style: { fontSize: 12 } }}
             type="password"
             value={confirmationPassword}
@@ -241,9 +241,9 @@ function SignupPage() {
         </Box>
 
         <Box className="text-center">
-          Already have an account? <span onClick={navigateHome}> Sign in.</span>
+          Already have an account? <span onClick={navigateSignin}> Sign in.</span>
           <Routes>
-            <Route path="/*/" element={<HomePage />} />
+            <Route path="/*/" element={<SigninPage />} />
           </Routes>
         </Box>
 
@@ -262,7 +262,7 @@ function SignupPage() {
             )}
           </DialogActions>
         </Dialog>
-      </Box>
+        </Box>
     </div>
   );
 }
