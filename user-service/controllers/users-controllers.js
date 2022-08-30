@@ -72,7 +72,19 @@ const updatePassword = async (req, res, next) => {
     return;
   }
 
-  bcrypt.hash(req.body.password, 10).then(hashedPassword => {
+  try {
+    comparisonResult = await bcrypt.compare(req.body.password, existingUser.password)
+  } catch (error) {
+    res.status(503).json("Error hashing the password at update password.")
+    return;
+  }
+
+  if (!comparisonResult) {
+    res.status(403).json('Wrong old password. Password not updated.');
+    return;
+  }
+
+  bcrypt.hash(req.body.new_password, 10).then(hashedPassword => {
     const updatedUser = new User({
       _id: existingUser.id,
       name: existingUser.name,
@@ -97,6 +109,7 @@ const updatePassword = async (req, res, next) => {
       return;
     })
 };
+
 
 
 // GET

@@ -149,11 +149,31 @@ describe('Test API Routes', function () {
   });
 
 
-  it('Verify that an existing user\'s password is updated', (done) => {
+  it('Verify that an existing user\'s password cannot be updated if the old password is wrong', (done) => {
     const updatedUser = {
       name: "Valverdo",
       email: "valverdo@alberto.com",
-      password: "Alfredo"
+      password: "Salah",
+      new_password: "Alfredo"
+    }
+
+    chai.request(server)
+      .put('/api/users/updatePassword')
+      .send(updatedUser)
+      .end((err, res) => {
+        res.should.have.status(403);
+        res.body.should.be.equal("Wrong old password. Password not updated.");
+        done();
+      });
+  });
+
+
+  it('Verify that an existing user\'s password is updated when the old password is correct', (done) => {
+    const updatedUser = {
+      name: "Valverdo",
+      email: "valverdo@alberto.com",
+      password: "Mohammed",
+      new_password: "Alfredo"
     }
 
     chai.request(server)
@@ -165,6 +185,7 @@ describe('Test API Routes', function () {
         done();
       });
   });
+
 
 
   it('Verify that an if user does not exist in database, update password returns an error', (done) => {

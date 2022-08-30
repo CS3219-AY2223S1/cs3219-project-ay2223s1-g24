@@ -36,7 +36,7 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || 'An unknown error occurred!' });
 });
 
-const mongodbUrl = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.ypl7pl9.mongodb.net/${process.env.MONGODB_CLUSTER}?retryWrites=true&w=majority`;
+const mongodbUrl = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.g6mwpo0.mongodb.net/${process.env.MONGODB_CLUSTER}?retryWrites=true&w=majority`;
 console.log(mongodbUrl);
 
 mongoose.connect(mongodbUrl, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
