@@ -150,6 +150,12 @@ const login = async (req, res, next) => {
 
 // DELETE
 const deleteUser = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json('Invalid inputs passed, please check your data.');
+    return;
+  }
+
   const { email, password } = req.body;
   User.findOne({ email }).then(user => {
     if (user) {

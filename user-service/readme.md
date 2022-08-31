@@ -19,10 +19,10 @@ Retrieves all users in database
 
 ### GET `/login`:
 #### Body Parameters:
-- `email`: Email of user logging up
-- `password`: Password of user logging up
+- `email`: Email of user logging in
+- `password`: Password of user logging in
 #### Status codes:
-- `200`: User has successfully logged up
+- `200`: User has successfully logged in
 - `400`: Body parameters not specified correctly
 - `401`: No such account
 - `403`: Wrong password

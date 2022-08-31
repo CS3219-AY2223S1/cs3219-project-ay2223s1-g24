@@ -22,7 +22,23 @@ router.post(
 );
 
 router.get('/login', usersController.login);
-router.delete('/deleteUser', usersController.deleteUser);
-router.put('/updatePassword', usersController.updatePassword);
+router.delete('/deleteUser', [
+  check('email')
+    .normalizeEmail()
+    .isEmail(),
+  check('password').not().isEmpty()
+  ],
+  usersController.deleteUser);
+router.put('/updatePassword', [
+  check('name')
+    .not()
+    .isEmpty(),
+  check('email')
+    .normalizeEmail()
+    .isEmail(),
+  check('password').not().isEmpty(),
+  check('new_password').isLength({ min: 6 }),
+  ],
+  usersController.updatePassword);
 
 module.exports = router;
