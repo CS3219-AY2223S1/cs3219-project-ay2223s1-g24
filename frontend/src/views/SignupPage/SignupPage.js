@@ -12,11 +12,10 @@ import {
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
-import { URL_USER_SVC, HEROKU_ENDPOINT } from "configs";
+import { HEROKU_ENDPOINT } from "configs";
 import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "constants";
 import { Link } from "react-router-dom";
 import "./signup.scss";
-import mainLogo from "assets/logo.png";
 import HomePage from "views/HomePage/HomePage";
 
 function SignupPage() {
