@@ -12,12 +12,12 @@ import {
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
-import { URL_USER_SVC, HEROKU_ENDPOINT } from "configs";
+import { HEROKU_ENDPOINT } from "configs";
 import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "constants";
 import { Link } from "react-router-dom";
 import "./signup.scss";
-import mainLogo from "assets/logo.png";
 import SigninPage from "views/SigninPage/SigninPage";
+import HomePage from "views/HomePage/HomePage";
 
 function SignupPage() {
   const [username, setUsername] = useState("");
@@ -247,18 +247,24 @@ function SignupPage() {
           </Routes>
         </Box>
 
-        <Dialog open={isDialogOpen} onClose={closeDialog}>
-          <DialogTitle>{dialogTitle}</DialogTitle>
+        <Dialog open={isDialogOpen} onClose={closeDialog} className="modal">
+          <DialogTitle sx={{ fontSize: "18px", height: "20px" }}>
+            {dialogTitle}
+          </DialogTitle>
           <DialogContent>
-            <DialogContentText>{dialogMsg}</DialogContentText>
+            <DialogContentText sx={{ fontSize: "14px", height: "10px" }}>
+              {dialogMsg}
+            </DialogContentText>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ height: "24px" }}>
             {isSignupSuccess ? (
-              <Button component={Link} to="/login">
+              <Button component={Link} to="/login" sx={{ fontSize: "12px" }}>
                 Log in
               </Button>
             ) : (
-              <Button onClick={closeDialog}>Done</Button>
+              <Button onClick={closeDialog} sx={{ fontSize: "12px" }}>
+                Done
+              </Button>
             )}
           </DialogActions>
         </Dialog>

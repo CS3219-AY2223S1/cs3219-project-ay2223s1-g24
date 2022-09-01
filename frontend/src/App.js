@@ -10,7 +10,7 @@ function App() {
       <Box>
         <Router>
           <Routes>
-            <Route exact path="/" element={<HomePage />}></Route>
+            <Route exact path="*" element={<HomePage />}></Route>
             <Route path="/signup/*" element={<SignupPage />} />
             <Route path="/signin/*" element={<SigninPage />} />
           </Routes>

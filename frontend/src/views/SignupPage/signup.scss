@@ -59,4 +59,10 @@
             cursor: pointer;
         }
     }
+
+    .modal {
+        >* {
+            font-size: 10px;
+        }
+    }
 }
