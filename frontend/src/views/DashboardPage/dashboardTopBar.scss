@@ -1,0 +1,18 @@
+.dashboardTopbar {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid lightgray;
+
+    >div {
+        padding: 20px 0px;
+    }
+
+    .tabs {
+        padding-left: 60px;
+    }
+
+    .user {
+        padding-right: 60px;
+    }
+
+}

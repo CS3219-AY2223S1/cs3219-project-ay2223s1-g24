@@ -1,11 +1,11 @@
 import {
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
+  // Dialog,
+  // DialogActions,
+  // DialogContent,
+  // DialogContentText,
+  // DialogTitle,
   TextField,
   Typography,
 } from "@mui/material";
@@ -14,7 +14,7 @@ import { useState } from "react";
 import axios from "axios";
 import { HEROKU_ENDPOINT } from "configs";
 import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "constants";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import "./signup.scss";
 import HomePage from "views/HomePage/HomePage";
 
@@ -32,6 +32,7 @@ function SignupPage() {
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogMsg, setDialogMsg] = useState("");
   const [isSignupSuccess, setIsSignupSuccess] = useState(false);
+  const [status, setStatus] = useState(200);
 
   const navigate = useNavigate();
   const navigateHome = () => {
@@ -68,14 +69,17 @@ function SignupPage() {
       .post(postUserEndpoint, { name: username, password, email })
       .catch((err) => {
         console.log(err);
+        console.log(err.response.status);
         if (err.response.status === STATUS_CODE_CONFLICT) {
           setErrorDialog("This username already exists");
+          setStatus(STATUS_CODE_CONFLICT);
         } else {
           setErrorDialog("Please try again later");
         }
       });
 
     if (res && res.status === STATUS_CODE_CREATED) {
+      setStatus(200);
       setSuccessDialog("Account successfully created");
       setIsSignupSuccess(true);
     }
@@ -113,6 +117,7 @@ function SignupPage() {
             value={username}
             onChange={(e) => {
               setUsername(e.target.value);
+              setStatus(200);
             }}
             onBlur={() => {
               setUserInputTouched(true);
@@ -125,6 +130,14 @@ function SignupPage() {
             }`}
           >
             • Username is required
+          </div>
+
+          <div
+            className={`error-msg ${
+              username !== "" && status === STATUS_CODE_CONFLICT ? "" : "hide"
+            }`}
+          >
+            • Username already exists
           </div>
 
           <TextField
@@ -246,7 +259,7 @@ function SignupPage() {
           </Routes>
         </Box>
 
-        <Dialog open={isDialogOpen} onClose={closeDialog} className="modal">
+        {/* <Dialog open={isDialogOpen} onClose={closeDialog} className="modal">
           <DialogTitle sx={{ fontSize: "18px", height: "20px" }}>
             {dialogTitle}
           </DialogTitle>
@@ -266,7 +279,7 @@ function SignupPage() {
               </Button>
             )}
           </DialogActions>
-        </Dialog>
+        </Dialog> */}
       </Box>
     </div>
   );
