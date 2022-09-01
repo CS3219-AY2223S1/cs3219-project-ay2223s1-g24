@@ -247,13 +247,15 @@ function SignupPage() {
         </Box>
 
         <Dialog open={isDialogOpen} onClose={closeDialog} className="modal">
-          <DialogTitle sx={{ fontSize: "18px" }}>{dialogTitle}</DialogTitle>
+          <DialogTitle sx={{ fontSize: "18px", height: "20px" }}>
+            {dialogTitle}
+          </DialogTitle>
           <DialogContent>
             <DialogContentText sx={{ fontSize: "14px", height: "10px" }}>
               {dialogMsg}
             </DialogContentText>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ height: "24px" }}>
             {isSignupSuccess ? (
               <Button component={Link} to="/login" sx={{ fontSize: "12px" }}>
                 Log in
