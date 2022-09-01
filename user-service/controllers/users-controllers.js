@@ -7,7 +7,6 @@ const User = require('../models/user');
 
 // GET
 const getUsers = async (req, res, next) => {
-
   let users;
   try {
     users = await User.find({}, '-password');
@@ -21,7 +20,6 @@ const getUsers = async (req, res, next) => {
 
 // POST
 const signup = async (req, res, next) => {
-
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json('Invalid inputs passed, please check your data.');
@@ -50,7 +48,6 @@ const signup = async (req, res, next) => {
 
 
 const updatePassword = async (req, res, next) => {
-
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json('Invalid inputs passed, please check your data.');
@@ -114,6 +111,11 @@ const updatePassword = async (req, res, next) => {
 
 // GET
 const login = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json('Invalid inputs passed, please check your data.');
+    return;
+  }
 
   let existingUser;
   try {
