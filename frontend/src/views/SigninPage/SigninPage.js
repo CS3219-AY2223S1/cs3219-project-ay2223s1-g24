@@ -11,62 +11,85 @@ import {
 } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
+import { HEROKU_ENDPOINT } from "configs";
 import { Link } from "react-router-dom";
+import mainLogo from "assets/logo.png";
 import "./signin.scss";
 import SignupPage from "views/SignupPage/SignupPage";
+import { STATUS_CODE_SUCCESS, STATUS_CODE_INCORRECT_PARAMS, STATUS_CODE_ACCOUNT_DOES_NOT_EXIST, 
+    STATUS_CODE_WRONG_PASSWORD, STATUS_CODE_UNEXPECTED_ERROR } from "constants";
 
 function SigninPage() {
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [dialogTitle, setDialogTitle] = useState("");
+    const [status, setStatus] = useState(STATUS_CODE_SUCCESS);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isUserInputTouched, setUserInputTouched] = useState(false);
     const [isPasswordInputTouched, setPasswordInputTouched] = useState(false);
     const [dialogMsg, setDialogMsg] = useState("");
     const [isSigninSuccess, setIsSigninSuccess] = useState(false);
 
-    const navigate = useNavigate();
-    const navigateSignup = () => {
-        navigate("/signup");
+    const navigateSignup = useNavigate();
+    const navigateToSignup = () => {
+        navigateSignup("/signup");
     };
+
+    // Placeholder path for dashboard, to be updated
+    const navigateDashboard = useNavigate();
+    const navigateToDashboard = () => {
+        navigateDashboard("/");
+    };
+
+    const isValidEmail = (email) => {
+        return /\S+@\S+\.\S+/.test(email);
+      };
+
+    const areValidFields = (email, password) => {
+        if (email === "") {
+            return false;
+        }  else if (!isValidEmail) {
+            return false;
+        } else if (password === "") {
+            return false;
+        }
+
+        return true;
+    }
 
     const handleSignin = async () => {
         setIsSigninSuccess(false);
     
-        // Add more validation e.g length requirements etc
-        if (username === "") {
-          setErrorDialog("Username cannot be empty");
-          return;
-        } else if (password === "") {
-          setErrorDialog("Password cannot be empty");
-          return;
+        // Check fields submitted if they are valid inputs
+        if (!areValidFields) {
+            return;
         }
+            
+        const postUserEndpoint = HEROKU_ENDPOINT + "login";
+        const res = await axios
+          .post(postUserEndpoint, { email, password })
+          .catch((err) => {
+            console.log(err);
+            if (err.response.status === STATUS_CODE_INCORRECT_PARAMS) {
+                setStatus(STATUS_CODE_INCORRECT_PARAMS);
+            } else if (err.response.status === STATUS_CODE_ACCOUNT_DOES_NOT_EXIST) {
+                setStatus(STATUS_CODE_ACCOUNT_DOES_NOT_EXIST);
+            } else if (err.response.status === STATUS_CODE_WRONG_PASSWORD) {
+                setStatus(STATUS_CODE_WRONG_PASSWORD);
+            } else if (err.response.status === STATUS_CODE_UNEXPECTED_ERROR) {
+                setStatus(STATUS_CODE_UNEXPECTED_ERROR);
+            } else {
+              setErrorDialog("Please try again later");
+            }
+          });
     
-        // const postUserEndpoint = HEROKU_ENDPOINT + "signin";
-        // const res = await axios
-        //   .post(postUserEndpoint, { name: username, password})
-        //   .catch((err) => {
-        //     console.log(err);
-        //     if (err.response.status === STATUS_CODE_CONFLICT) {
-        //       setErrorDialog("This username already exists");
-        //     } else {
-        //       setErrorDialog("Please try again later");
-        //     }
-        //   });
-    
-        // if (res && res.status === STATUS_CODE_CREATED) {
-        //   setSuccessDialog("Account successfully created");
-        //   setIsSigninSuccess(true);
-        // }
+        if (res && res.status === STATUS_CODE_SUCCESS) {
+          navigateToDashboard();
+        }
     };
 
     const closeDialog = () => setIsDialogOpen(false);
-
-    const setSuccessDialog = (msg) => {
-        setIsDialogOpen(true);
-        setDialogTitle("Success");
-        setDialogMsg(msg);
-    };
 
     const setErrorDialog = (msg) => {
         setIsDialogOpen(true);
@@ -77,57 +100,90 @@ function SigninPage() {
     return (
         <div className="signin">
             <Box display={"flex"} flexDirection={"column"} width={"30%"}>
-                <Typography className="title" marginBottom={"1rem"}>
-                    Sign In
-                </Typography>
+                <div className="heading">
+                    <img className="left-img" src={mainLogo} alt="main-logo" />
+                    <div className="title" marginBottom={"1rem"}>
+                        Sign in
+                    </div>
+                    <img className="right-img" src={mainLogo} alt="main-logo" />
+                </div>
                 <div className="textfields">
                     <TextField
                         className="field"
-                        label="Username"
-                        error={isUserInputTouched && username === ""}
+                        label="Email"
+                        error={(isUserInputTouched && email === "") || (email !== "" && !isValidEmail(email))}
                         variant="filled"
                         size="small"
                         InputProps={{ style: { fontSize: 10 } }}
                         InputLabelProps={{ style: { fontSize: 12 } }}
-                        value={username}
+                        value={email}
                         onChange={(e) => {
-                        setUsername(e.target.value);
+                            setEmail(e.target.value);
+                            setStatus(200);
                         }}
                         onBlur={() => {
-                        setUserInputTouched(true);
+                            setUserInputTouched(true);
                         }}
                     />
 
                     <div
                         className={`error-msg ${
-                        isUserInputTouched && username === "" ? "" : "hide"
+                            isUserInputTouched && email === "" ? "" : "hide"
                         }`}
                     >
-                        • Username is required
+                        • Email is required
+                    </div>
+                    
+                    <div
+                        className={`error-msg ${
+                            email !== "" && !isValidEmail(email) ? "" : "hide"
+                        }`}
+                    >
+                        • Email is not valid
+                    </div>
+                    
+                    <div
+                        className={`error-msg ${
+                            isValidEmail(email) && status === STATUS_CODE_ACCOUNT_DOES_NOT_EXIST ? "" : "hide"
+                        }`}
+                    >
+                        • Your account does not exists
                     </div>
 
                     <TextField
                         className="field"
                         label="Password"
-                        error={isPasswordInputTouched && password === ""}
+                        error={(isPasswordInputTouched && password === "") || 
+                            (password !== "" && status === STATUS_CODE_WRONG_PASSWORD)}
                         variant="filled"
                         size="small"
                         InputProps={{ style: { fontSize: 10 } }}
                         InputLabelProps={{ style: { fontSize: 12 } }}
                         type="password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => {
+                            setPassword(e.target.value)
+                            setStatus(200);
+                        }}
                         onBlur={() => {
-                        setPasswordInputTouched(true);
+                            setPasswordInputTouched(true);
                         }}
                     />
 
                     <div
                         className={`error-msg ${
-                        isPasswordInputTouched && password === "" ? "" : "hide"
+                            isPasswordInputTouched && password === "" ? "" : "hide"
                         }`}
                     >
                         • Password is required
+                    </div>
+                    
+                    <div
+                        className={`error-msg ${
+                            password !== "" && status === STATUS_CODE_WRONG_PASSWORD ? "" : "hide"
+                        }`}
+                    >
+                        • Wrong password. Please try again
                     </div>
                 </div>
                 <Box>
@@ -144,9 +200,9 @@ function SigninPage() {
                 </Box>
 
                 <Box className="text-center">
-                    Don't have an account? <span onClick={navigateSignup}> Sign Up Now!</span>
+                    Don't have an account? <span onClick={navigateToSignup}> Sign Up Now!</span>
                     <Routes>
-                        <Route path="/*/" element={<SignupPage />} />
+                        <Route path="/signup/*" element={<SignupPage />} />
                     </Routes>
                 </Box>
 

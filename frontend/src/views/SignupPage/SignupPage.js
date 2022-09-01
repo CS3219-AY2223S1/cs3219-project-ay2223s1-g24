@@ -17,7 +17,6 @@ import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "constants";
 import { Link } from "react-router-dom";
 import "./signup.scss";
 import SigninPage from "views/SigninPage/SigninPage";
-import HomePage from "views/HomePage/HomePage";
 
 function SignupPage() {
   const [username, setUsername] = useState("");
@@ -43,24 +42,28 @@ function SignupPage() {
     return /\S+@\S+\.\S+/.test(email);
   };
 
+  const areFieldsValid = (username, email, password, confirmationPassword) => {
+    if (username === "") {
+      return false;
+    } else if (email === "") {
+      return false;
+    } else if (!isValidEmail(email)) {
+      return false;
+    } else if (password === "" || confirmationPassword === "") {
+      return false;
+    } else if (password !== confirmationPassword) {
+      return false;
+    }
+
+    return true;
+
+  }
+
   const handleSignup = async () => {
     setIsSignupSuccess(false);
 
-    // Add more validation e.g length requirements etc
-    if (username === "") {
-      setErrorDialog("Username cannot be empty");
-      return;
-    } else if (email === "") {
-      setErrorDialog("Email cannot be empty");
-      return;
-    } else if (!isValidEmail(email)) {
-      setErrorDialog("Invalid email provided");
-      return;
-    } else if (password === "" || confirmationPassword === "") {
-      setErrorDialog("Passwords cannot be empty");
-      return;
-    } else if (password !== confirmationPassword) {
-      setErrorDialog("Passwords do not match");
+    // Check fields submitted if they are valid inputs
+    if (!areFieldsValid) {
       return;
     }
 
