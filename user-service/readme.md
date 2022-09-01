@@ -1,3 +1,50 @@
-# CS3219 AY 22/23 S1
+# User Service API Documentation
+## Route: `/api/users`
 
-## Individual Assignment B1
+### GET `/getUsers`:
+Retrieves all users in database
+#### Status codes:
+- `200`: Successfully retrieved all users in database
+- `503`: Server/Network error
+
+### POST `/signup`:
+#### Body Parameters:
+- `name`: Name of user signing up
+- `email`: Email of user signing up
+- `password`: Password of user signing up
+#### Status codes:
+- `201`: New user has successfully signed up
+- `400`: Body parameters not specified correctly
+- `409`: Email already exists in database
+
+### GET `/login`:
+#### Body Parameters:
+- `email`: Email of user logging in
+- `password`: Password of user logging in
+#### Status codes:
+- `200`: User has successfully logged in
+- `400`: Body parameters not specified correctly
+- `401`: No such account
+- `403`: Wrong password
+- `503`: Server error / Network error / Error hashing the password
+
+### PUT `/updatePassword`:
+#### Body Parameters:
+- `email`: Email of user requesting to change password
+- `password`: Current password the user has
+- `new_password`: Updated password of the user
+#### Status codes:
+- `201`: User has successfully been deleted from database
+- `400`: Invalid inputs sent
+- `403`: Wrong current password and password of user account is not changed.
+- `404`: User is not found in database
+- `503`: Server error / Network error / Error hashing the password
+
+### DELETE `/deleteUser`:
+#### Body Parameters:
+- `email`: Email of user to be deleted
+- `password`: Password of user to be deleted
+#### Status codes:
+- `201`: User has successfully been deleted from database
+- `404`: User to be deleted is not found in database
+
