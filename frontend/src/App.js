@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SignupPage from "./views/SignupPage/SignupPage";
 import HomePage from "./views/HomePage/HomePage";
 import { Box } from "@mui/material";
+import DashboardPage from "views/DashboardPage/DashboardPage";
+import SigninPage from "views/SigninPage/SigninPage";
+import MainPage from "views/DashboardPage/MainPage";
 
 function App() {
   return (
@@ -11,6 +14,9 @@ function App() {
           <Routes>
             <Route exact path="*" element={<HomePage />}></Route>
             <Route path="/signup/*" element={<SignupPage />} />
+            <Route path="/dashboard/*" element={<DashboardPage />} />
+            <Route path="/signin/*" element={<SigninPage />} />
+            <Route path="/main/*" element={<MainPage />} />
           </Routes>
         </Router>
       </Box>

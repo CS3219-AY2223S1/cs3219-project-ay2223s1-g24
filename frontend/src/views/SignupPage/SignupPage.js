@@ -1,111 +1,93 @@
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { HEROKU_ENDPOINT } from "configs";
 import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "constants";
-import { Link } from "react-router-dom";
 import "./signup.scss";
-import HomePage from "views/HomePage/HomePage";
+import Alert from "@mui/material/Alert";
+import SigninPage from "views/SigninPage/SigninPage";
 
 function SignupPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [confirmationPassword, setConfirmationPassword] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUserInputTouched, setUserInputTouched] = useState(false);
   const [isEmailInputTouched, setEmailInputTouched] = useState(false);
   const [isPasswordInputTouched, setPasswordInputTouched] = useState(false);
   const [isPasswordConfirmationTouched, setPasswordConfirmationTouched] =
     useState(false);
-  const [dialogTitle, setDialogTitle] = useState("");
-  const [dialogMsg, setDialogMsg] = useState("");
-  const [isSignupSuccess, setIsSignupSuccess] = useState(false);
+  const [isUsernameDuplicate, setUsernameDuplicate] = useState(false);
+  const [isEmailDuplicate, setEmailDuplicate] = useState(false);
+  const [hasUnexpectedError, setUnexpectedError] = useState(false);
+  const MIN_PASSWORD_LEN = 6;
 
   const navigate = useNavigate();
-  const navigateHome = () => {
-    navigate("/");
+  const navigateSignin = () => {
+    navigate("/signin");
   };
 
   const isValidEmail = (email) => {
     return /\S+@\S+\.\S+/.test(email);
   };
 
-  const handleSignup = async () => {
-    setIsSignupSuccess(false);
+  const isFormValid = () => {
+    return (
+      username !== "" &&
+      email !== "" &&
+      isValidEmail(email) &&
+      password !== "" &&
+      password.length >= MIN_PASSWORD_LEN &&
+      confirmationPassword !== "" &&
+      password === confirmationPassword
+    );
+  };
 
-    // Add more validation e.g length requirements etc
-    if (username === "") {
-      setErrorDialog("Username cannot be empty");
-      return;
-    } else if (email === "") {
-      setErrorDialog("Email cannot be empty");
-      return;
-    } else if (!isValidEmail(email)) {
-      setErrorDialog("Invalid email provided");
-      return;
-    } else if (password === "" || confirmationPassword === "") {
-      setErrorDialog("Passwords cannot be empty");
-      return;
-    } else if (password !== confirmationPassword) {
-      setErrorDialog("Passwords do not match");
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSignup();
+    }
+  };
+
+  const handleSignup = async () => {
+    // Check fields submitted if they are valid inputs
+    if (!isFormValid) {
       return;
     }
-
-    const postUserEndpoint = HEROKU_ENDPOINT + "signup";
+    const payload = { name: username, password, email };
     const res = await axios
-      .post(postUserEndpoint, { name: username, password, email })
+      .post(HEROKU_ENDPOINT + "signup", payload)
       .catch((err) => {
-        console.log(err);
+        console.log(err.response);
         if (err.response.status === STATUS_CODE_CONFLICT) {
-          setErrorDialog("This username already exists");
+          setUsernameDuplicate(err.response.data.invalidEmail);
+          setEmailDuplicate(err.response.data.invalidUsername);
         } else {
-          setErrorDialog("Please try again later");
+          setUnexpectedError(true);
         }
+        return;
       });
 
     if (res && res.status === STATUS_CODE_CREATED) {
-      setSuccessDialog("Account successfully created");
-      setIsSignupSuccess(true);
+      navigateSignin();
     }
-  };
-
-  const closeDialog = () => setIsDialogOpen(false);
-
-  const setSuccessDialog = (msg) => {
-    setIsDialogOpen(true);
-    setDialogTitle("Success");
-    setDialogMsg(msg);
-  };
-
-  const setErrorDialog = (msg) => {
-    setIsDialogOpen(true);
-    setDialogTitle("Error");
-    setDialogMsg(msg);
   };
 
   return (
     <div className="signup">
       <Box display={"flex"} flexDirection={"column"} width={"30%"}>
-        <Typography className="title" marginBottom={"1rem"}>
+        <Typography className="title" marginbottom={"1rem"}>
           Sign Up
         </Typography>
         <div className="textfields">
           <TextField
             className="field"
             label="Username"
-            error={isUserInputTouched && username === ""}
+            error={
+              (isUserInputTouched && username === "") ||
+              (username !== "" && isUsernameDuplicate)
+            }
             variant="filled"
             size="small"
             InputProps={{ style: { fontSize: 12 } }}
@@ -116,7 +98,9 @@ function SignupPage() {
             }}
             onBlur={() => {
               setUserInputTouched(true);
+              setUsernameDuplicate(false);
             }}
+            onKeyDown={handleKeyDown}
           />
 
           <div
@@ -127,10 +111,21 @@ function SignupPage() {
             • Username is required
           </div>
 
+          <div
+            className={`error-msg ${
+              username !== "" && isUsernameDuplicate ? "" : "hide"
+            }`}
+          >
+            • Username already exists
+          </div>
+
           <TextField
             className="field"
             label="Email"
-            error={isEmailInputTouched && email === ""}
+            error={
+              (isEmailInputTouched && email === "") ||
+              (username !== "" && isEmailDuplicate)
+            }
             variant="filled"
             size="small"
             InputProps={{ style: { fontSize: 12 } }}
@@ -140,7 +135,9 @@ function SignupPage() {
             onChange={(e) => setEmail(e.target.value)}
             onBlur={() => {
               setEmailInputTouched(true);
+              setEmailDuplicate(false);
             }}
+            onKeyDown={handleKeyDown}
           />
 
           <div
@@ -149,6 +146,14 @@ function SignupPage() {
             }`}
           >
             • Email is required
+          </div>
+
+          <div
+            className={`error-msg ${
+              username !== "" && isEmailDuplicate ? "" : "hide"
+            }`}
+          >
+            • Email already exists
           </div>
 
           <div
@@ -175,6 +180,7 @@ function SignupPage() {
             onBlur={() => {
               setPasswordInputTouched(true);
             }}
+            onKeyDown={handleKeyDown}
           />
 
           <div
@@ -183,6 +189,18 @@ function SignupPage() {
             }`}
           >
             • Password is required
+          </div>
+
+          <div
+            className={`error-msg ${
+              isPasswordInputTouched &&
+              password !== "" &&
+              password.length < MIN_PASSWORD_LEN
+                ? ""
+                : "hide"
+            }`}
+          >
+            • Length must be at least {MIN_PASSWORD_LEN} characters
           </div>
 
           <TextField
@@ -199,6 +217,7 @@ function SignupPage() {
             onBlur={() => {
               setPasswordConfirmationTouched(true);
             }}
+            onKeyDown={handleKeyDown}
           />
 
           <div
@@ -224,6 +243,13 @@ function SignupPage() {
           </div>
         </div>
 
+        <Alert
+          className={`alert ${hasUnexpectedError ? "" : "hide"}`}
+          severity="error"
+        >
+          Something went wrong. Try again later!
+        </Alert>
+
         <Box>
           <Button
             className="signup-btn"
@@ -240,33 +266,12 @@ function SignupPage() {
         </Box>
 
         <Box className="text-center">
-          Already have an account? <span onClick={navigateHome}> Sign in.</span>
+          Already have an account?{" "}
+          <span onClick={navigateSignin}> Sign in.</span>
           <Routes>
-            <Route path="/*/" element={<HomePage />} />
+            <Route path="/*/" element={<SigninPage />} />
           </Routes>
         </Box>
-
-        <Dialog open={isDialogOpen} onClose={closeDialog} className="modal">
-          <DialogTitle sx={{ fontSize: "18px", height: "20px" }}>
-            {dialogTitle}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText sx={{ fontSize: "14px", height: "10px" }}>
-              {dialogMsg}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions sx={{ height: "24px" }}>
-            {isSignupSuccess ? (
-              <Button component={Link} to="/login" sx={{ fontSize: "12px" }}>
-                Log in
-              </Button>
-            ) : (
-              <Button onClick={closeDialog} sx={{ fontSize: "12px" }}>
-                Done
-              </Button>
-            )}
-          </DialogActions>
-        </Dialog>
       </Box>
     </div>
   );

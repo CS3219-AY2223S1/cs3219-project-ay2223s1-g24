@@ -1,20 +1,35 @@
-.signup {
+.signin {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
+    margin-top: 80px;
 
-    .title {
-        font-weight: bold;
+    .heading {
         display: flex;
+        margin-top: 10px;
         justify-content: center;
-        font-size: 25px;
-        margin-top: 30px;
+
+        img {
+            height: 30px;
+            margin-top: 5px;
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 25px;
+            padding: 0px 5px;
+        }
+
+        .right-img {
+            visibility: hidden;
+        }
     }
 
     .textfields {
         display: flex;
         flex-direction: column;
-        margin-bottom: 30px;
+        margin-bottom: 40px;
         font-size: 12px;
 
         .field {
@@ -32,7 +47,7 @@
 
     }
 
-    .signup-btn {
+    .signin-btn {
         width: 100%;
         height: 45px;
         font-size: 16px;
@@ -43,8 +58,17 @@
         margin-bottom: 20px;
     }
 
-    .signup-btn:hover {
+    .signin-btn:hover {
         background-color: rgb(11, 108, 236);
+    }
+    
+    .alert {
+        border: 1px solid red;
+        margin-bottom: 10px;
+    }
+
+    .hide {
+        display: none;
     }
 
     .text-center {
@@ -58,14 +82,5 @@
             text-decoration: none;
             cursor: pointer;
         }
-    }
-
-    .alert {
-        margin-bottom: 20px;
-        border: 1px solid red;
-    }
-
-    .hide {
-        display: none;
     }
 }
