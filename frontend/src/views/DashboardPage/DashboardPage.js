@@ -1,4 +1,3 @@
-import * as React from 'react';
 import "./dashboard.scss";
 import DashboardTopBar from "./DashboardTopBar";
 import Box from '@mui/material/Box';
@@ -16,7 +15,7 @@ function DashboardPage() {
   return (
     <div className="dashboard">
       <DashboardTopBar />
-      <div class="flexbox-container">
+      <div className="flexbox-container">
         <Box className='flexbox-item'>
           <CardMedia
             component="img"
@@ -75,7 +74,7 @@ function DashboardPage() {
           </CardActions>
         </Box>
       </div>
-      <Box class="flexbox-container">
+      <Box className="flexbox-container">
         <Button className="confirm-btn">
           Confirm Selection
         </Button>

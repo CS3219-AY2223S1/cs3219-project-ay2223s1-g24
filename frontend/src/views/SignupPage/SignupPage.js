@@ -102,7 +102,7 @@ function SignupPage() {
   return (
     <div className="signup">
       <Box display={"flex"} flexDirection={"column"} width={"30%"}>
-        <Typography className="title" marginBottom={"1rem"}>
+        <Typography className="title" marginbottom={"1rem"}>
           Sign Up
         </Typography>
         <div className="textfields">
