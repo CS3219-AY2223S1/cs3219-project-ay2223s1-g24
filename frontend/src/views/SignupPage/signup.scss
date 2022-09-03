@@ -14,7 +14,7 @@
     .textfields {
         display: flex;
         flex-direction: column;
-        margin-bottom: 40px;
+        margin-bottom: 30px;
         font-size: 12px;
 
         .field {
@@ -60,9 +60,12 @@
         }
     }
 
-    .modal {
-        >* {
-            font-size: 10px;
-        }
+    .alert {
+        margin-bottom: 20px;
+        border: 1px solid red;
+    }
+
+    .hide {
+        display: none;
     }
 }
