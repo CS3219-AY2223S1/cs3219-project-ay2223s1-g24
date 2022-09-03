@@ -4,7 +4,6 @@ import { useState } from "react";
 import axios from "axios";
 import { HEROKU_ENDPOINT } from "configs";
 import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "constants";
-// import { Link } from "react-router-dom";
 import "./signup.scss";
 import SigninPage from "views/SigninPage/SigninPage";
 
@@ -45,7 +44,7 @@ function SignupPage() {
 
   const handleSignup = async () => {
     // Check fields submitted if they are valid inputs
-    if (!areFieldsValid) {
+    if (!isFormValid) {
       return;
     }
     const payload = { name: username, password, email };
@@ -61,7 +60,7 @@ function SignupPage() {
       });
 
     if (res && res.status === STATUS_CODE_CREATED) {
-      navigateHome();
+      navigateSignin();
     }
   };
 
