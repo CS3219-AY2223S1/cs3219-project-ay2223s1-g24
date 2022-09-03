@@ -1,14 +1,4 @@
-import {
-  Box,
-  Button,
-  // Dialog,
-  // DialogActions,
-  // DialogContent,
-  // DialogContentText,
-  // DialogTitle,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
@@ -23,16 +13,14 @@ function SignupPage() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [confirmationPassword, setConfirmationPassword] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUserInputTouched, setUserInputTouched] = useState(false);
   const [isEmailInputTouched, setEmailInputTouched] = useState(false);
   const [isPasswordInputTouched, setPasswordInputTouched] = useState(false);
   const [isPasswordConfirmationTouched, setPasswordConfirmationTouched] =
     useState(false);
-  const [dialogTitle, setDialogTitle] = useState("");
-  const [dialogMsg, setDialogMsg] = useState("");
-  const [isSignupSuccess, setIsSignupSuccess] = useState(false);
-  const [status, setStatus] = useState(200);
+  const [isUsernameDuplicate, setUsernameDuplicate] = useState(false);
+  const [isEmailDuplicate, setEmailDuplicate] = useState(false);
+  const MIN_PASSWORD_LEN = 6;
 
   const navigate = useNavigate();
   const navigateHome = () => {
@@ -43,60 +31,37 @@ function SignupPage() {
     return /\S+@\S+\.\S+/.test(email);
   };
 
-  const handleSignup = async () => {
-    setIsSignupSuccess(false);
+  const isFormValid = () => {
+    return (
+      username !== "" &&
+      email !== "" &&
+      isValidEmail(email) &&
+      password !== "" &&
+      password.length >= MIN_PASSWORD_LEN &&
+      confirmationPassword !== "" &&
+      password === confirmationPassword
+    );
+  };
 
-    // Add more validation e.g length requirements etc
-    if (username === "") {
-      setErrorDialog("Username cannot be empty");
-      return;
-    } else if (email === "") {
-      setErrorDialog("Email cannot be empty");
-      return;
-    } else if (!isValidEmail(email)) {
-      setErrorDialog("Invalid email provided");
-      return;
-    } else if (password === "" || confirmationPassword === "") {
-      setErrorDialog("Passwords cannot be empty");
-      return;
-    } else if (password !== confirmationPassword) {
-      setErrorDialog("Passwords do not match");
+  const handleSignup = async () => {
+    if (!isFormValid()) {
       return;
     }
-
-    const postUserEndpoint = HEROKU_ENDPOINT + "signup";
+    const payload = { name: username, password, email };
     const res = await axios
-      .post(postUserEndpoint, { name: username, password, email })
+      .post(HEROKU_ENDPOINT + "signup", payload)
       .catch((err) => {
-        console.log(err);
-        console.log(err.response.status);
         if (err.response.status === STATUS_CODE_CONFLICT) {
-          setErrorDialog("This username already exists");
-          setStatus(STATUS_CODE_CONFLICT);
+          setUsernameDuplicate(err.response.data.invalidEmail);
+          setEmailDuplicate(err.response.data.invalidUsername);
         } else {
-          setErrorDialog("Please try again later");
         }
+        return;
       });
 
     if (res && res.status === STATUS_CODE_CREATED) {
-      setStatus(200);
-      setSuccessDialog("Account successfully created");
-      setIsSignupSuccess(true);
+      navigateHome();
     }
-  };
-
-  const closeDialog = () => setIsDialogOpen(false);
-
-  const setSuccessDialog = (msg) => {
-    setIsDialogOpen(true);
-    setDialogTitle("Success");
-    setDialogMsg(msg);
-  };
-
-  const setErrorDialog = (msg) => {
-    setIsDialogOpen(true);
-    setDialogTitle("Error");
-    setDialogMsg(msg);
   };
 
   return (
@@ -109,7 +74,10 @@ function SignupPage() {
           <TextField
             className="field"
             label="Username"
-            error={isUserInputTouched && username === ""}
+            error={
+              (isUserInputTouched && username === "") ||
+              (username !== "" && isUsernameDuplicate)
+            }
             variant="filled"
             size="small"
             InputProps={{ style: { fontSize: 12 } }}
@@ -117,10 +85,10 @@ function SignupPage() {
             value={username}
             onChange={(e) => {
               setUsername(e.target.value);
-              setStatus(200);
             }}
             onBlur={() => {
               setUserInputTouched(true);
+              setUsernameDuplicate(false);
             }}
           />
 
@@ -134,7 +102,7 @@ function SignupPage() {
 
           <div
             className={`error-msg ${
-              username !== "" && status === STATUS_CODE_CONFLICT ? "" : "hide"
+              username !== "" && isUsernameDuplicate ? "" : "hide"
             }`}
           >
             • Username already exists
@@ -143,7 +111,10 @@ function SignupPage() {
           <TextField
             className="field"
             label="Email"
-            error={isEmailInputTouched && email === ""}
+            error={
+              (isEmailInputTouched && email === "") ||
+              (username !== "" && isEmailDuplicate)
+            }
             variant="filled"
             size="small"
             InputProps={{ style: { fontSize: 12 } }}
@@ -153,6 +124,7 @@ function SignupPage() {
             onChange={(e) => setEmail(e.target.value)}
             onBlur={() => {
               setEmailInputTouched(true);
+              setEmailDuplicate(false);
             }}
           />
 
@@ -162,6 +134,14 @@ function SignupPage() {
             }`}
           >
             • Email is required
+          </div>
+
+          <div
+            className={`error-msg ${
+              username !== "" && isEmailDuplicate ? "" : "hide"
+            }`}
+          >
+            • Email already exists
           </div>
 
           <div
@@ -196,6 +176,18 @@ function SignupPage() {
             }`}
           >
             • Password is required
+          </div>
+
+          <div
+            className={`error-msg ${
+              isPasswordInputTouched &&
+              password !== "" &&
+              password.length < MIN_PASSWORD_LEN
+                ? ""
+                : "hide"
+            }`}
+          >
+            • Length must be at least {MIN_PASSWORD_LEN} characters
           </div>
 
           <TextField
@@ -258,28 +250,6 @@ function SignupPage() {
             <Route path="/*/" element={<HomePage />} />
           </Routes>
         </Box>
-
-        {/* <Dialog open={isDialogOpen} onClose={closeDialog} className="modal">
-          <DialogTitle sx={{ fontSize: "18px", height: "20px" }}>
-            {dialogTitle}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText sx={{ fontSize: "14px", height: "10px" }}>
-              {dialogMsg}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions sx={{ height: "24px" }}>
-            {isSignupSuccess ? (
-              <Button component={Link} to="/login" sx={{ fontSize: "12px" }}>
-                Log in
-              </Button>
-            ) : (
-              <Button onClick={closeDialog} sx={{ fontSize: "12px" }}>
-                Done
-              </Button>
-            )}
-          </DialogActions>
-        </Dialog> */}
       </Box>
     </div>
   );
