@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken")
 
 const User = require('../models/user');
 
@@ -45,23 +46,31 @@ const signup = async (req, res, next) => {
     return;
   }
 
-  bcrypt.hash(req.body.password, 10).then(hashedPassword => {
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(req.body.password, 10);
+  } catch (err) {
+    res.status(409).json("This account already exists (likely) or network issue (unlikely).");
+    return
+  }
+
+  let retrievedResult;
+  try {
     const createdUser = new User({
       name,
       email,
       password: hashedPassword
     });
+    retrievedResult = await createdUser.save()
+  } catch (err) {
+    res.status(503).json('Something went wrong  while trying to sign up user. likely network error.');
+    return;
+  }
 
-    createdUser.save().then((retrievedResult => {
-      res.status(201).json({
-        message: "Signup done!",
-        result: retrievedResult
-      })
-    }))
-      .catch(err => {
-        res.status(409).json("This account already exists (likely) or network issue (unlikely).");
-      })
-  });
+  res.status(201).json({
+    message: "Signup done!",
+    result: retrievedResult
+  })
 };
 
 
