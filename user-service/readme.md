@@ -16,6 +16,7 @@ Retrieves all users in database
 - `201`: New user has successfully signed up
 - `400`: Body parameters not specified correctly
 - `409`: Email already exists in database
+- `503`: Error creating JWT Token
 
 ### GET `/login`:
 #### Body Parameters:
@@ -26,7 +27,7 @@ Retrieves all users in database
 - `400`: Body parameters not specified correctly
 - `401`: No such account
 - `403`: Wrong password
-- `503`: Server error / Network error / Error hashing the password
+- `503`: Server error / Network error / Error hashing the password / Error verifying JWT Token
 
 ### PUT `/updatePassword`:
 #### Body Parameters:
@@ -38,7 +39,7 @@ Retrieves all users in database
 - `400`: Invalid inputs sent
 - `403`: Wrong current password and password of user account is not changed.
 - `404`: User is not found in database
-- `503`: Server error / Network error / Error hashing the password
+- `503`: Server error / Network error / Error hashing the password / Error creating JWT Token
 
 ### DELETE `/deleteUser`:
 #### Body Parameters:

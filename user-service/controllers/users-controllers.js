@@ -174,7 +174,10 @@ const updatePassword = async (req, res, next) => {
     return;
   }
 
-  res.status(200).json("User password updated!");
+  res.status(200).json({
+    message: "User password updated!",
+    token: jwtToken
+  });
 };
 
 
@@ -229,8 +232,8 @@ const login = async (req, res, next) => {
 
   res.status(200).json({
     message: 'Logged in!',
-    user: existingUser.toObject({ getters: true })
-
+    user: existingUser,
+    token: jwtToken
   });
 };
 

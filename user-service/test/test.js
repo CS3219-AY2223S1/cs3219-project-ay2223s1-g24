@@ -120,6 +120,12 @@ describe('Test API Routes', function () {
       .end((err, res) => {
         res.should.have.status(200);
         res.body["message"].should.be.equal("Logged in!");
+
+        const token = res.body["token"]
+        const decodedToken = jwt.verify(token, process.env.JWT_KEY);
+        const decodedUserData = { email: decodedToken.email, name: decodedToken.name};
+        decodedUserData["email"].should.be.equal(existingUser["email"]);
+        decodedUserData["name"].should.be.equal(existingUser["name"]);
         done();
       });
   });
@@ -231,7 +237,13 @@ describe('Test API Routes', function () {
       .send(updatedUser)
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.should.be.equal("User password updated!");
+        res.body["message"].should.be.equal("User password updated!");
+
+        const token = res.body["token"]
+        const decodedToken = jwt.verify(token, process.env.JWT_KEY);
+        const decodedUserData = { email: decodedToken.email, name: decodedToken.name};
+        decodedUserData["email"].should.be.equal(updatedUser["email"]);
+        decodedUserData["name"].should.be.equal(updatedUser["name"]);
         done();
       });
   });
