@@ -7,7 +7,6 @@ const User = require('../models/user');
 
 // GET
 const getUsers = async (req, res, next) => {
-
   let users;
   try {
     users = await User.find({}, '-password');
@@ -21,25 +20,42 @@ const getUsers = async (req, res, next) => {
 
 // POST
 const signup = async (req, res, next) => {
-
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json('Invalid inputs passed, please check your data.');
     return;
   }
 
+  const { name, email } = req.body;
+
+  let msg = {};
+
+  const userExists = await User.exists({ name });
+  if (userExists) {
+    msg["invalidUsername"] = true;
+  }
+
+  const emailExists = await User.exists({ email });
+  if (emailExists) {
+    msg["invalidEmail"] = true;
+  }
+
+  if (JSON.stringify(msg) !== "{}") {
+    res.status(400).json(msg);
+    return;
+  }
+
   bcrypt.hash(req.body.password, 10).then(hashedPassword => {
     const createdUser = new User({
-      name: req.body.name,
-      email: req.body.email,
+      name,
+      email,
       password: hashedPassword
     });
 
     createdUser.save().then((retrievedResult => {
       res.status(201).json({
         message: "Signup done!",
-        result: retrievedResult,
-        user: createdUser.toObject({ getters: true })
+        result: retrievedResult
       })
     }))
       .catch(err => {
@@ -50,7 +66,6 @@ const signup = async (req, res, next) => {
 
 
 const updatePassword = async (req, res, next) => {
-
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json('Invalid inputs passed, please check your data.');
@@ -61,7 +76,6 @@ const updatePassword = async (req, res, next) => {
   try {
     existingUser = await User.findOne({ email: req.body.email });
   } catch (err) {
-
     console.log(err)
     res.status(503).json('Something went wrong (likely network issue). Could not delete user.');
     return;
@@ -114,6 +128,11 @@ const updatePassword = async (req, res, next) => {
 
 // GET
 const login = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json('Invalid inputs passed, please check your data.');
+    return;
+  }
 
   let existingUser;
   try {

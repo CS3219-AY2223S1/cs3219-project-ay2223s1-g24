@@ -55,9 +55,9 @@ describe('Test API Routes', function () {
       .send(newUser)
       .end((err, res) => {
         res.should.have.status(201);
-        res.body["user"].should.be.a('object');
-        res.body["user"]["name"].should.be.equal(newUser["name"]);
-        res.body["user"]["email"].should.be.equal(newUser["email"]);
+        res.body["result"].should.be.a('object');
+        res.body["result"]["name"].should.be.equal(newUser["name"]);
+        res.body["result"]["email"].should.be.equal(newUser["email"]);
         done();
       });
   });
@@ -74,7 +74,9 @@ describe('Test API Routes', function () {
       .post('/api/users/signup')
       .send(existingUser)
       .end((err, res) => {
-        res.should.have.status(409);
+        res.should.have.status(400);
+        res.body["invalidUsername"].should.be.equal(true);
+        res.body["invalidEmail"].should.be.equal(true);
         done();
       });
   });
