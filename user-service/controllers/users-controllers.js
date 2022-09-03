@@ -212,6 +212,21 @@ const login = async (req, res, next) => {
     return;
   }
 
+  let jwtToken;
+  try {
+    jwtToken = jwt.sign(
+      {
+        email: existingUser.email,
+        name: existingUser.name,
+      },
+      process.env.JWT_KEY,
+      { expiresIn: "24h" }
+    );
+  } catch (err) {
+    res.status(503).json('Something went wrong while trying create token for signed up user.');
+    return;
+  }
+
   res.status(200).json({
     message: 'Logged in!',
     user: existingUser.toObject({ getters: true })
