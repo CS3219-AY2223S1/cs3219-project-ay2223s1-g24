@@ -39,7 +39,7 @@ function SigninPage() {
     // Placeholder path for dashboard, to be updated
     const navigateDashboard = useNavigate();
     const navigateToDashboard = () => {
-        navigateDashboard("/");
+        navigateDashboard("/dashboard");
     };
 
     const isValidEmail = (email) => {
@@ -57,6 +57,13 @@ function SigninPage() {
 
         return true;
     }
+
+    const handleKeyDown = event => {
+    
+        if (event.key === 'Enter') {
+          handleSignin();
+        }
+    };
 
     const handleSignin = async () => {
         setIsSigninSuccess(false);
@@ -111,7 +118,8 @@ function SigninPage() {
                     <TextField
                         className="field"
                         label="Email"
-                        error={(isUserInputTouched && email === "") || (email !== "" && !isValidEmail(email))}
+                        error={(isUserInputTouched && email === "") || (email !== "" && !isValidEmail(email)) 
+                            || (isValidEmail(email) && status === STATUS_CODE_ACCOUNT_DOES_NOT_EXIST)}
                         variant="filled"
                         size="small"
                         InputProps={{ style: { fontSize: 10 } }}
@@ -124,6 +132,7 @@ function SigninPage() {
                         onBlur={() => {
                             setUserInputTouched(true);
                         }}
+                        onKeyDown={handleKeyDown}
                     />
 
                     <div
@@ -168,6 +177,7 @@ function SigninPage() {
                         onBlur={() => {
                             setPasswordInputTouched(true);
                         }}
+                        onKeyDown={handleKeyDown}
                     />
 
                     <div
@@ -190,9 +200,7 @@ function SigninPage() {
                     <Button
                         className="signin-btn"
                         onClick={() => {
-                        setUserInputTouched(true);
-                        setPasswordInputTouched(true);
-                        handleSignin();
+                            handleSignin();
                         }}
                     >
                         Sign In
