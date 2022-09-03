@@ -54,22 +54,41 @@ const signup = async (req, res, next) => {
     return
   }
 
+  const createdUser = new User({
+    name,
+    email,
+    password: hashedPassword
+  });
+
   let retrievedResult;
   try {
-    const createdUser = new User({
-      name,
-      email,
-      password: hashedPassword
-    });
+    
     retrievedResult = await createdUser.save()
+  
   } catch (err) {
-    res.status(503).json('Something went wrong  while trying to sign up user. likely network error.');
+    res.status(503).json('Something went wrong while trying to sign up user. likely network error.');
+    return;
+  }
+
+  let jwtToken;
+  try {
+    jwtToken = jwt.sign(
+      {
+        email: createdUser.email,
+        name: createdUser.name,
+      },
+      process.env.JWT_KEY,
+      { expiresIn: "24h" }
+    );
+  } catch (err) {
+    res.status(503).json('Something went wrong while trying create token for signed up user.');
     return;
   }
 
   res.status(201).json({
     message: "Signup done!",
-    result: retrievedResult
+    result: retrievedResult,
+    token: jwtToken
   })
 };
 
@@ -107,30 +126,55 @@ const updatePassword = async (req, res, next) => {
     return;
   }
 
-  bcrypt.hash(req.body.new_password, 10).then(hashedPassword => {
-    const updatedUser = new User({
-      _id: existingUser.id,
-      name: existingUser.name,
-      email: existingUser.email,
-      password: hashedPassword,
-    });
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(req.body.new_password, 10)
+  } catch (err) {
+    console.log(err)
+    res.status(503).json("Error trying to hash password");
+    return;
+  }
 
-    User.updateOne(
+  const updatedUser = new User({
+    _id: existingUser.id,
+    name: existingUser.name,
+    email: existingUser.email,
+    password: hashedPassword,
+  })
+  
+  let updateResult;
+  try {
+    updateResult = await User.updateOne(
       { _id: existingUser.id, email: req.body.email },
       updatedUser
-    ).then((result) => {
-      if (!result) {
-        res.status(503).json("Unable to update user password. Service unavailable.");
-        return;
-      }
-      res.status(200).json("User password updated!");
-    });
-  })
-    .catch(err => {
-      console.log(err)
-      res.status(503).json("Error trying to hash password");
-      return;
-    })
+    )
+  } catch (err) {
+    console.log(err)
+    res.status(503).json("Error trying update user's password. Likely network error.");
+    return;
+  }
+
+  if (!updateResult) {
+    res.status(503).json("Unable to update user password. Service unavailable.");
+    return;
+  }
+
+  let jwtToken;
+  try {
+    jwtToken = jwt.sign(
+      {
+        email: updatedUser.email,
+        name: updatedUser.name,
+      },
+      process.env.JWT_KEY,
+      { expiresIn: "24h" }
+    );
+  } catch (err) {
+    res.status(503).json('Something went wrong while trying create token for signed up user.');
+    return;
+  }
+
+  res.status(200).json("User password updated!");
 };
 
 
