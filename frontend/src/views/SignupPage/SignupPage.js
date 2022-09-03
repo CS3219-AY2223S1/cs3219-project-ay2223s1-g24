@@ -5,6 +5,7 @@ import axios from "axios";
 import { HEROKU_ENDPOINT } from "configs";
 import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "constants";
 import "./signup.scss";
+import Alert from "@mui/material/Alert";
 import SigninPage from "views/SigninPage/SigninPage";
 
 function SignupPage() {
@@ -19,6 +20,7 @@ function SignupPage() {
     useState(false);
   const [isUsernameDuplicate, setUsernameDuplicate] = useState(false);
   const [isEmailDuplicate, setEmailDuplicate] = useState(false);
+  const [hasUnexpectedError, setUnexpectedError] = useState(false);
   const MIN_PASSWORD_LEN = 6;
 
   const navigate = useNavigate();
@@ -51,10 +53,12 @@ function SignupPage() {
     const res = await axios
       .post(HEROKU_ENDPOINT + "signup", payload)
       .catch((err) => {
+        console.log(err.response);
         if (err.response.status === STATUS_CODE_CONFLICT) {
           setUsernameDuplicate(err.response.data.invalidEmail);
           setEmailDuplicate(err.response.data.invalidUsername);
         } else {
+          setUnexpectedError(true);
         }
         return;
       });
@@ -228,6 +232,13 @@ function SignupPage() {
             • Passwords do not match
           </div>
         </div>
+
+        <Alert
+          className={`alert ${hasUnexpectedError ? "" : "hide"}`}
+          severity="error"
+        >
+          Something went wrong. Try again later!
+        </Alert>
 
         <Box>
           <Button
