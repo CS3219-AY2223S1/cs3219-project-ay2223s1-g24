@@ -18,17 +18,27 @@ router.post(
       .isEmail(),
     check('password').isLength({ min: 6 })
   ],
-  usersController.signup
-);
+  usersController.signup);
 
-router.get('/login', usersController.login);
+router.get('/login',
+  [
+    check('email')
+      .normalizeEmail()
+      .isEmail(),
+    check('password')
+      .not()
+      .isEmpty()
+  ],
+  usersController.login);
+
 router.delete('/deleteUser', [
   check('email')
     .normalizeEmail()
     .isEmail(),
   check('password').not().isEmpty()
-  ],
+],
   usersController.deleteUser);
+
 router.put('/updatePassword', [
   check('name')
     .not()
@@ -38,7 +48,7 @@ router.put('/updatePassword', [
     .isEmail(),
   check('password').not().isEmpty(),
   check('new_password').isLength({ min: 6 }),
-  ],
+],
   usersController.updatePassword);
 
 module.exports = router;
