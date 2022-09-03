@@ -6,7 +6,7 @@ import { HEROKU_ENDPOINT } from "configs";
 import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "constants";
 // import { Link } from "react-router-dom";
 import "./signup.scss";
-import HomePage from "views/HomePage/HomePage";
+import SigninPage from "views/SigninPage/SigninPage";
 
 function SignupPage() {
   const [username, setUsername] = useState("");
@@ -23,8 +23,8 @@ function SignupPage() {
   const MIN_PASSWORD_LEN = 6;
 
   const navigate = useNavigate();
-  const navigateHome = () => {
-    navigate("/");
+  const navigateSignin = () => {
+    navigate("/signin");
   };
 
   const isValidEmail = (email) => {
@@ -44,7 +44,8 @@ function SignupPage() {
   };
 
   const handleSignup = async () => {
-    if (!isFormValid()) {
+    // Check fields submitted if they are valid inputs
+    if (!areFieldsValid) {
       return;
     }
     const payload = { name: username, password, email };
@@ -245,9 +246,10 @@ function SignupPage() {
         </Box>
 
         <Box className="text-center">
-          Already have an account? <span onClick={navigateHome}> Sign in.</span>
+          Already have an account?{" "}
+          <span onClick={navigateSignin}> Sign in.</span>
           <Routes>
-            <Route path="/*/" element={<HomePage />} />
+            <Route path="/*/" element={<SigninPage />} />
           </Routes>
         </Box>
       </Box>

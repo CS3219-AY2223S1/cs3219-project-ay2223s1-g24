@@ -1,31 +1,44 @@
 import "./dashboardTopBar.scss";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
 import { useState } from "react";
+import mainLogo from "assets/logo.png";
 
 function DashboardTopBar() {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState("one");
 
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const tabStyling = {
+    fontFamily: "sans-serif",
+    fontSize: "14px",
+    fontWeight: "500",
+    textTransform: "none",
+  };
   return (
     <div className="dashboardTopbar">
-      <div className="tabs">
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={value}
-            onChange={setValue}
-            aria-label="basic tabs example"
-          >
-            <Tab label="Item One" />
-            <Tab label="Item Two" />
-            <Tab label="Item Three" />
-          </Tabs>
-        </Box>
+      <div className="tabs item">
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          TabIndicatorProps={{
+            style: {
+              backgroundColor: "#2c7be5",
+            },
+          }}
+          aria-label="secondary tabs example"
+        >
+          <Tab value="one" sx={tabStyling} label="Home" />
+          <Tab value="two" sx={tabStyling} label="Dashboard" />
+        </Tabs>
       </div>
-      <div className="logo">LOGO</div>
+      <div className="logo item">
+        <img src={mainLogo} alt="main-logo" />
+      </div>
 
-      <div className="user">USER</div>
+      <div className="user item">USER</div>
     </div>
   );
 }
