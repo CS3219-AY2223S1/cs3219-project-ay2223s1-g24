@@ -44,6 +44,12 @@ function SignupPage() {
     );
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSignup();
+    }
+  };
+
   const handleSignup = async () => {
     // Check fields submitted if they are valid inputs
     if (!isFormValid) {
@@ -94,6 +100,7 @@ function SignupPage() {
               setUserInputTouched(true);
               setUsernameDuplicate(false);
             }}
+            onKeyDown={handleKeyDown}
           />
 
           <div
@@ -130,6 +137,7 @@ function SignupPage() {
               setEmailInputTouched(true);
               setEmailDuplicate(false);
             }}
+            onKeyDown={handleKeyDown}
           />
 
           <div
@@ -172,6 +180,7 @@ function SignupPage() {
             onBlur={() => {
               setPasswordInputTouched(true);
             }}
+            onKeyDown={handleKeyDown}
           />
 
           <div
@@ -208,6 +217,7 @@ function SignupPage() {
             onBlur={() => {
               setPasswordConfirmationTouched(true);
             }}
+            onKeyDown={handleKeyDown}
           />
 
           <div

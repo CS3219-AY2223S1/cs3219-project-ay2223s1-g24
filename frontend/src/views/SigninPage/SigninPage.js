@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   Dialog,
@@ -35,6 +36,7 @@ function SigninPage() {
   const [isPasswordInputTouched, setPasswordInputTouched] = useState(false);
   const [dialogMsg, setDialogMsg] = useState("");
   const [isSigninSuccess, setIsSigninSuccess] = useState(false);
+  const [hasUnexpectedError, setUnexpectedError] = useState(false);
 
   const navigateSignup = useNavigate();
   const navigateToSignup = () => {
@@ -51,16 +53,8 @@ function SigninPage() {
     return /\S+@\S+\.\S+/.test(email);
   };
 
-  const areValidFields = (email, password) => {
-    if (email === "") {
-      return false;
-    } else if (!isValidEmail) {
-      return false;
-    } else if (password === "") {
-      return false;
-    }
-
-    return true;
+  const areValidFields = () => {
+    return email !== "" && isValidEmail(email) && password !== "";
   };
 
   const handleKeyDown = (event) => {
@@ -77,7 +71,7 @@ function SigninPage() {
       return;
     }
 
-    const postUserEndpoint = HEROKU_ENDPOINT + "login";
+    const postUserEndpoint = HEROKU_ENDPOINT + "bruh";
     const res = await axios
       .post(postUserEndpoint, { email, password })
       .catch((err) => {
@@ -91,7 +85,7 @@ function SigninPage() {
         } else if (err.response.status === STATUS_CODE_UNEXPECTED_ERROR) {
           setStatus(STATUS_CODE_UNEXPECTED_ERROR);
         } else {
-          setErrorDialog("Please try again later");
+          setUnexpectedError(true);
         }
       });
 
@@ -211,6 +205,15 @@ function SigninPage() {
             • Wrong password. Please try again
           </div>
         </div>
+
+        <Alert
+          className={`alert ${hasUnexpectedError ? "" : "hide"}`}
+          severity="error"
+          marginbottom={"10px"}
+        >
+          Something went wrong. Try again later!
+        </Alert>
+
         <Box>
           <Button
             className="signin-btn"
