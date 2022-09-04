@@ -1,6 +1,8 @@
 var chai = require('chai');
 var chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
+const jwt = require("jsonwebtoken");
+
 const User = require('../models/user');
 var server = require('../server');
 
@@ -58,6 +60,12 @@ describe('Test API Routes', function () {
         res.body["result"].should.be.a('object');
         res.body["result"]["name"].should.be.equal(newUser["name"]);
         res.body["result"]["email"].should.be.equal(newUser["email"]);
+
+        const token = res.body["token"]
+        const decodedToken = jwt.verify(token, process.env.JWT_KEY);
+        const decodedUserData = { email: decodedToken.email, name: decodedToken.name};
+        decodedUserData["email"].should.be.equal(newUser["email"]);
+        decodedUserData["name"].should.be.equal(newUser["name"]);
         done();
       });
   });
@@ -112,6 +120,12 @@ describe('Test API Routes', function () {
       .end((err, res) => {
         res.should.have.status(200);
         res.body["message"].should.be.equal("Logged in!");
+
+        const token = res.body["token"]
+        const decodedToken = jwt.verify(token, process.env.JWT_KEY);
+        const decodedUserData = { email: decodedToken.email, name: decodedToken.name};
+        decodedUserData["email"].should.be.equal(existingUser["email"]);
+        decodedUserData["name"].should.be.equal(existingUser["name"]);
         done();
       });
   });
@@ -223,7 +237,13 @@ describe('Test API Routes', function () {
       .send(updatedUser)
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.should.be.equal("User password updated!");
+        res.body["message"].should.be.equal("User password updated!");
+
+        const token = res.body["token"]
+        const decodedToken = jwt.verify(token, process.env.JWT_KEY);
+        const decodedUserData = { email: decodedToken.email, name: decodedToken.name};
+        decodedUserData["email"].should.be.equal(updatedUser["email"]);
+        decodedUserData["name"].should.be.equal(updatedUser["name"]);
         done();
       });
   });
