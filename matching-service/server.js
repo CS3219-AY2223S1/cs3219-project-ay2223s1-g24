@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }))
@@ -13,5 +14,14 @@ app.get('/', (req, res) => {
 });
 
 const httpServer = createServer(app)
+const io = new Server(httpServer, {
+    cors: {
+        origin: ["http://localhost:3000"]
+    }
+});
+
+io.on("connection", (socket) => {
+    console.log(socket.id)
+});
 
 httpServer.listen(8001);

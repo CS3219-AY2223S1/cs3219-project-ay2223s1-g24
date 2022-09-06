@@ -5,8 +5,11 @@ import { Box } from "@mui/material";
 import DashboardPage from "views/DashboardPage/DashboardPage";
 import SigninPage from "views/SigninPage/SigninPage";
 import MainPage from "views/DashboardPage/MainPage";
+import { io } from "socket.io-client";
 
 function App() {
+  const socket = io("http://localhost:8001");
+
   return (
     <div className="App">
       <Box>
