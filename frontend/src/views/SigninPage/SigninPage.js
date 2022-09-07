@@ -67,7 +67,7 @@ function SigninPage() {
     setIsSigninSuccess(false);
 
     // Check fields submitted if they are valid inputs
-    if (!areValidFields) {
+    if (!areValidFields()) {
       return;
     }
 
