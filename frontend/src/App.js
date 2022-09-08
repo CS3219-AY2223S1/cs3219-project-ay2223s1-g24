@@ -8,10 +8,20 @@ import MainPage from "views/DashboardPage/MainPage";
 import { io } from "socket.io-client";
 
 function App() {
-  const socket = io("http://localhost:8001");
+  // Placeholder for socket io connection and examples below:
+  var socket = io("http://localhost:8001");
+  socket.connect();
 
+  socket.on("matched", () => {
+    console.log("MATCHED");
+  })
+
+  const leaveQueue = () => {
+    socket.emit("leaveQueue");
+  }
   return (
     <div className="App">
+      <button onClick={leaveQueue}>HIHIHI</button>
       <Box>
         <Router>
           <Routes>
