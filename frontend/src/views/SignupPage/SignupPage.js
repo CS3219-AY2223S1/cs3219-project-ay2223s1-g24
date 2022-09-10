@@ -52,7 +52,7 @@ function SignupPage() {
 
   const handleSignup = async () => {
     // Check fields submitted if they are valid inputs
-    if (!isFormValid) {
+    if (!isFormValid()) {
       return;
     }
     const payload = { name: username, password, email };

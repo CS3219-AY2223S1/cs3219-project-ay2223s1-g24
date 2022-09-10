@@ -1,84 +1,64 @@
-import "./dashboard.scss";
-import DashboardTopBar from "./DashboardTopBar";
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Typography from '@mui/material/Typography';
-import easyDifficulty from "assets/easy_difficulty.png";
-import mediumDifficulty from "assets/medium_difficulty.png";
-import hardDifficulty from "assets/hard_difficulty.png";
+import "./dashboardPage.scss";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import { useState } from "react";
+import mainLogo from "assets/logo.png";
+import MainComponent from "./MainComponent";
+import DashboardComponent from "./DashboardComponent";
 
 function DashboardPage() {
+  const [value, setValue] = useState("one");
+  const [tabNumber, setTabNumber] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const tabStyling = {
+    fontFamily: "sans-serif",
+    fontSize: "14px",
+    fontWeight: "500",
+    textTransform: "none",
+  };
 
   return (
     <div className="dashboard">
-      <DashboardTopBar />
-      <div className="flexbox-container">
-        <Box className='flexbox-item'>
-          <CardMedia
-            component="img"
-            height="140"
-            image={easyDifficulty}
-            alt="Easy difficulty picture"
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
-              Easy
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              This is the easy difficulty.
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <Button size="small">Learn More</Button>
-          </CardActions>
-        </Box>
-        <Box className='flexbox-item'>
-          <CardMedia
-            component="img"
-            height="140"
-            image={mediumDifficulty}
-            alt="Medium difficulty picture"
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
-              Medium
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              This is the medium difficulty.
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <Button size="small">Learn More</Button>
-          </CardActions>
-        </Box>
-        <Box className='flexbox-item'>
-          <CardMedia
-            component="img"
-            height="140"
-            image={hardDifficulty}
-            alt="Hard difficulty picture"
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
-              Hard
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              This is the hard difficulty.
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <Button size="small">Learn More</Button>
-          </CardActions>
-        </Box>
+      <div className="dashboardTopbar">
+        <div className="tabs item">
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            TabIndicatorProps={{
+              style: {
+                backgroundColor: "#2c7be5",
+              },
+            }}
+            aria-label="secondary tabs example"
+          >
+            <Tab
+              value="one"
+              sx={tabStyling}
+              label="Main"
+              onClick={() => setTabNumber(0)}
+            />
+            <Tab
+              value="two"
+              sx={tabStyling}
+              label="Dashboard"
+              onClick={() => setTabNumber(1)}
+            />
+          </Tabs>
+        </div>
+        <div className="logo item">
+          <img src={mainLogo} alt="main-logo" />
+        </div>
+
+        <div className="user item">USER</div>
       </div>
-      <Box className="flexbox-container">
-        <Button className="confirm-btn">
-          Confirm Selection
-        </Button>
-      </Box>
+
+      {tabNumber === 0 && <MainComponent />}
+      {tabNumber === 1 && <DashboardComponent />}
     </div>
   );
 }
