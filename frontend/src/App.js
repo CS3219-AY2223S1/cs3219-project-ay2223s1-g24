@@ -9,6 +9,7 @@ import { io } from "socket.io-client";
 
 function App() {
   // Placeholder for socket io connection and examples below:
+  // TODO: to create socket instance when matchmaking
   var socket = io("http://localhost:8001");
   socket.connect();
 

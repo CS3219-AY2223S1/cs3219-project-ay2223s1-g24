@@ -28,6 +28,7 @@ io.on("connection", (socket) => {
         console.log("Client disconnected with id: " + socket.id);
         deleteUserFromQueue(socket.id);
     });
+
     socket.on("leaveQueue", () => {
         console.log("Client has left queue: " + socket.id);
         deleteUserFromQueue(socket.id);
