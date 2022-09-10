@@ -6,7 +6,7 @@ import { HEROKU_ENDPOINT } from "configs";
 import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "constants";
 import "./signup.scss";
 import Alert from "@mui/material/Alert";
-import SigninPage from "views/SigninPage/SigninPage";
+import { useCookies } from "react-cookie";
 
 function SignupPage() {
   const [username, setUsername] = useState("");
@@ -22,8 +22,13 @@ function SignupPage() {
   const [isEmailDuplicate, setEmailDuplicate] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
   const MIN_PASSWORD_LEN = 6;
+  const SINGLE_DAY_EXPIRY = 86400 * 1000;
 
   const navigate = useNavigate();
+  const navigateDashboard = () => {
+    navigate("/dashboard");
+  };
+
   const navigateSignin = () => {
     navigate("/signin");
   };
@@ -50,6 +55,8 @@ function SignupPage() {
     }
   };
 
+  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken"]);
+
   const handleSignup = async () => {
     // Check fields submitted if they are valid inputs
     if (!isFormValid()) {
@@ -70,7 +77,12 @@ function SignupPage() {
       });
 
     if (res && res.status === STATUS_CODE_CREATED) {
-      navigateSignin();
+      let expires = new Date();
+      expires.setTime(expires.getTime() + SINGLE_DAY_EXPIRY);
+      setCookie("jwtToken", res.data.token, { path: "/", expires });
+      setCookie("email", res.data.result.email, { path: "/", expires });
+      setCookie("name", res.data.result.name, { path: "/", expires });
+      navigateDashboard();
     }
   };
 
@@ -268,9 +280,6 @@ function SignupPage() {
         <Box className="text-center">
           Already have an account?{" "}
           <span onClick={navigateSignin}> Sign in.</span>
-          <Routes>
-            <Route path="/*/" element={<SigninPage />} />
-          </Routes>
         </Box>
       </Box>
     </div>
