@@ -71,7 +71,7 @@ function SigninPage() {
       return;
     }
 
-    const postUserEndpoint = HEROKU_ENDPOINT + "bruh";
+    const postUserEndpoint = HEROKU_ENDPOINT + "login";
     const res = await axios
       .post(postUserEndpoint, { email, password })
       .catch((err) => {
