@@ -42,7 +42,7 @@ const signup = async (req, res, next) => {
   }
 
   if (JSON.stringify(msg) !== "{}") {
-    res.status(400).json(msg);
+    res.status(409).json(msg);
     return;
   }
 
