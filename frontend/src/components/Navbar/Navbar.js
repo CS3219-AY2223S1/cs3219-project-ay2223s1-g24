@@ -19,7 +19,7 @@ function Navbar() {
       <div className="actions">
         <Button onClick={navigateSignin} text={"Sign In"} />
         <Routes>
-            <Route path="/signin/*" element={<SigninPage />} />
+          <Route path="/signin/*" element={<SigninPage />} />
         </Routes>
       </div>
     </div>
