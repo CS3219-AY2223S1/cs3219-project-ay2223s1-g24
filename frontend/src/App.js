@@ -10,7 +10,6 @@ import { Box } from "@mui/material";
 import DashboardPage from "views/DashboardPage/DashboardPage";
 import SigninPage from "views/SigninPage/SigninPage";
 import { CookiesProvider, useCookies } from "react-cookie";
-import MainPage from "views/DashboardPage/MainPage";
 import { io } from "socket.io-client";
 
 function App() {
@@ -22,11 +21,11 @@ function App() {
 
   socket.on("matched", () => {
     console.log("MATCHED");
-  })
+  });
 
   const leaveQueue = () => {
     socket.emit("leaveQueue");
-  }
+  };
   return (
     <CookiesProvider>
       <div className="App">
