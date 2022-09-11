@@ -29,7 +29,6 @@ function App() {
             <Route path="/signup/*" element={<SignupPage />} />
             <Route path="/dashboard/*" element={<DashboardPage />} />
             <Route path="/signin/*" element={<SigninPage />} />
-            <Route path="/main/*" element={<MainPage />} />
           </Routes>
         </Router>
       </Box>
