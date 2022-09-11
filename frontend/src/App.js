@@ -22,7 +22,6 @@ function App() {
   }
   return (
     <div className="App">
-      <button onClick={leaveQueue}>HIHIHI</button>
       <Box>
         <Router>
           <Routes>
