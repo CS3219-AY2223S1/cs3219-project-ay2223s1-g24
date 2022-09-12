@@ -4,24 +4,22 @@ on:
   push:
     branches:
       - main
-      - github-action-integration
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Install dependencies
-      working-directory: ./user-service
-      run: npm ci
-      
-    - name: Run tests
-      env:
-        MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
-        MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-        MONGODB_CLUSTER: ${{ secrets.MONGODB_CLUSTER }}
-      working-directory: ./user-service
-      run: npm test
-      
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        working-directory: ./user-service
+        run: npm ci
+
+      - name: Run tests
+        env:
+          MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
+          MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+          MONGODB_CLUSTER: ${{ secrets.MONGODB_CLUSTER }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+        working-directory: ./user-service
+        run: npm test
