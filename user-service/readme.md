@@ -14,8 +14,7 @@ Retrieves all users in database
 - `password`: Password of user signing up
 #### Status codes:
 - `201`: New user has successfully signed up
-- `400`: Body parameters not specified correctly
-- `409`: Email already exists in database
+- `409`: Email or Name already exists in database
 - `503`: Error creating JWT Token
 
 ### GET `/login`:

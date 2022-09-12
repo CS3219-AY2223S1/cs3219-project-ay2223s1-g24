@@ -20,7 +20,7 @@ router.post(
   ],
   usersController.signup);
 
-router.get('/login',
+router.post('/login',
   [
     check('email')
       .normalizeEmail()

@@ -11,13 +11,14 @@ import {
   Typography,
 } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { HEROKU_ENDPOINT } from "configs";
 import { Link } from "react-router-dom";
 import mainLogo from "assets/logo.png";
 import "./signin.scss";
 import SignupPage from "views/SignupPage/SignupPage";
+import { useCookies } from "react-cookie";
 import {
   STATUS_CODE_SUCCESS,
   STATUS_CODE_INCORRECT_PARAMS,
@@ -37,17 +38,25 @@ function SigninPage() {
   const [dialogMsg, setDialogMsg] = useState("");
   const [isSigninSuccess, setIsSigninSuccess] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
+  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken"]);
+  const SINGLE_DAY_EXPIRY = 86400 * 1000;
 
-  const navigateSignup = useNavigate();
+  const navigate = useNavigate();
+
   const navigateToSignup = () => {
-    navigateSignup("/signup");
+    navigate("/signup");
   };
 
   // Placeholder path for dashboard, to be updated
-  const navigateDashboard = useNavigate();
   const navigateToDashboard = () => {
-    navigateDashboard("/dashboard");
+    navigate("/dashboard");
   };
+
+  useEffect(() => {
+    if (cookies.jwtToken) {
+      navigateToDashboard();
+    }
+  }, []);
 
   const isValidEmail = (email) => {
     return /\S+@\S+\.\S+/.test(email);
@@ -90,6 +99,13 @@ function SigninPage() {
       });
 
     if (res && res.status === STATUS_CODE_SUCCESS) {
+      let expires = new Date();
+      expires.setTime(expires.getTime() + SINGLE_DAY_EXPIRY);
+      setCookie("jwtToken", res.data.token, { path: "/", expires });
+      setCookie("email", res.data.user.email, { path: "/", expires });
+      console.log(res.data.user.email);
+      console.log(res.data.user.name);
+      setCookie("name", res.data.user.name, { path: "/", expires });
       navigateToDashboard();
     }
   };
@@ -124,7 +140,7 @@ function SigninPage() {
             }
             variant="filled"
             size="small"
-            InputProps={{ style: { fontSize: 10 } }}
+            InputProps={{ style: { fontSize: 12 } }}
             InputLabelProps={{ style: { fontSize: 12 } }}
             value={email}
             onChange={(e) => {
@@ -173,7 +189,7 @@ function SigninPage() {
             }
             variant="filled"
             size="small"
-            InputProps={{ style: { fontSize: 10 } }}
+            InputProps={{ style: { fontSize: 12 } }}
             InputLabelProps={{ style: { fontSize: 12 } }}
             type="password"
             value={password}

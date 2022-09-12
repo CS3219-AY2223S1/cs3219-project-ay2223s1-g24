@@ -2,6 +2,7 @@ import { Button } from "@mui/material";
 import React from "react";
 import mockData from "assets/mockdata.json";
 import "./codeComponent.scss";
+import Editor from "components/Editor/Editor";
 
 function CodeComponent({ returnFunc }) {
   return (
@@ -47,7 +48,12 @@ function CodeComponent({ returnFunc }) {
           Back{" "}
         </div>
       </div>
-      <div className="right"> Right</div>
+
+      {/* To be changed */}
+      <div className="right"> 
+        Right
+        <Editor />
+      </div>
     </div>
   );
 }
