@@ -1,0 +1,16 @@
+.code-container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+}
+
+.pane {
+    display: flex;
+    width: 50vw;
+}
+
+.left-pane {
+    background-color: rgb(220,220,220);
+    color: black;
+    flex-grow: 1;
+}

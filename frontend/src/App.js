@@ -9,6 +9,7 @@ import HomePage from "./views/HomePage/HomePage";
 import { Box } from "@mui/material";
 import DashboardPage from "views/DashboardPage/DashboardPage";
 import SigninPage from "views/SigninPage/SigninPage";
+import CodingPage from "views/CodingPage/CodingPage";
 import { CookiesProvider, useCookies } from "react-cookie";
 import { io } from "socket.io-client";
 
@@ -36,6 +37,7 @@ function App() {
               <Route path="/signup/*" element={<SignupPage />} />
               <Route path="/dashboard/*" element={<DashboardPage />} />
               <Route path="/signin/*" element={<SigninPage />} />
+              <Route path="/coding/*" element={<CodingPage />} />
             </Routes>
           </Router>
         </Box>

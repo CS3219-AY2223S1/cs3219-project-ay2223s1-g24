@@ -1,10 +1,12 @@
 import { Button } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import mockData from "assets/mockdata.json";
 import "./codeComponent.scss";
 import Editor from "components/Editor/Editor";
 
 function CodeComponent({ returnFunc }) {
+  const [javascript, setJavascript] = useState('');
+
   return (
     <div className="codeComponent">
       <div className="left">
@@ -50,9 +52,13 @@ function CodeComponent({ returnFunc }) {
       </div>
 
       {/* To be changed */}
-      <div className="right"> 
-        Right
-        <Editor />
+      <div className="code-editor"> 
+        <Editor 
+          language="javascript" 
+          displayName="Javascript"
+          value={javascript}
+          onChange={setJavascript}
+        />
       </div>
     </div>
   );

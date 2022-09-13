@@ -5,9 +5,17 @@ import Button from "components/Button/Button";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import CodeComponent from "./CodeComponent";
+import { Routes, Route, useNavigate } from "react-router-dom";
 
 function MainComponent() {
   const [isCodePageRendered, setCodePageRender] = useState(0);
+
+  const navigate = useNavigate();
+
+  const navigateToCodingPage = () => {
+    navigate("/coding");
+  };
+
   return (
     <div>
       {isCodePageRendered === 0 && (
@@ -38,13 +46,13 @@ function MainComponent() {
               </Typography>
             </Box>
           </div>
-          <div className="flexbox-container2 confirm-btn">
+          {/*<div className="flexbox-container2 confirm-btn">
             <Button text={"Start Matching!"} onClick={() => setCodePageRender(1)} />
+          </div>*/}
+          <div className="flexbox-container2 confirm-btn">
+            <Button text={"Start Matching!"} onClick={navigateToCodingPage} />
           </div>
         </div>
-      )}
-      {isCodePageRendered === 1 && (
-        <CodeComponent returnFunc={setCodePageRender} />
       )}
     </div>
   );
