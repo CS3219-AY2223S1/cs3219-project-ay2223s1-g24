@@ -1,24 +1,32 @@
-import React, { useState } from "react";
+import React from "react";
 
 // The following imports is for the theme.
 import "codemirror/lib/codemirror.css";
 import 'codemirror/theme/material.css'
 import "./editor.scss";
 
-// Languages to be used
-import 'codemirror/mode/javascript/javascript';
-import "codemirror/mode/python/python";
-
 import { Controlled as ControlledEditor } from 'react-codemirror2'
+import { Button } from "@mui/material";
+import MenuItem from "@mui/material/MenuItem";
+import ControlDropdown from "../ControlDropdown/ControlDropdown";
 
 export default function Editor(props) {
 
   const {
+    setLanguage,
     language,
-    displayName,
     value,
     onChange
   } = props
+
+  const modes = [
+    { name: "Javascript", code: "javascript" },
+    { name: "Python", code: "python" },
+  ];
+
+  const handleMode = (e) => {
+    setLanguage( e.target.value );
+  };
 
   function handleChange(editor, data, value) {
     onChange(value)
@@ -27,8 +35,12 @@ export default function Editor(props) {
   return (
     <div className="editor-container">
       <div className="editor-title">
-          {displayName}
-          <button>Fullscreen</button>
+        <ControlDropdown
+          default={language}
+          options={modes}
+          handleDropdown={handleMode}
+        />
+        <button>Fullscreen</button>
       </div>
       <ControlledEditor 
         onBeforeChange={handleChange}
