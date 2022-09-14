@@ -8,7 +8,6 @@ import {
   DialogContentText,
   DialogTitle,
   TextField,
-  Typography,
 } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -50,6 +49,10 @@ function SigninPage() {
   // Placeholder path for dashboard, to be updated
   const navigateToDashboard = () => {
     navigate("/dashboard");
+  };
+
+  const navigateToHome = () => {
+    navigate("/");
   };
 
   useEffect(() => {
@@ -112,17 +115,16 @@ function SigninPage() {
 
   const closeDialog = () => setIsDialogOpen(false);
 
-  const setErrorDialog = (msg) => {
-    setIsDialogOpen(true);
-    setDialogTitle("Error");
-    setDialogMsg(msg);
-  };
-
   return (
     <div className="signin">
       <Box display={"flex"} flexDirection={"column"} width={"30%"}>
         <div className="heading">
-          <img className="left-img" src={mainLogo} alt="main-logo" />
+          <img
+            className="left-img"
+            src={mainLogo}
+            alt="main-logo"
+            onClick={navigateToHome}
+          />
           <div className="title" marginbottom={"1rem"}>
             Sign in
           </div>
