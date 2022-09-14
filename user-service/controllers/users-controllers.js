@@ -7,6 +7,9 @@ const User = require('../models/user');
 
 // GET
 const getUsers = async (req, res, next) => {
+
+  console.log(req.userData)
+
   let users;
   try {
     users = await User.find({}, '-password');
@@ -91,7 +94,7 @@ const signup = async (req, res, next) => {
   })
 };
 
-
+// PUT
 const updatePassword = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -180,8 +183,7 @@ const updatePassword = async (req, res, next) => {
 };
 
 
-
-// GET
+// POST
 const login = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

@@ -31,18 +31,17 @@ after((done) => {
 describe('Test API Routes', function () {
 
   // GET
-  it('Verify that there are 0 users in the DB', (done) => {
+  it('Verify that without a valid authorization, user cannot check number of users in the DB', (done) => {
     chai.request(server)
       .get('/api/users/getUsers')
       .end((err, res) => {
-        res.should.have.status(200);
-        res.body["users"].should.be.a('array');
-        res.body["users"].length.should.be.equal(0);
+        res.should.have.status(401);
+        res.body["message"].should.be.equal('Authentication failed!');
         done();
       });
   });
 
-
+  
   // POST
   it('Verify that signup works for new user', (done) => {
 
@@ -82,7 +81,7 @@ describe('Test API Routes', function () {
       .post('/api/users/signup')
       .send(existingUser)
       .end((err, res) => {
-        res.should.have.status(400);
+        res.should.have.status(409);
         res.body["invalidUsername"].should.be.equal(true);
         res.body["invalidEmail"].should.be.equal(true);
         done();
@@ -115,7 +114,7 @@ describe('Test API Routes', function () {
     }
 
     chai.request(server)
-      .get('/api/users/login')
+      .post('/api/users/login')
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(200);
@@ -130,6 +129,19 @@ describe('Test API Routes', function () {
       });
   });
 
+  // GET
+  // it('Verify that there is 1 user in the DB', (done) => {
+  //   chai.request(server)
+  //     .get('/api/users/getUsers')
+  //     .send(existingUser)
+  //     .end((err, res) => {
+  //       res.should.have.status(200);
+  //       res.body["users"].should.be.a('array');
+  //       res.body["users"].length.should.be.equal(0);
+  //       done();
+  //     });
+  // });
+
 
   it('Verify that existing user with wrong password cannot log in', (done) => {
     const existingUser = {
@@ -139,7 +151,7 @@ describe('Test API Routes', function () {
     }
 
     chai.request(server)
-      .get('/api/users/login')
+      .post('/api/users/login')
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(403);
@@ -157,7 +169,7 @@ describe('Test API Routes', function () {
     }
 
     chai.request(server)
-      .get('/api/users/login')
+      .post('/api/users/login')
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(401);
@@ -320,16 +332,16 @@ describe('Test API Routes', function () {
 
 
   // GET
-  it('Verify that after deletion, there are 0 users in the database', (done) => {
-    chai.request(server)
-      .get('/api/users/getUsers')
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body["users"].should.be.a('array');
-        res.body["users"].length.should.be.equal(0);
-        done();
-      });
-  });
+  // it('Verify that after deletion, there are 0 users in the database', (done) => {
+  //   chai.request(server)
+  //     .get('/api/users/getUsers')
+  //     .end((err, res) => {
+  //       res.should.have.status(200);
+  //       res.body["users"].should.be.a('array');
+  //       res.body["users"].length.should.be.equal(0);
+  //       done();
+  //     });
+  // });
 });
 
 
