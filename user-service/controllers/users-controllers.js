@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken")
 
 const User = require('../models/user');
 
-
 // GET
 const getUsers = async (req, res, next) => {
   let users;
