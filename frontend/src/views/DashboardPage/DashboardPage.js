@@ -17,12 +17,22 @@ import MainComponent from "./MainComponent";
 import DashboardComponent from "./DashboardComponent";
 import { useCookies } from "react-cookie";
 import UserMenu from "components/UserMenu/UserMenu";
-import { MIN_PASSWORD_LEN } from "constants";
+import {
+  MIN_PASSWORD_LEN,
+  STATUS_CODE_ACCOUNT_DOES_NOT_EXIST,
+  STATUS_CODE_CREATED,
+} from "constants";
+import { HEROKU_ENDPOINT } from "configs";
+import axios from "axios";
 
 function DashboardPage() {
   const [value, setValue] = useState("one");
   const [tabNumber, setTabNumber] = useState(0);
-  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken"]);
+  const [cookies, setCookie, removeCookie] = useCookies([
+    "name",
+    "email",
+    "jwtToken",
+  ]);
   const [isChangePasswordDialogOpen, setChangePasswordDialogOpen] =
     useState(false);
   const [isProfileDialogOpen, setProfileDialogOpen] = useState(false);
@@ -36,8 +46,14 @@ function DashboardPage() {
   const [newPassword, setNewPassword] = useState("");
   const [isNewPasswordInputTouched, setNewPasswordInputTouched] =
     useState(false);
+  const [isIncorrectPasswordStatus, setPasswordIncorrectStatus] =
+    useState(false);
 
   const navigate = useNavigate();
+
+  const navigateHome = () => {
+    navigate("/");
+  };
 
   useEffect(() => {
     if (!cookies.jwtToken) {
@@ -47,6 +63,37 @@ function DashboardPage() {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+  };
+
+  const isDeleteAccountFormValid = () => {
+    return password !== "" || !cookies.email;
+  };
+
+  const handleDeleteAccount = async () => {
+    // Check fields submitted if they are valid inputs
+    if (!isDeleteAccountFormValid()) {
+      return;
+    }
+    const payload = { email: cookies.email, password };
+    console.log(payload);
+    const res = await axios
+      .delete(HEROKU_ENDPOINT + "deleteUser", payload)
+      .catch((err) => {
+        console.log(err.response);
+        if (err.response.status === STATUS_CODE_ACCOUNT_DOES_NOT_EXIST) {
+          console.log("password is incorrect");
+          setPasswordIncorrectStatus(true);
+        } else {
+        }
+        return;
+      });
+
+    if (res && res.status === STATUS_CODE_CREATED) {
+      removeCookie("name", { path: "/" });
+      removeCookie("email", { path: "/" });
+      removeCookie("jwtToken", { path: "/" });
+      navigateHome();
+    }
   };
 
   const tabStyling = {
@@ -287,7 +334,12 @@ function DashboardPage() {
             />{" "}
             {isPasswordInputTouched && !password && (
               <Typography sx={errorMsgStyling}>
-                • Password is required
+                • Please confirm your old password.
+              </Typography>
+            )}
+            {isPasswordInputTouched && isIncorrectPasswordStatus && (
+              <Typography sx={errorMsgStyling}>
+                • Password is incorrect. Try again.
               </Typography>
             )}
           </DialogContent>
@@ -298,7 +350,7 @@ function DashboardPage() {
             <Button
               sx={{ ml: "7px" }}
               onClick={() => {
-                setProfileDialogOpen(false);
+                handleDeleteAccount();
               }}
             >
               Delete Account
