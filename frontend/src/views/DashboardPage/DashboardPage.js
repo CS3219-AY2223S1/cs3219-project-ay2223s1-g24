@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  Typography,
 } from "@mui/material";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -16,6 +17,7 @@ import MainComponent from "./MainComponent";
 import DashboardComponent from "./DashboardComponent";
 import { useCookies } from "react-cookie";
 import UserMenu from "components/UserMenu/UserMenu";
+import { MIN_PASSWORD_LEN } from "constants";
 
 function DashboardPage() {
   const [value, setValue] = useState("one");
@@ -26,6 +28,14 @@ function DashboardPage() {
   const [isProfileDialogOpen, setProfileDialogOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [isPasswordInputTouched, setPasswordInputTouched] = useState(false);
+  const [confirmationPassword, setConfirmationPassword] = useState("");
+  const [
+    isConfirmationPasswordInputTouched,
+    setConfirmationPasswordInputTouched,
+  ] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [isNewPasswordInputTouched, setNewPasswordInputTouched] =
+    useState(false);
 
   const navigate = useNavigate();
 
@@ -44,6 +54,23 @@ function DashboardPage() {
     fontSize: "14px",
     fontWeight: "500",
     textTransform: "none",
+  };
+
+  const errorMsgStyling = {
+    fontFamily: "sans-serif",
+    fontSize: "12px",
+    fontWeight: "500",
+    textTransform: "none",
+    color: "red",
+  };
+
+  const errorMsgStylingWithMB = {
+    fontFamily: "sans-serif",
+    fontSize: "12px",
+    fontWeight: "500",
+    textTransform: "none",
+    color: "red",
+    marginTop: "7px",
   };
 
   return (
@@ -89,12 +116,21 @@ function DashboardPage() {
         <Dialog open={isChangePasswordDialogOpen}>
           <DialogTitle>Password Change</DialogTitle>
           <DialogContent
-            sx={{ display: "flex", "flex-direction": "column", width: "300px" }}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              width: "300px",
+              paddingBottom: "0px",
+              paddingTop: "0px",
+            }}
           >
             <TextField
               className="field"
               label="Current Password"
-              error={false}
+              error={
+                isPasswordInputTouched &&
+                (!password || (password && password.length < MIN_PASSWORD_LEN))
+              }
               variant="filled"
               size="small"
               InputProps={{ style: { fontSize: 12 } }}
@@ -108,42 +144,91 @@ function DashboardPage() {
               }}
               // onKeyDown={handleKeyDown}
             />
+            {isPasswordInputTouched && !password && (
+              <Typography sx={errorMsgStylingWithMB}>
+                • Please enter your old password.
+              </Typography>
+            )}
+            {isPasswordInputTouched &&
+              password &&
+              password.length < MIN_PASSWORD_LEN && (
+                <Typography sx={errorMsgStylingWithMB}>
+                  • Password must be at least {MIN_PASSWORD_LEN} characters.
+                </Typography>
+              )}
+
             <TextField
-              sx={{ mt: "15px" }}
               className="field"
               label="New Password"
-              error={false}
-              variant="filled"
-              size="small"
-              InputProps={{ style: { fontSize: 12 } }}
-              InputLabelProps={{ style: { fontSize: 12 } }}
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-              onBlur={() => {
-                setPasswordInputTouched(true);
-              }}
-              // onKeyDown={handleKeyDown}
-            />
-            <TextField
               sx={{ mt: "15px" }}
-              className="field"
-              label="Confirm Password"
-              error={false}
+              error={
+                isNewPasswordInputTouched &&
+                (!newPassword ||
+                  (newPassword && newPassword.length < MIN_PASSWORD_LEN))
+              }
               variant="filled"
               size="small"
               InputProps={{ style: { fontSize: 12 } }}
               InputLabelProps={{ style: { fontSize: 12 } }}
-              value={password}
+              value={newPassword}
               onChange={(e) => {
-                setPassword(e.target.value);
+                setNewPassword(e.target.value);
               }}
               onBlur={() => {
-                setPasswordInputTouched(true);
+                setNewPasswordInputTouched(true);
               }}
               // onKeyDown={handleKeyDown}
             />
+            {isNewPasswordInputTouched && !newPassword && (
+              <Typography sx={errorMsgStylingWithMB}>
+                • Please enter your new password.
+              </Typography>
+            )}
+
+            {isNewPasswordInputTouched &&
+              newPassword &&
+              newPassword.length < MIN_PASSWORD_LEN && (
+                <Typography sx={errorMsgStylingWithMB}>
+                  • Password must be at least {MIN_PASSWORD_LEN} characters.
+                </Typography>
+              )}
+
+            <TextField
+              className="field"
+              label="Confirm New Password"
+              sx={{ mt: "15px", mb: "7px" }}
+              error={
+                isConfirmationPasswordInputTouched &&
+                (!confirmationPassword ||
+                  (confirmationPassword &&
+                    confirmationPassword !== newPassword))
+              }
+              variant="filled"
+              size="small"
+              InputProps={{ style: { fontSize: 12 } }}
+              InputLabelProps={{ style: { fontSize: 12 } }}
+              value={confirmationPassword}
+              onChange={(e) => {
+                setConfirmationPassword(e.target.value);
+              }}
+              onBlur={() => {
+                setConfirmationPasswordInputTouched(true);
+              }}
+              // onKeyDown={handleKeyDown}
+            />
+            {isConfirmationPasswordInputTouched && !confirmationPassword && (
+              <Typography sx={errorMsgStylingWithMB}>
+                • Please confirm your new password.
+              </Typography>
+            )}
+
+            {isConfirmationPasswordInputTouched &&
+              confirmationPassword &&
+              confirmationPassword !== newPassword && (
+                <Typography sx={errorMsgStyling}>
+                  • Passwords do not match.
+                </Typography>
+              )}
           </DialogContent>
           <DialogActions
             sx={{ display: "flex", justifyContent: "space-between" }}
@@ -160,6 +245,12 @@ function DashboardPage() {
               sx={{ mr: "7px" }}
               onClick={() => {
                 setChangePasswordDialogOpen(false);
+                setPasswordInputTouched(false);
+                setNewPasswordInputTouched(false);
+                setConfirmationPasswordInputTouched(false);
+                setPassword("");
+                setConfirmationPassword("");
+                setNewPassword("");
               }}
             >
               Close
@@ -170,15 +261,17 @@ function DashboardPage() {
         <Dialog open={isProfileDialogOpen}>
           <DialogTitle>Account</DialogTitle>
           <DialogContent
-            sx={{ display: "flex", "flex-direction": "column", width: "300px" }}
+            sx={{ display: "flex", flexDirection: "column", width: "300px" }}
           >
-            <span style={{ marginBottom: "20px" }}>
+            <Typography style={{ marginBottom: "20px" }}>
               To delete your account, please confirm your password.
-            </span>
+            </Typography>
             <TextField
               className="field"
               label="Confirm Password"
-              error={false}
+              sx={{ mb: "10px" }}
+              type="password"
+              error={isPasswordInputTouched && !password}
               variant="filled"
               size="small"
               InputProps={{ style: { fontSize: 12 } }}
@@ -192,7 +285,13 @@ function DashboardPage() {
               }}
               // onKeyDown={handleKeyDown}
             />{" "}
+            {isPasswordInputTouched && !password && (
+              <Typography sx={errorMsgStyling}>
+                • Password is required
+              </Typography>
+            )}
           </DialogContent>
+
           <DialogActions
             sx={{ display: "flex", justifyContent: "space-between" }}
           >
@@ -208,6 +307,8 @@ function DashboardPage() {
               sx={{ mr: "7px" }}
               onClick={() => {
                 setProfileDialogOpen(false);
+                setPasswordInputTouched(false);
+                setPassword("");
               }}
             >
               Close

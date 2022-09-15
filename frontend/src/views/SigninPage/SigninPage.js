@@ -106,8 +106,6 @@ function SigninPage() {
       expires.setTime(expires.getTime() + SINGLE_DAY_EXPIRY);
       setCookie("jwtToken", res.data.token, { path: "/", expires });
       setCookie("email", res.data.user.email, { path: "/", expires });
-      console.log(res.data.user.email);
-      console.log(res.data.user.name);
       setCookie("name", res.data.user.name, { path: "/", expires });
       navigateToDashboard();
     }
@@ -237,6 +235,8 @@ function SigninPage() {
             className="signin-btn"
             onClick={() => {
               handleSignin();
+              setUserInputTouched(true);
+              setPasswordInputTouched(true);
             }}
           >
             Sign In
@@ -244,8 +244,8 @@ function SigninPage() {
         </Box>
 
         <Box className="text-center">
-          Don't have an account?{" "}
-          <span onClick={navigateToSignup}> Sign Up Now!</span>
+          Don't have an account yet?{" "}
+          <span onClick={navigateToSignup}> Sign up.</span>
           <Routes>
             <Route path="/signup/*" element={<SignupPage />} />
           </Routes>

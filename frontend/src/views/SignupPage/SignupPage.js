@@ -3,7 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { HEROKU_ENDPOINT } from "configs";
-import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "constants";
+import {
+  STATUS_CODE_CONFLICT,
+  STATUS_CODE_CREATED,
+  MIN_PASSWORD_LEN,
+  SINGLE_DAY_EXPIRY,
+} from "constants";
 import "./signup.scss";
 import Alert from "@mui/material/Alert";
 import { useCookies } from "react-cookie";
@@ -22,9 +27,6 @@ function SignupPage() {
   const [isUsernameDuplicate, setUsernameDuplicate] = useState(false);
   const [isEmailDuplicate, setEmailDuplicate] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
-  const MIN_PASSWORD_LEN = 6;
-  const SINGLE_DAY_EXPIRY = 86400 * 1000;
-
   const navigate = useNavigate();
   const navigateDashboard = () => {
     navigate("/dashboard");

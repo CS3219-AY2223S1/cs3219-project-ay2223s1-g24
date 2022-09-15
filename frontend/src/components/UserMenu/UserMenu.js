@@ -4,6 +4,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
+import { Typography } from "@mui/material";
 
 export default function BasicMenu({
   name,
@@ -63,9 +64,15 @@ export default function BasicMenu({
           "aria-labelledby": "basic-button",
         }}
       >
-        <MenuItem onClick={openProfile}>Profile</MenuItem>
-        <MenuItem onClick={changePassword}>Change Password</MenuItem>
-        <MenuItem onClick={logout}>Logout</MenuItem>
+        <MenuItem fontSize="small" onClick={openProfile}>
+          <Typography fontSize="small">Profile</Typography>
+        </MenuItem>
+        <MenuItem fontSize="small" onClick={changePassword}>
+          <Typography fontSize="small">Change Password</Typography>
+        </MenuItem>
+        <MenuItem onClick={logout}>
+          <Typography fontSize="small">Logout</Typography>
+        </MenuItem>
       </Menu>
     </div>
   );
