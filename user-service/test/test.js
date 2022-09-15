@@ -294,7 +294,7 @@ describe('Test API Routes', function () {
       .send(deletedUser)
       .end((err, res) => {
         res.should.have.status(404);
-        res.body.should.be.equal('User does not exist in database.');
+        res.body.should.be.equal('User not found in database to delete account.');
         done();
       });
   });
