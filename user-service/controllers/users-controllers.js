@@ -14,7 +14,7 @@ const getUsers = async (req, res, next) => {
   try {
     users = await User.find({}, '-password');
   } catch (err) {
-    res.status(503).json('Something went wrong (likely network issue). Could not delete user.');
+    res.status(503).json('Something went wrong (likely network issue). Could not get users.');
     return;
   }
   res.status(200).json({ users: users.map(user => user.toObject({ getters: true })) });
@@ -107,7 +107,7 @@ const updatePassword = async (req, res, next) => {
     existingUser = await User.findOne({ email: req.body.email });
   } catch (err) {
     console.log(err)
-    res.status(503).json('Something went wrong (likely network issue). Could not delete user.');
+    res.status(503).json('Something went wrong (likely network issue). Could not user update user password.');
     return;
   }
 
@@ -248,19 +248,47 @@ const deleteUser = async (req, res, next) => {
     return;
   }
 
-  const { email, password } = req.body;
-  User.findOne({ email }).then(user => {
-    if (user) {
-      const isMatch = bcrypt.compare(password, user.password);
-      isMatch ?
-        User.deleteOne({ email }).then(() => {
-          res.status(200).json(`Deleted: (email: ${email})`);
-        }) :
-        res.status(400).json('User found but invalid password provided');
-    } else {
-      res.status(404).json('User does not exist in database.');
-    }
-  });
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: req.body.email });
+  } catch (err) {
+    // console.log(err)
+    res.status(503).json('Something went wrong (likely network issue). Could not delete user.');
+    return;
+  }
+
+  if (!existingUser) {
+    res.status(404).json("User not found in database to delete account.")
+    return;
+  }
+
+  try {
+    comparisonResult = await bcrypt.compare(req.body.password, existingUser.password)
+  } catch (error) {
+    res.status(503).json("Error hashing the password at delete password.")
+    return;
+  }
+
+  if (!comparisonResult) {
+    res.status(400).json('Wrong old password. Account not deleted.');
+    return;
+  }
+
+  let deleteResult;
+  try {
+    deleteResult = await User.deleteOne({ _id: existingUser.id, email: req.body.email })
+  } catch (err) {
+    console.log(err)
+    res.status(503).json("Error trying delete user from DB. Likely network error.");
+    return;
+  }
+
+  if (!deleteResult) {
+    res.status(503).json("Unable to delete user account. Service unavailable.");
+    return;
+  }
+
+  res.status(200).json(`Deleted: (email: ${req.body.email})`);
 };
 
 
