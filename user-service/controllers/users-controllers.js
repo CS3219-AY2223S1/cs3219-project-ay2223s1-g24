@@ -5,9 +5,11 @@ const jwt = require("jsonwebtoken")
 
 const User = require('../models/user');
 
-
 // GET
 const getUsers = async (req, res, next) => {
+
+  console.log(req.userData)
+
   let users;
   try {
     users = await User.find({}, '-password');
@@ -78,7 +80,7 @@ const signup = async (req, res, next) => {
         name: createdUser.name,
       },
       process.env.JWT_KEY,
-      { expiresIn: "24h" }
+      { expiresIn: 30 }
     );
   } catch (err) {
     res.status(503).json('Something went wrong while trying create token for signed up user.');
@@ -92,7 +94,7 @@ const signup = async (req, res, next) => {
   })
 };
 
-
+// PUT
 const updatePassword = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -167,7 +169,7 @@ const updatePassword = async (req, res, next) => {
         name: updatedUser.name,
       },
       process.env.JWT_KEY,
-      { expiresIn: "24h" }
+      { expiresIn: 30 }
     );
   } catch (err) {
     res.status(503).json('Something went wrong while trying create token for signed up user.');
@@ -181,8 +183,7 @@ const updatePassword = async (req, res, next) => {
 };
 
 
-
-// GET
+// POST
 const login = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -223,7 +224,8 @@ const login = async (req, res, next) => {
         name: existingUser.name,
       },
       process.env.JWT_KEY,
-      { expiresIn: "24h" }
+      // { expiresIn: "24h" }
+      { expiresIn: 30 } //30 seconds
     );
   } catch (err) {
     res.status(503).json('Something went wrong while trying create token for signed up user.');
