@@ -45,6 +45,9 @@ Retrieves all users in database
 - `email`: Email of user to be deleted
 - `password`: Password of user to be deleted
 #### Status codes:
+- `200`: Deleted user
 - `201`: User has successfully been deleted from database
+- `400`: Wrong old password. Account not deleted
 - `404`: User to be deleted is not found in database
+- `503`: Unable to delete user account. Service unavailable.
 
