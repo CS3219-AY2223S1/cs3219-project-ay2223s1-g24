@@ -9,10 +9,11 @@
         display: flex;
         margin-top: 10px;
         justify-content: center;
+        align-items: center;
 
         img {
-            height: 30px;
-            margin-top: 5px;
+            height: 45px;
+            cursor: pointer;
         }
 
         .title {
@@ -61,7 +62,7 @@
     .signin-btn:hover {
         background-color: rgb(11, 108, 236);
     }
-    
+
     .alert {
         border: 1px solid red;
         margin-bottom: 10px;

@@ -8,7 +8,6 @@ import {
   DialogContentText,
   DialogTitle,
   TextField,
-  Typography,
 } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -50,6 +49,10 @@ function SigninPage() {
   // Placeholder path for dashboard, to be updated
   const navigateToDashboard = () => {
     navigate("/dashboard");
+  };
+
+  const navigateToHome = () => {
+    navigate("/");
   };
 
   useEffect(() => {
@@ -103,8 +106,6 @@ function SigninPage() {
       expires.setTime(expires.getTime() + SINGLE_DAY_EXPIRY);
       setCookie("jwtToken", res.data.token, { path: "/", expires });
       setCookie("email", res.data.user.email, { path: "/", expires });
-      console.log(res.data.user.email);
-      console.log(res.data.user.name);
       setCookie("name", res.data.user.name, { path: "/", expires });
       navigateToDashboard();
     }
@@ -112,17 +113,16 @@ function SigninPage() {
 
   const closeDialog = () => setIsDialogOpen(false);
 
-  const setErrorDialog = (msg) => {
-    setIsDialogOpen(true);
-    setDialogTitle("Error");
-    setDialogMsg(msg);
-  };
-
   return (
     <div className="signin">
       <Box display={"flex"} flexDirection={"column"} width={"30%"}>
         <div className="heading">
-          <img className="left-img" src={mainLogo} alt="main-logo" />
+          <img
+            className="left-img"
+            src={mainLogo}
+            alt="main-logo"
+            onClick={navigateToHome}
+          />
           <div className="title" marginbottom={"1rem"}>
             Sign in
           </div>
@@ -235,6 +235,8 @@ function SigninPage() {
             className="signin-btn"
             onClick={() => {
               handleSignin();
+              setUserInputTouched(true);
+              setPasswordInputTouched(true);
             }}
           >
             Sign In
@@ -242,8 +244,8 @@ function SigninPage() {
         </Box>
 
         <Box className="text-center">
-          Don't have an account?{" "}
-          <span onClick={navigateToSignup}> Sign Up Now!</span>
+          Don't have an account yet?{" "}
+          <span onClick={navigateToSignup}> Sign up.</span>
           <Routes>
             <Route path="/signup/*" element={<SignupPage />} />
           </Routes>
