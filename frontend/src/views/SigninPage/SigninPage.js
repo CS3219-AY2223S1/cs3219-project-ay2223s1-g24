@@ -14,7 +14,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { HEROKU_ENDPOINT } from "configs";
 import { Link } from "react-router-dom";
-import mainLogo from "assets/logo.png";
+import mainLogo from "assets/mainlogo.png";
 import "./signin.scss";
 import SignupPage from "views/SignupPage/SignupPage";
 import { useCookies } from "react-cookie";
@@ -46,7 +46,6 @@ function SigninPage() {
     navigate("/signup");
   };
 
-  // Placeholder path for dashboard, to be updated
   const navigateToDashboard = () => {
     navigate("/dashboard");
   };

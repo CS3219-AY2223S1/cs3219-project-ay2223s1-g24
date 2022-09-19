@@ -17,7 +17,7 @@ function HomePage() {
     navigate("/dashboard");
   };
 
-  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken"]);
+  const [cookies] = useCookies(["name", "email", "jwtToken"]);
 
   useEffect(() => {
     if (cookies.jwtToken) {

@@ -12,7 +12,7 @@ import {
 import "./signup.scss";
 import Alert from "@mui/material/Alert";
 import { useCookies } from "react-cookie";
-import mainLogo from "assets/logo.png";
+import mainLogo from "assets/mainlogo.png";
 
 function SignupPage() {
   const [username, setUsername] = useState("");
@@ -27,6 +27,11 @@ function SignupPage() {
   const [isUsernameDuplicate, setUsernameDuplicate] = useState(false);
   const [isEmailDuplicate, setEmailDuplicate] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
+  const [cookies, setCookie, removeCookie] = useCookies([
+    "name",
+    "email",
+    "jwtToken",
+  ]);
   const navigate = useNavigate();
   const navigateDashboard = () => {
     navigate("/dashboard");
@@ -62,13 +67,12 @@ function SignupPage() {
     }
   };
 
-  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken"]);
-
   const handleSignup = async () => {
     // Check fields submitted if they are valid inputs
     if (!isFormValid()) {
       return;
     }
+    console.log(typeof username);
     const payload = { name: username, password, email };
     const res = await axios
       .post(HEROKU_ENDPOINT + "signup", payload)

@@ -3,8 +3,8 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { useCookies } from "react-cookie";
-import { useNavigate } from "react-router-dom";
 import { Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export default function BasicMenu({
   name,
@@ -13,18 +13,20 @@ export default function BasicMenu({
 }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const [cookies, setCookie, removeCookie] = useCookies([
-    "name",
-    "email",
-    "jwtToken",
-  ]);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   const navigate = useNavigate();
+
+  const [cookies, setCookie, removeCookie] = useCookies([
+    "name",
+    "email",
+    "jwtToken",
+  ]);
 
   const logout = () => {
     setAnchorEl(null);

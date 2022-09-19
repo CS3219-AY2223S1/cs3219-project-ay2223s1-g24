@@ -28,11 +28,6 @@ import axios from "axios";
 function DashboardPage() {
   const [value, setValue] = useState("one");
   const [tabNumber, setTabNumber] = useState(0);
-  const [cookies, setCookie, removeCookie] = useCookies([
-    "name",
-    "email",
-    "jwtToken",
-  ]);
   const [isChangePasswordDialogOpen, setChangePasswordDialogOpen] =
     useState(false);
   const [isProfileDialogOpen, setProfileDialogOpen] = useState(false);
@@ -48,12 +43,19 @@ function DashboardPage() {
     useState(false);
   const [isIncorrectPasswordStatus, setPasswordIncorrectStatus] =
     useState(false);
+  const [isPasswordChanged, setPasswordChangedStatus] = useState(false);
 
   const navigate = useNavigate();
 
   const navigateHome = () => {
     navigate("/");
   };
+
+  const [cookies, setCookie, removeCookie] = useCookies([
+    "name",
+    "email",
+    "jwtToken",
+  ]);
 
   useEffect(() => {
     if (!cookies.jwtToken) {
@@ -66,7 +68,16 @@ function DashboardPage() {
   };
 
   const isDeleteAccountFormValid = () => {
-    return password !== "" || !cookies.email;
+    return password && cookies.email;
+  };
+
+  const isPasswordChangeFormValid = () => {
+    return (
+      cookies.email &&
+      password &&
+      newPassword &&
+      newPassword === confirmationPassword
+    );
   };
 
   const handleDeleteAccount = async () => {
@@ -74,7 +85,7 @@ function DashboardPage() {
     if (!isDeleteAccountFormValid()) {
       return;
     }
-    const payload = { email: cookies.email, password };
+    const payload = { name: cookies.name, email: cookies.email, password };
     console.log(payload);
     const res = await axios
       .delete(HEROKU_ENDPOINT + "deleteUser", payload)
@@ -93,6 +104,34 @@ function DashboardPage() {
       removeCookie("email", { path: "/" });
       removeCookie("jwtToken", { path: "/" });
       navigateHome();
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    // Check fields submitted if they are valid inputs
+    if (!isPasswordChangeFormValid()) {
+      return;
+    }
+    console.log("firing");
+    const payload = {
+      email: cookies.email,
+      password,
+      new_password: newPassword,
+    };
+    const res = await axios
+      .put(HEROKU_ENDPOINT + "updatePassword", payload)
+      .catch((err) => {
+        console.log(err.response);
+        if (err.response.status === STATUS_CODE_ACCOUNT_DOES_NOT_EXIST) {
+          console.log("password cannot be changed");
+          setPasswordChangedStatus(false);
+        } else {
+        }
+        return;
+      });
+
+    if (res && res.status === STATUS_CODE_CREATED) {
+      setPasswordChangedStatus(true);
     }
   };
 
@@ -283,7 +322,8 @@ function DashboardPage() {
             <Button
               sx={{ ml: "7px" }}
               onClick={() => {
-                setChangePasswordDialogOpen(false);
+                console.log("changing..");
+                handlePasswordChange();
               }}
             >
               Change Password
