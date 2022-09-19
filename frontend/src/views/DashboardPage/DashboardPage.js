@@ -381,6 +381,9 @@ function DashboardPage() {
               sx={{ ml: "7px" }}
               onClick={() => {
                 handlePasswordChange();
+                setPasswordInputTouched(true);
+                setNewPasswordInputTouched(true);
+                setConfirmationPasswordInputTouched(true);
               }}
             >
               Change Password
@@ -449,6 +452,7 @@ function DashboardPage() {
               sx={{ ml: "7px" }}
               onClick={() => {
                 handleDeleteAccount();
+                setPasswordInputTouched(true);
               }}
             >
               Delete Account

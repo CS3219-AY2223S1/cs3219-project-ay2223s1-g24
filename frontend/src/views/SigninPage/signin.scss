@@ -57,6 +57,12 @@
         text-transform: none;
         font-weight: 400;
         margin-bottom: 20px;
+
+        .progress {
+            display: flex;
+            align-items: center;
+            margin-left: 8px;
+        }
     }
 
     .signin-btn:hover {

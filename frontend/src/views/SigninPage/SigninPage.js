@@ -8,6 +8,7 @@ import {
   DialogContentText,
   DialogTitle,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -37,6 +38,7 @@ function SigninPage() {
   const [dialogMsg, setDialogMsg] = useState("");
   const [isSigninSuccess, setIsSigninSuccess] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [cookies, setCookie] = useCookies(["name", "email", "jwtToken"]);
   const SINGLE_DAY_EXPIRY = 86400 * 1000;
 
@@ -82,6 +84,7 @@ function SigninPage() {
       return;
     }
 
+    setLoading(true);
     const postUserEndpoint = HEROKU_ENDPOINT + "login";
     const res = await axios
       .post(postUserEndpoint, { email, password })
@@ -98,9 +101,12 @@ function SigninPage() {
         } else {
           setUnexpectedError(true);
         }
+        setLoading(false);
+        return;
       });
 
     if (res && res.status === STATUS_CODE_SUCCESS) {
+      setLoading(false);
       let expires = new Date();
       expires.setTime(expires.getTime() + SINGLE_DAY_EXPIRY);
       setCookie("jwtToken", res.data.token, { path: "/", expires });
@@ -242,6 +248,11 @@ function SigninPage() {
             }}
           >
             Sign In
+            {isLoading && (
+              <div className="progress">
+                <CircularProgress color="inherit" size="16px" />
+              </div>
+            )}
           </Button>
         </Box>
 

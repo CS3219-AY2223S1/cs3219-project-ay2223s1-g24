@@ -1,4 +1,11 @@
-import { Alert, Box, Button, TextField, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
@@ -26,6 +33,7 @@ function SignupPage() {
   const [isUsernameDuplicate, setUsernameDuplicate] = useState(false);
   const [isEmailDuplicate, setEmailDuplicate] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [cookies, setCookie, removeCookie] = useCookies([
     "name",
     "email",
@@ -71,11 +79,12 @@ function SignupPage() {
     if (!isFormValid()) {
       return;
     }
-    console.log(typeof username);
+    setLoading(true);
     const payload = { name: username, password, email };
     const res = await axios
       .post(HEROKU_ENDPOINT + "signup", payload)
       .catch((err) => {
+        setLoading(false);
         console.log(err.response);
         if (err.response.status === STATUS_CODE_CONFLICT) {
           setUsernameDuplicate(err.response.data.invalidEmail);
@@ -87,6 +96,7 @@ function SignupPage() {
       });
 
     if (res && res.status === STATUS_CODE_CREATED) {
+      setLoading(false);
       let expires = new Date();
       expires.setTime(expires.getTime() + SINGLE_DAY_EXPIRY);
       setCookie("jwtToken", res.data.token, { path: "/", expires });
@@ -296,6 +306,11 @@ function SignupPage() {
             }}
           >
             Sign up
+            {isLoading && (
+              <div className="progress">
+                <CircularProgress color="inherit" size="16px" />
+              </div>
+            )}
           </Button>
         </Box>
 
