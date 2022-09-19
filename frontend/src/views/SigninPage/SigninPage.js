@@ -176,7 +176,7 @@ function SigninPage() {
                 : "hide"
             }`}
           >
-            • Your account does not exists
+            • Account does not exist.
           </div>
 
           <TextField
@@ -225,6 +225,9 @@ function SigninPage() {
           className={`alert ${hasUnexpectedError ? "" : "hide"}`}
           severity="error"
           marginbottom={"10px"}
+          onClose={() => {
+            setUnexpectedError(false);
+          }}
         >
           Something went wrong. Try again later!
         </Alert>

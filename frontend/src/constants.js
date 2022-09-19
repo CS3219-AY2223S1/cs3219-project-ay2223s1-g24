@@ -8,3 +8,7 @@ export const STATUS_CODE_UNEXPECTED_ERROR = 503;
 
 export const MIN_PASSWORD_LEN = 6;
 export const SINGLE_DAY_EXPIRY = 86400 * 1000;
+
+export const ERROR_DEFAULT = "";
+export const ERROR_WRONG_PASSWORD = "wrong-password";
+export const ERROR_UNEXPECTED = "unexpected";

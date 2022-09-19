@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
@@ -10,7 +10,6 @@ import {
   SINGLE_DAY_EXPIRY,
 } from "constants";
 import "./signup.scss";
-import Alert from "@mui/material/Alert";
 import { useCookies } from "react-cookie";
 import mainLogo from "assets/mainlogo.png";
 
@@ -278,6 +277,9 @@ function SignupPage() {
         <Alert
           className={`alert ${hasUnexpectedError ? "" : "hide"}`}
           severity="error"
+          onClose={() => {
+            setUnexpectedError(false);
+          }}
         >
           Something went wrong. Try again later!
         </Alert>

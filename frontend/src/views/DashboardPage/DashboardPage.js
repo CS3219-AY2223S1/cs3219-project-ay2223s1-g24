@@ -8,6 +8,7 @@ import {
   DialogTitle,
   TextField,
   Typography,
+  Alert,
 } from "@mui/material";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -19,8 +20,12 @@ import { useCookies } from "react-cookie";
 import UserMenu from "components/UserMenu/UserMenu";
 import {
   MIN_PASSWORD_LEN,
-  STATUS_CODE_ACCOUNT_DOES_NOT_EXIST,
-  STATUS_CODE_CREATED,
+  STATUS_CODE_WRONG_PASSWORD,
+  STATUS_CODE_SUCCESS,
+  STATUS_CODE_INCORRECT_PARAMS,
+  ERROR_DEFAULT,
+  ERROR_WRONG_PASSWORD,
+  ERROR_UNEXPECTED,
 } from "constants";
 import { HEROKU_ENDPOINT } from "configs";
 import axios from "axios";
@@ -44,6 +49,7 @@ function DashboardPage() {
   const [isIncorrectPasswordStatus, setPasswordIncorrectStatus] =
     useState(false);
   const [isPasswordChanged, setPasswordChangedStatus] = useState(false);
+  const [isErrorPresent, setErrorStatus] = useState(ERROR_DEFAULT);
 
   const navigate = useNavigate();
 
@@ -62,6 +68,18 @@ function DashboardPage() {
       navigate("/signin");
     }
   }, []);
+
+  const resetFields = () => {
+    setProfileDialogOpen(false);
+    setChangePasswordDialogOpen(false);
+    setPasswordInputTouched(false);
+    setNewPasswordInputTouched(false);
+    setConfirmationPasswordInputTouched(false);
+    setPassword("");
+    setConfirmationPassword("");
+    setNewPassword("");
+    setErrorStatus(ERROR_DEFAULT);
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -88,18 +106,17 @@ function DashboardPage() {
     const payload = { name: cookies.name, email: cookies.email, password };
     console.log(payload);
     const res = await axios
-      .delete(HEROKU_ENDPOINT + "deleteUser", payload)
+      .delete(HEROKU_ENDPOINT + "deleteUser", { data: payload })
       .catch((err) => {
         console.log(err.response);
-        if (err.response.status === STATUS_CODE_ACCOUNT_DOES_NOT_EXIST) {
-          console.log("password is incorrect");
+        if (err.response.status === STATUS_CODE_INCORRECT_PARAMS) {
           setPasswordIncorrectStatus(true);
         } else {
+          setErrorStatus(ERROR_UNEXPECTED);
         }
         return;
       });
-
-    if (res && res.status === STATUS_CODE_CREATED) {
+    if (res && res.status === STATUS_CODE_SUCCESS) {
       removeCookie("name", { path: "/" });
       removeCookie("email", { path: "/" });
       removeCookie("jwtToken", { path: "/" });
@@ -112,8 +129,8 @@ function DashboardPage() {
     if (!isPasswordChangeFormValid()) {
       return;
     }
-    console.log("firing");
     const payload = {
+      name: cookies.name,
       email: cookies.email,
       password,
       new_password: newPassword,
@@ -121,16 +138,19 @@ function DashboardPage() {
     const res = await axios
       .put(HEROKU_ENDPOINT + "updatePassword", payload)
       .catch((err) => {
+        console.log(payload);
         console.log(err.response);
-        if (err.response.status === STATUS_CODE_ACCOUNT_DOES_NOT_EXIST) {
-          console.log("password cannot be changed");
+        if (err.response.status === STATUS_CODE_WRONG_PASSWORD) {
           setPasswordChangedStatus(false);
+          setErrorStatus(ERROR_WRONG_PASSWORD);
         } else {
+          setErrorStatus(ERROR_UNEXPECTED);
         }
         return;
       });
 
-    if (res && res.status === STATUS_CODE_CREATED) {
+    if (res && res.status === STATUS_CODE_SUCCESS) {
+      setErrorStatus(ERROR_DEFAULT);
       setPasswordChangedStatus(true);
     }
   };
@@ -212,6 +232,7 @@ function DashboardPage() {
           >
             <TextField
               className="field"
+              type="password"
               label="Current Password"
               error={
                 isPasswordInputTouched &&
@@ -245,6 +266,7 @@ function DashboardPage() {
 
             <TextField
               className="field"
+              type="password"
               label="New Password"
               sx={{ mt: "15px" }}
               error={
@@ -281,6 +303,7 @@ function DashboardPage() {
 
             <TextField
               className="field"
+              type="password"
               label="Confirm New Password"
               sx={{ mt: "15px", mb: "7px" }}
               error={
@@ -315,6 +338,41 @@ function DashboardPage() {
                   • Passwords do not match.
                 </Typography>
               )}
+            {isPasswordChanged && (
+              <Alert
+                sx={{ mt: "10px", fontSize: "12px" }}
+                severity="success"
+                onClose={() => {
+                  setPasswordChangedStatus(false);
+                }}
+              >
+                Password changed successfully.
+              </Alert>
+            )}
+
+            {isErrorPresent === ERROR_UNEXPECTED && (
+              <Alert
+                sx={{ mt: "10px", fontSize: "12px" }}
+                severity="error"
+                onClose={() => {
+                  setErrorStatus(ERROR_DEFAULT);
+                }}
+              >
+                Something went wrong. Try again later!
+              </Alert>
+            )}
+
+            {isErrorPresent === ERROR_WRONG_PASSWORD && (
+              <Alert
+                sx={{ mt: "10px", fontSize: "12px" }}
+                severity="error"
+                onClose={() => {
+                  setErrorStatus(ERROR_DEFAULT);
+                }}
+              >
+                Wrong password. Try again!
+              </Alert>
+            )}
           </DialogContent>
           <DialogActions
             sx={{ display: "flex", justifyContent: "space-between" }}
@@ -322,24 +380,12 @@ function DashboardPage() {
             <Button
               sx={{ ml: "7px" }}
               onClick={() => {
-                console.log("changing..");
                 handlePasswordChange();
               }}
             >
               Change Password
             </Button>
-            <Button
-              sx={{ mr: "7px" }}
-              onClick={() => {
-                setChangePasswordDialogOpen(false);
-                setPasswordInputTouched(false);
-                setNewPasswordInputTouched(false);
-                setConfirmationPasswordInputTouched(false);
-                setPassword("");
-                setConfirmationPassword("");
-                setNewPassword("");
-              }}
-            >
+            <Button sx={{ mr: "7px" }} onClick={resetFields}>
               Close
             </Button>
           </DialogActions>
@@ -366,6 +412,7 @@ function DashboardPage() {
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
+                setPasswordIncorrectStatus(false);
               }}
               onBlur={() => {
                 setPasswordInputTouched(true);
@@ -382,6 +429,17 @@ function DashboardPage() {
                 • Password is incorrect. Try again.
               </Typography>
             )}
+            {isErrorPresent === ERROR_UNEXPECTED && (
+              <Alert
+                sx={{ mt: "10px", fontSize: "12px" }}
+                severity="error"
+                onClose={() => {
+                  setErrorStatus(ERROR_DEFAULT);
+                }}
+              >
+                Something went wrong. Try again later!
+              </Alert>
+            )}
           </DialogContent>
 
           <DialogActions
@@ -395,14 +453,7 @@ function DashboardPage() {
             >
               Delete Account
             </Button>
-            <Button
-              sx={{ mr: "7px" }}
-              onClick={() => {
-                setProfileDialogOpen(false);
-                setPasswordInputTouched(false);
-                setPassword("");
-              }}
-            >
+            <Button sx={{ mr: "7px" }} onClick={resetFields}>
               Close
             </Button>
           </DialogActions>
