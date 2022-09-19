@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { HEROKU_ENDPOINT } from "configs";
 import {
@@ -40,6 +40,13 @@ function SignupPage() {
     "jwtToken",
   ]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (cookies.jwtToken) {
+      navigate("/dashboard");
+    }
+  }, []);
+
   const navigateDashboard = () => {
     navigate("/dashboard");
   };

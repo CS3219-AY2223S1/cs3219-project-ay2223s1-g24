@@ -117,6 +117,7 @@ function DashboardPage() {
         return;
       });
     if (res && res.status === STATUS_CODE_SUCCESS) {
+      setPassword("");
       removeCookie("name", { path: "/" });
       removeCookie("email", { path: "/" });
       removeCookie("jwtToken", { path: "/" });
@@ -152,6 +153,9 @@ function DashboardPage() {
     if (res && res.status === STATUS_CODE_SUCCESS) {
       setErrorStatus(ERROR_DEFAULT);
       setPasswordChangedStatus(true);
+      setPassword("");
+      setNewPassword("");
+      setConfirmationPassword("");
     }
   };
 
