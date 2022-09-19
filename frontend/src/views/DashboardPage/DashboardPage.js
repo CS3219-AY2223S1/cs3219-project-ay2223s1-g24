@@ -1,14 +1,15 @@
 import "./dashboardPage.scss";
 import { useNavigate } from "react-router-dom";
 import {
+  Alert,
   Button,
   Dialog,
+  CircularProgress,
   DialogActions,
   DialogContent,
   DialogTitle,
   TextField,
   Typography,
-  Alert,
 } from "@mui/material";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -48,8 +49,9 @@ function DashboardPage() {
     useState(false);
   const [isIncorrectPasswordStatus, setPasswordIncorrectStatus] =
     useState(false);
-  const [isPasswordChanged, setPasswordChangedStatus] = useState(false);
+  const [isActionSuccess, setActionSuccess] = useState(false);
   const [isErrorPresent, setErrorStatus] = useState(ERROR_DEFAULT);
+  const [isLoading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -69,9 +71,25 @@ function DashboardPage() {
     }
   }, []);
 
-  const resetFields = () => {
+  const sleep = (ms) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  const resetAllFields = () => {
     setProfileDialogOpen(false);
     setChangePasswordDialogOpen(false);
+    setPasswordInputTouched(false);
+    setNewPasswordInputTouched(false);
+    setConfirmationPasswordInputTouched(false);
+    setPassword("");
+    setConfirmationPassword("");
+    setNewPassword("");
+    setActionSuccess(false);
+    setErrorStatus(ERROR_DEFAULT);
+    setLoading(false);
+  };
+
+  const resetPasswordFields = () => {
     setPasswordInputTouched(false);
     setNewPasswordInputTouched(false);
     setConfirmationPasswordInputTouched(false);
@@ -103,12 +121,12 @@ function DashboardPage() {
     if (!isDeleteAccountFormValid()) {
       return;
     }
+    setLoading(true);
     const payload = { name: cookies.name, email: cookies.email, password };
-    console.log(payload);
     const res = await axios
       .delete(HEROKU_ENDPOINT + "deleteUser", { data: payload })
       .catch((err) => {
-        console.log(err.response);
+        setLoading(false);
         if (err.response.status === STATUS_CODE_INCORRECT_PARAMS) {
           setPasswordIncorrectStatus(true);
         } else {
@@ -117,10 +135,12 @@ function DashboardPage() {
         return;
       });
     if (res && res.status === STATUS_CODE_SUCCESS) {
-      setPassword("");
+      setLoading(false);
+      setActionSuccess(true);
       removeCookie("name", { path: "/" });
       removeCookie("email", { path: "/" });
       removeCookie("jwtToken", { path: "/" });
+      await sleep(4000);
       navigateHome();
     }
   };
@@ -130,6 +150,7 @@ function DashboardPage() {
     if (!isPasswordChangeFormValid()) {
       return;
     }
+    setLoading(true);
     const payload = {
       name: cookies.name,
       email: cookies.email,
@@ -139,10 +160,11 @@ function DashboardPage() {
     const res = await axios
       .put(HEROKU_ENDPOINT + "updatePassword", payload)
       .catch((err) => {
+        setLoading(false);
         console.log(payload);
         console.log(err.response);
         if (err.response.status === STATUS_CODE_WRONG_PASSWORD) {
-          setPasswordChangedStatus(false);
+          setActionSuccess(false);
           setErrorStatus(ERROR_WRONG_PASSWORD);
         } else {
           setErrorStatus(ERROR_UNEXPECTED);
@@ -151,11 +173,9 @@ function DashboardPage() {
       });
 
     if (res && res.status === STATUS_CODE_SUCCESS) {
-      setErrorStatus(ERROR_DEFAULT);
-      setPasswordChangedStatus(true);
-      setPassword("");
-      setNewPassword("");
-      setConfirmationPassword("");
+      setLoading(false);
+      resetPasswordFields();
+      setActionSuccess(true);
     }
   };
 
@@ -342,12 +362,12 @@ function DashboardPage() {
                   • Passwords do not match.
                 </Typography>
               )}
-            {isPasswordChanged && (
+            {isActionSuccess && (
               <Alert
                 sx={{ mt: "10px", fontSize: "12px" }}
                 severity="success"
                 onClose={() => {
-                  setPasswordChangedStatus(false);
+                  setActionSuccess(false);
                 }}
               >
                 Password changed successfully.
@@ -390,9 +410,18 @@ function DashboardPage() {
                 setConfirmationPasswordInputTouched(true);
               }}
             >
-              Change Password
+              Change Password{" "}
+              {isLoading && (
+                <div className="progress">
+                  <CircularProgress
+                    color="inherit"
+                    size="16px"
+                    sx={{ display: "flex", ml: "7px", alignItems: "center" }}
+                  />
+                </div>
+              )}
             </Button>
-            <Button sx={{ mr: "7px" }} onClick={resetFields}>
+            <Button sx={{ mr: "7px" }} onClick={resetAllFields}>
               Close
             </Button>
           </DialogActions>
@@ -447,6 +476,19 @@ function DashboardPage() {
                 Something went wrong. Try again later!
               </Alert>
             )}
+            {isActionSuccess && (
+              <Alert sx={{ mt: "10px", fontSize: "12px", display: "flex" }}>
+                Account deleted successfully.
+                <div className="progress">
+                  Redirecting to main page..
+                  <CircularProgress
+                    color="inherit"
+                    size="10px"
+                    sx={{ ml: "7px" }}
+                  />
+                </div>
+              </Alert>
+            )}
           </DialogContent>
 
           <DialogActions
@@ -460,8 +502,17 @@ function DashboardPage() {
               }}
             >
               Delete Account
+              {isLoading && (
+                <div className="progress">
+                  <CircularProgress
+                    color="inherit"
+                    size="16px"
+                    sx={{ display: "flex", ml: "7px", alignItems: "center" }}
+                  />
+                </div>
+              )}
             </Button>
-            <Button sx={{ mr: "7px" }} onClick={resetFields}>
+            <Button sx={{ mr: "7px" }} onClick={resetAllFields}>
               Close
             </Button>
           </DialogActions>
