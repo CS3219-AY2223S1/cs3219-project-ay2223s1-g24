@@ -262,6 +262,7 @@ const deleteUser = async (req, res, next) => {
     return;
   }
 
+  let comparisonResult;
   try {
     comparisonResult = await bcrypt.compare(req.body.password, existingUser.password)
   } catch (error) {
