@@ -27,6 +27,7 @@ function App() {
   const leaveQueue = () => {
     socket.emit("leaveQueue");
   };
+
   return (
     <CookiesProvider>
       <div className="App">

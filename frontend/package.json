@@ -22,8 +22,8 @@
     "web-vitals": "^2.1.4"
   },
   "engines": {
-    "npm": "8.16.0",
-    "node": "14.17.3"
+    "npm": ">=8.16.0",
+    "node": ">=14.17.3"
   },
   "scripts": {
     "heroku-postbuild": "npm install",
