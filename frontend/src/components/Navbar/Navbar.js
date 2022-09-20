@@ -8,9 +8,8 @@ import SigninPage from "views/SigninPage/SigninPage";
 function Navbar() {
   const navigate = useNavigate();
   const navigateSignin = () => {
-    navigate("/signin");
+    navigate("signin");
   };
-
   return (
     <div className="navbar">
       <div className="logo">
