@@ -14,8 +14,9 @@ function App() {
   // var socket = io("http://localhost:8001");
   // socket.connect();
 
-  socket.on("MATCHED", () => {
-    console.log("MATCHED");
+  socket.on("MATCHED", (roomID) => {
+    console.log("MATCHED with room ID: " + roomID);
+    socket.emit("JOIN_ROOM", roomID);
   });
 
   const joinQueue = (difficulty) => {

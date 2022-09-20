@@ -37,6 +37,11 @@ io.on("connection", (socket) => {
         console.log("Client has left queue: " + socket.id);
         deleteUserFromQueue(socket.id);
     });
+
+    socket.on("JOIN_ROOM", (roomID) => {
+        console.log("Client with socket id: " + socket.id + " has joined room: " + roomID);
+        socket.join(roomID);
+    })
 });
 
 httpServer.listen(8001);
