@@ -14,20 +14,19 @@ function App() {
   // var socket = io("http://localhost:8001");
   // socket.connect();
 
-  socket.on("MATCHED", (roomID) => {
-    console.log("MATCHED with room ID: " + roomID);
-    socket.emit("JOIN_ROOM", roomID);
-  });
+  // socket.on("MATCHED", (roomID) => {
+  //   console.log("MATCHED with room ID: " + roomID);
+  //   socket.emit("JOIN_ROOM", roomID);
+  // });
 
-  const joinQueue = (difficulty) => {
-    socket.emit("JOIN_QUEUE", difficulty)
-  }
+  // const joinQueue = (difficulty) => {
+  //   socket.emit("JOIN_QUEUE", difficulty)
+  // }
 
-  const leaveQueue = () => {
-    socket.emit("LEAVE_QUEUE");
-  };
+  // const leaveQueue = () => {
+  //   socket.emit("LEAVE_QUEUE");
+  // };
 
-  joinQueue("easy");
   
   return (
     <CookiesProvider>
