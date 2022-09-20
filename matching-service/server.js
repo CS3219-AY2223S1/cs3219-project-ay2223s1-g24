@@ -23,15 +23,17 @@ const io = new Server(httpServer, {
 
 io.on("connection", (socket) => {
     // client to pass a difficulty parameter through socket in the future
-    console.log("Client connected with id: " + socket.id);
-    addUserToQueue(socket.id, "easy", io);
-
     socket.on("disconnect", () => {
         console.log("Client disconnected with id: " + socket.id);
         deleteUserFromQueue(socket.id);
     });
 
-    socket.on("leaveQueue", () => {
+    socket.on("JOIN_QUEUE", (difficulty) => {
+        console.log("Client joined the queue with id: " + socket.id);
+        addUserToQueue(socket.id, difficulty, io);
+    })
+
+    socket.on("LEAVE_QUEUE", () => {
         console.log("Client has left queue: " + socket.id);
         deleteUserFromQueue(socket.id);
     });

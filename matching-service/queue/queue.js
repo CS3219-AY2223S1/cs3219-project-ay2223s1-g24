@@ -11,8 +11,8 @@ export const addUserToQueue = async (socketId, difficulty, io) => {
     const firstUser = users[0].socket_id;
     const secondUser = users[1].socket_id;
     deleteUserPairFromDB(firstUser, secondUser).then(() => {
-      io.to(firstUser).emit("matched");
-      io.to(secondUser).emit("matched");
+      io.to(firstUser).emit("MATCHED");
+      io.to(secondUser).emit("MATCHED");
     })
     console.log(">> " + firstUser + " and " + secondUser + " matched");
   }

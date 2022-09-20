@@ -14,13 +14,20 @@ function App() {
   // var socket = io("http://localhost:8001");
   // socket.connect();
 
-  // socket.on("matched", () => {
-  //   console.log("MATCHED");
-  // });
+  socket.on("MATCHED", () => {
+    console.log("MATCHED");
+  });
 
-  // const leaveQueue = () => {
-  //   socket.emit("leaveQueue");
-  // };
+  const joinQueue = (difficulty) => {
+    socket.emit("JOIN_QUEUE", difficulty)
+  }
+
+  const leaveQueue = () => {
+    socket.emit("LEAVE_QUEUE");
+  };
+
+  joinQueue("easy");
+  
   return (
     <CookiesProvider>
       <div className="App">
