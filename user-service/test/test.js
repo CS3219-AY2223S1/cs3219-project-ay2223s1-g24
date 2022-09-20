@@ -36,7 +36,7 @@ describe('Test API Routes', function () {
       .get('/api/users/getUsers')
       .end((err, res) => {
         res.should.have.status(200);
-        res.body["message"].should.be.equal('Authentication failed!');
+        res.body["users"].length.should.be.equal(0);
         done();
       });
   });
