@@ -1,12 +1,12 @@
+const { expect } = require('chai');
 var chai = require('chai');
 var chaiHttp = require('chai-http');
-const mongoose = require('mongoose');
+// const chaiAsPromised = require('chai-as-promised');
 const jwt = require("jsonwebtoken");
 
 const User = require('../models/user');
 var server = require('../server');
 
-var expect = chai.expect;
 chai.should();
 chai.use(chaiHttp);
 
@@ -30,20 +30,19 @@ after((done) => {
 
 describe('Test API Routes', function () {
 
-  // GET
+  // get users
   it('Verify that there are 0 users in the DB', (done) => {
     chai.request(server)
       .get('/api/users/getUsers')
       .end((err, res) => {
         res.should.have.status(200);
-        res.body["users"].should.be.a('array');
-        res.body["users"].length.should.be.equal(0);
+        res.body["message"].should.be.equal('Authentication failed!');
         done();
       });
   });
 
 
-  // POST
+  // signup
   it('Verify that signup works for new user', (done) => {
 
     const newUser = {
@@ -70,7 +69,6 @@ describe('Test API Routes', function () {
       });
   });
 
-
   it('Verify that existing user cannot sign up again', (done) => {
     const existingUser = {
       name: "Valverdo",
@@ -82,7 +80,7 @@ describe('Test API Routes', function () {
       .post('/api/users/signup')
       .send(existingUser)
       .end((err, res) => {
-        res.should.have.status(400);
+        res.should.have.status(409);
         res.body["invalidUsername"].should.be.equal(true);
         res.body["invalidEmail"].should.be.equal(true);
         done();
@@ -107,6 +105,7 @@ describe('Test API Routes', function () {
   });
 
 
+  // login
   it('Verify that existing user can log in', (done) => {
     const existingUser = {
       name: "Valverdo",
@@ -115,7 +114,7 @@ describe('Test API Routes', function () {
     }
 
     chai.request(server)
-      .get('/api/users/login')
+      .post('/api/users/login')
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(200);
@@ -130,7 +129,6 @@ describe('Test API Routes', function () {
       });
   });
 
-
   it('Verify that existing user with wrong password cannot log in', (done) => {
     const existingUser = {
       name: "Valverdo",
@@ -139,7 +137,7 @@ describe('Test API Routes', function () {
     }
 
     chai.request(server)
-      .get('/api/users/login')
+      .post('/api/users/login')
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(403);
@@ -147,7 +145,6 @@ describe('Test API Routes', function () {
         done();
       });
   });
-
 
   it('Verify that non-existing user cannot log in', (done) => {
     const existingUser = {
@@ -157,7 +154,7 @@ describe('Test API Routes', function () {
     }
 
     chai.request(server)
-      .get('/api/users/login')
+      .post('/api/users/login')
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(401);
@@ -167,6 +164,7 @@ describe('Test API Routes', function () {
   });
 
 
+  // update password
   it('Verify if the request body is of wrong format, updatePassword will not proceed', (done) => {
 
     const updatedUser = {
@@ -184,7 +182,6 @@ describe('Test API Routes', function () {
         done();
       });
   });
-
 
   it('Verify that an existing user\'s password cannot be updated if the old password is wrong', (done) => {
     const updatedUser = {
@@ -204,7 +201,6 @@ describe('Test API Routes', function () {
       });
   });
 
-
   it('Verify that an existing user\'s password is cannot be updated if the new password is not at least length 6', (done) => {
     const updatedUser = {
       name: "Valverdo",
@@ -222,7 +218,6 @@ describe('Test API Routes', function () {
         done();
       });
   });
-
 
   it('Verify that an existing user\'s password is updated when the old password is correct', (done) => {
     const updatedUser = {
@@ -248,8 +243,6 @@ describe('Test API Routes', function () {
       });
   });
 
-
-
   it('Verify that an if user does not exist in database, update password returns an error', (done) => {
 
     const updatedUser = {
@@ -270,6 +263,7 @@ describe('Test API Routes', function () {
   });
 
 
+  // delete user
   it('Verify that delete works for existing user', (done) => {
     const deleteUser = {
       email: "valverdo@alberto.com",
@@ -285,7 +279,6 @@ describe('Test API Routes', function () {
       });
   });
 
-  // DELETE
   it('Verify that delete returns 404 if the user does not exist', (done) => {
     const deletedUser = {
       email: "valverdo@alberto.com",
@@ -296,13 +289,11 @@ describe('Test API Routes', function () {
       .send(deletedUser)
       .end((err, res) => {
         res.should.have.status(404);
-        res.body.should.be.equal('User does not exist in database.');
+        res.body.should.be.equal('User not found in database to delete account.');
         done();
       });
   });
 
-
-  // DELETE
   it('Verify that delete returns 400 if the request body is of the wrong format', (done) => {
     const deletedUser = {
       user_email: "valverdo@alberto.com",
@@ -318,18 +309,6 @@ describe('Test API Routes', function () {
       });
   });
 
-
-  // GET
-  it('Verify that after deletion, there are 0 users in the database', (done) => {
-    chai.request(server)
-      .get('/api/users/getUsers')
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body["users"].should.be.a('array');
-        res.body["users"].length.should.be.equal(0);
-        done();
-      });
-  });
 });
 
 

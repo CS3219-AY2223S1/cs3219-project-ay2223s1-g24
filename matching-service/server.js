@@ -19,11 +19,13 @@ const io = new Server(httpServer, {
     cors: {
         origin: ["http://localhost:3000"]
     }
-});
+})
 
 io.on("connection", (socket) => {
+    // client to pass a difficulty parameter through socket in the future
     console.log("Client connected with id: " + socket.id);
-    addUserToQueue(socket.id, io);
+    addUserToQueue(socket.id, "easy", io);
+
     socket.on("disconnect", () => {
         console.log("Client disconnected with id: " + socket.id);
         deleteUserFromQueue(socket.id);

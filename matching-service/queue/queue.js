@@ -1,24 +1,24 @@
-var queue = [];
+import { getUsersInDB, addUserToDB, deleteUserfromDB, deleteUserPairFromDB } from "../db/db.js";
 
-export const addUserToQueue = (socketId, io) => {
-  queue.push(socketId);
-  console.log(queue);
-  if (queue.length >= 2) {
-    const firstUser = queue.pop();
-    io.to(firstUser).emit("matched");
-    const secondUser = queue.pop();
-    io.to(secondUser).emit("matched");
+export const addUserToQueue = async (socketId, difficulty, io) => {
+  // add user to db
+  await addUserToDB(socketId, difficulty);
+  // check users in db
+  const res = await getUsersInDB(difficulty);
+  const users = res.rows;
+
+  if (users.length >= 2) {
+    const firstUser = users[0].socket_id;
+    const secondUser = users[1].socket_id;
+    deleteUserPairFromDB(firstUser, secondUser).then(() => {
+      io.to(firstUser).emit("matched");
+      io.to(secondUser).emit("matched");
+    })
+    console.log(">> " + firstUser + " and " + secondUser + " matched");
   }
 }
 
-
-export const deleteUserFromQueue = (socketId) => {
-  var newQueue = [];
-  while (queue.length > 0) {
-    var id = queue.pop();
-    if (id === socketId) continue;
-    newQueue.push(id);
-  }
-  queue = newQueue;
-  console.log(queue);
+export const deleteUserFromQueue = async (socketId) => {
+  await deleteUserfromDB(socketId);
 }
+

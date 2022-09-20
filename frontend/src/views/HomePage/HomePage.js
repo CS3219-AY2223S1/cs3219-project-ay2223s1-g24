@@ -4,12 +4,26 @@ import Navbar from "components/Navbar/Navbar";
 import Button from "components/Button/Button";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import SignupPage from "views/SignupPage/SignupPage";
+import { useCookies } from "react-cookie";
+import { useEffect } from "react";
 
 function HomePage() {
   const navigate = useNavigate();
   const navigateSignup = () => {
     navigate("/signup");
   };
+
+  const navigateToDashboard = () => {
+    navigate("/dashboard");
+  };
+
+  const [cookies] = useCookies(["name", "email", "jwtToken"]);
+
+  useEffect(() => {
+    if (cookies.jwtToken) {
+      navigateToDashboard();
+    }
+  }, []);
 
   return (
     <div className="homepage">

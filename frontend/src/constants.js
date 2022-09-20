@@ -5,3 +5,10 @@ export const STATUS_CODE_ACCOUNT_DOES_NOT_EXIST = 401;
 export const STATUS_CODE_WRONG_PASSWORD = 403;
 export const STATUS_CODE_CONFLICT = 409;
 export const STATUS_CODE_UNEXPECTED_ERROR = 503;
+
+export const MIN_PASSWORD_LEN = 6;
+export const SINGLE_DAY_EXPIRY = 86400 * 1000;
+
+export const ERROR_DEFAULT = "";
+export const ERROR_WRONG_PASSWORD = "wrong-password";
+export const ERROR_UNEXPECTED = "unexpected";
