@@ -5,10 +5,7 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
 
-// GET
 const getUsers = async (req, res, next) => {
-  console.log(req.userData);
-
   let users;
   try {
     users = await User.find({}, "-password");
@@ -25,7 +22,6 @@ const getUsers = async (req, res, next) => {
     .json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
-// POST
 const signup = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -108,7 +104,7 @@ const signup = async (req, res, next) => {
   });
 };
 
-// PUT
+
 const updatePassword = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -211,7 +207,6 @@ const updatePassword = async (req, res, next) => {
   });
 };
 
-// POST
 const login = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -278,7 +273,6 @@ const login = async (req, res, next) => {
   });
 };
 
-// DELETE
 const deleteUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -290,12 +284,7 @@ const deleteUser = async (req, res, next) => {
   try {
     existingUser = await User.findOne({ email: req.body.email });
   } catch (err) {
-    // console.log(err)
-    res
-      .status(503)
-      .json(
-        "Something went wrong (likely network issue). Could not delete user."
-      );
+    res.status(503).json('Something went wrong (likely network issue). Could not delete user.');
     return;
   }
 

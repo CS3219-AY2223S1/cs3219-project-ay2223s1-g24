@@ -30,19 +30,19 @@ after((done) => {
 
 describe('Test API Routes', function () {
 
-  // GET
-  it('Verify that without a valid authorization, user cannot check number of users in the DB', (done) => {
+  // get users
+  it('Verify that there are 0 users in the DB', (done) => {
     chai.request(server)
       .get('/api/users/getUsers')
       .end((err, res) => {
-        res.should.have.status(401);
+        res.should.have.status(200);
         res.body["message"].should.be.equal('Authentication failed!');
         done();
       });
   });
 
-  
-  // POST
+
+  // signup
   it('Verify that signup works for new user', (done) => {
 
     const newUser = {
@@ -69,7 +69,6 @@ describe('Test API Routes', function () {
       });
   });
 
-
   it('Verify that existing user cannot sign up again', (done) => {
     const existingUser = {
       name: "Valverdo",
@@ -87,7 +86,6 @@ describe('Test API Routes', function () {
         done();
       });
   });
-
 
   it('Verify that signup does not work if the request body is of the wrong format', (done) => {
     const existingUser = {
@@ -107,6 +105,7 @@ describe('Test API Routes', function () {
   });
 
 
+  // login
   it('Verify that existing user can log in', (done) => {
     const existingUser = {
       name: "Valverdo",
@@ -147,7 +146,6 @@ describe('Test API Routes', function () {
       });
   });
 
-
   it('Verify that non-existing user cannot log in', (done) => {
     const existingUser = {
       name: "Stamford",
@@ -166,6 +164,7 @@ describe('Test API Routes', function () {
   });
 
 
+  // update password
   it('Verify if the request body is of wrong format, updatePassword will not proceed', (done) => {
 
     const updatedUser = {
@@ -183,7 +182,6 @@ describe('Test API Routes', function () {
         done();
       });
   });
-
 
   it('Verify that an existing user\'s password cannot be updated if the old password is wrong', (done) => {
     const updatedUser = {
@@ -203,7 +201,6 @@ describe('Test API Routes', function () {
       });
   });
 
-
   it('Verify that an existing user\'s password is cannot be updated if the new password is not at least length 6', (done) => {
     const updatedUser = {
       name: "Valverdo",
@@ -221,7 +218,6 @@ describe('Test API Routes', function () {
         done();
       });
   });
-
 
   it('Verify that an existing user\'s password is updated when the old password is correct', (done) => {
     const updatedUser = {
@@ -247,7 +243,6 @@ describe('Test API Routes', function () {
       });
   });
 
-
   it('Verify that an if user does not exist in database, update password returns an error', (done) => {
 
     const updatedUser = {
@@ -268,6 +263,7 @@ describe('Test API Routes', function () {
   });
 
 
+  // delete user
   it('Verify that delete works for existing user', (done) => {
     const deleteUser = {
       email: "valverdo@alberto.com",
@@ -283,7 +279,6 @@ describe('Test API Routes', function () {
       });
   });
 
-  
   it('Verify that delete returns 404 if the user does not exist', (done) => {
     const deletedUser = {
       email: "valverdo@alberto.com",
@@ -298,7 +293,6 @@ describe('Test API Routes', function () {
         done();
       });
   });
-
 
   it('Verify that delete returns 400 if the request body is of the wrong format', (done) => {
     const deletedUser = {
@@ -315,22 +309,6 @@ describe('Test API Routes', function () {
       });
   });
 
-
-  // it('Verify that after deletion, there are 0 users in the database', (done) => {
-    
-  //   const getUsersFunction = async () => {
-  //     User.find()
-  //     .then((documents) => {
-  //       console.log(documents)
-  //       return documents
-  //     })
-  //     .catch((e) => {
-  //       console.log(`Error at getting users in npm test. error is ${e}`)
-  //       return e
-  //     });
-  //   }
-  //   await expect(getUsersFunction()).should.be.a('array')
-  // });
 });
 
 
