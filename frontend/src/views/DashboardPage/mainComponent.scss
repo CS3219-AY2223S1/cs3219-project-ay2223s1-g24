@@ -1,25 +1,33 @@
-.flexbox-container {
-    align-items: center;
+.dashboard {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+
+    .flexbox-container {
+        display: flex;
+        justify-content: center;
+        margin: 0.8rem 0 0.3rem 0;
+    }
+    
+    .flexbox-container2 {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+
+    }
+
+    .confirm-btn {
+        font-size: 1.25rem;
+        margin-bottom: 3rem;
+    }
 }
 
 .flexbox-item {
-    width: 200px;
+    align-items: center;
+    justify-content: center;
+    height: 16.25rem;
+    width: 12.5rem;
     margin: 30px;
     background-color: #dfdfdf;
-}
-
-.confirm-btn {
-    width: 10%;
-    font-size: 14px;
-    background-color: rgb(44, 123, 229);
-    color: white;
-    text-transform: none;
-    font-weight: 400;
-    margin-bottom: 20px;
-}
-
-.confirm-btn:hover {
-    background-color: rgb(11, 108, 236);
+    border-radius: 1.25rem;
+    padding: 0.8rem;
 }

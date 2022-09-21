@@ -1,12 +1,24 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
-import { Routes, Route, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { HEROKU_ENDPOINT } from "configs";
-import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "constants";
+import {
+  STATUS_CODE_CONFLICT,
+  STATUS_CODE_CREATED,
+  MIN_PASSWORD_LEN,
+  SINGLE_DAY_EXPIRY,
+} from "constants";
 import "./signup.scss";
-import Alert from "@mui/material/Alert";
 import { useCookies } from "react-cookie";
+import mainLogo from "assets/mainlogo.png";
 
 function SignupPage() {
   const [username, setUsername] = useState("");
@@ -21,16 +33,30 @@ function SignupPage() {
   const [isUsernameDuplicate, setUsernameDuplicate] = useState(false);
   const [isEmailDuplicate, setEmailDuplicate] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
-  const MIN_PASSWORD_LEN = 6;
-  const SINGLE_DAY_EXPIRY = 86400 * 1000;
-
+  const [isLoading, setLoading] = useState(false);
+  const [cookies, setCookie, removeCookie] = useCookies([
+    "name",
+    "email",
+    "jwtToken",
+  ]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (cookies.jwtToken) {
+      navigate("/dashboard");
+    }
+  }, []);
+
   const navigateDashboard = () => {
     navigate("/dashboard");
   };
 
   const navigateSignin = () => {
     navigate("/signin");
+  };
+
+  const navigateHome = () => {
+    navigate("/");
   };
 
   const isValidEmail = (email) => {
@@ -55,17 +81,17 @@ function SignupPage() {
     }
   };
 
-  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken"]);
-
   const handleSignup = async () => {
     // Check fields submitted if they are valid inputs
     if (!isFormValid()) {
       return;
     }
+    setLoading(true);
     const payload = { name: username, password, email };
     const res = await axios
       .post(HEROKU_ENDPOINT + "signup", payload)
       .catch((err) => {
+        setLoading(false);
         console.log(err.response);
         if (err.response.status === STATUS_CODE_CONFLICT) {
           setUsernameDuplicate(err.response.data.invalidEmail);
@@ -77,6 +103,7 @@ function SignupPage() {
       });
 
     if (res && res.status === STATUS_CODE_CREATED) {
+      setLoading(false);
       let expires = new Date();
       expires.setTime(expires.getTime() + SINGLE_DAY_EXPIRY);
       setCookie("jwtToken", res.data.token, { path: "/", expires });
@@ -89,8 +116,17 @@ function SignupPage() {
   return (
     <div className="signup">
       <Box display={"flex"} flexDirection={"column"} width={"30%"}>
-        <Typography className="title" marginbottom={"1rem"}>
-          Sign Up
+        <Typography className="title-container" marginbottom={"1rem"}>
+          <div className="heading">
+            <img
+              className="left-img"
+              src={mainLogo}
+              alt="main-logo"
+              onClick={navigateHome}
+            />
+            <div className="title">Signup</div>
+            <img className="right-img" src={mainLogo} alt="main-logo" />
+          </div>
         </Typography>
         <div className="textfields">
           <TextField
@@ -258,6 +294,9 @@ function SignupPage() {
         <Alert
           className={`alert ${hasUnexpectedError ? "" : "hide"}`}
           severity="error"
+          onClose={() => {
+            setUnexpectedError(false);
+          }}
         >
           Something went wrong. Try again later!
         </Alert>
@@ -274,6 +313,11 @@ function SignupPage() {
             }}
           >
             Sign up
+            {isLoading && (
+              <div className="progress">
+                <CircularProgress color="inherit" size="16px" />
+              </div>
+            )}
           </Button>
         </Box>
 

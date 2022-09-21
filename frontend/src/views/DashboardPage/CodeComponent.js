@@ -2,10 +2,7 @@ import { Button } from "@mui/material";
 import React, { useState } from "react";
 import mockData from "assets/mockdata.json";
 import "./codeComponent.scss";
-<<<<<<< HEAD
-=======
 import Editor from "components/Editor/Editor";
->>>>>>> 2babe3d28ed1eeb3bb2054266f91b4daa5744fd6
 
 function CodeComponent({ returnFunc }) {
   const [javascript, setJavascript] = useState('');

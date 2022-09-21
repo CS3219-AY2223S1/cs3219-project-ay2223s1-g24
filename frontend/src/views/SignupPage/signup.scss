@@ -3,12 +3,30 @@
     align-items: center;
     justify-content: center;
 
-    .title {
+    .title-container {
         font-weight: bold;
         display: flex;
         justify-content: center;
-        font-size: 25px;
         margin-top: 30px;
+
+        .heading {
+            display: flex;
+            align-items: center;
+
+            img {
+                height: 45px;
+                margin-right: 5px;
+                cursor: pointer;
+            }
+
+            .right-img {
+                visibility: hidden;
+            }
+        }
+
+        .title {
+            font-size: 25px;
+        }
     }
 
     .textfields {
@@ -41,6 +59,12 @@
         text-transform: none;
         font-weight: 400;
         margin-bottom: 20px;
+
+        .progress {
+            display: flex;
+            align-items: center;
+            margin-left: 8px;
+        }
     }
 
     .signup-btn:hover {
