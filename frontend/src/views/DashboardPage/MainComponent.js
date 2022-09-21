@@ -1,12 +1,8 @@
-import React, { useState } from "react";
-import "./dashboardComponent.scss";
+import { useState } from "react";
+import "./mainComponent.scss";
 import {
-  Alert,
-  Box,
   Button,
   Card,
-  CardActions,
-  CardActionArea,
   CardContent,
   CardMedia,
   Dialog,
@@ -15,9 +11,6 @@ import {
   DialogContentText,
   DialogTitle,
   Grid,
-  Paper,
-  styled,
-  TextField,
   Typography,
 } from "@mui/material";
 
@@ -64,81 +57,80 @@ function DashboardComponent() {
           className="grid-container"
         >
           <Grid item>
-            <Card sx={{ maxWidth: 345 }}>
-              <CardMedia
-                component="img"
-                height="140"
-                image="https://htmlcolorcodes.com/assets/images/colors/green-color-solid-background-1920x1080.png"
-                alt="green background color"
-              />
-              <CardContent>
-                <Typography gutterBottom variant="h5" component="div">
-                  Easy
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Questions that usually sets the tone for the concepts that
-                  will be tested subsequently
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button size="small" color="primary" onClick={openEasyModal}>
-                  Find Room
-                </Button>
-              </CardActions>
-            </Card>
+            <div className="glow-green">
+              <Card sx={{ maxWidth: 345 }}>
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image="https://htmlcolorcodes.com/assets/images/colors/green-color-solid-background-1920x1080.png"
+                  alt="green background color"
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    Easy
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Questions that usually sets the tone for the concepts that
+                    will be tested subsequently
+                  </Typography>
+                </CardContent>
+              </Card>
+            </div>
           </Grid>
 
           <Grid item>
-            <Card sx={{ maxWidth: 345 }}>
-              <CardMedia
-                component="img"
-                height="140"
-                image="https://htmlcolorcodes.com/assets/images/colors/yellow-color-solid-background-1920x1080.png"
-                alt="yellow background color"
-              />
-              <CardContent>
-                <Typography gutterBottom variant="h5" component="div">
-                  Medium
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Majority of the online assessment questions and real life
-                  interview questions are of this level
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button size="small" color="primary">
-                  Find Room
-                </Button>
-              </CardActions>
-            </Card>
+            <div className="glow-yellow">
+              <Card sx={{ maxWidth: 345 }}>
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image="https://htmlcolorcodes.com/assets/images/colors/yellow-color-solid-background-1920x1080.png"
+                  alt="yellow background color"
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    Medium
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Majority of the online assessment questions and real life
+                    interview questions are of this level
+                  </Typography>
+                </CardContent>
+              </Card>
+            </div>
           </Grid>
 
           <Grid item>
-            <Card sx={{ maxWidth: 345 }}>
-              <CardMedia
-                component="img"
-                height="140"
-                image="https://htmlcolorcodes.com/assets/images/colors/red-color-solid-background-1920x1080.png"
-                alt="red background color"
-              />
-              <CardContent>
-                <Typography gutterBottom variant="h5" component="div">
-                  Hard
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Frequently asked for firms that focus on trading-related
-                  activities. Not very common
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button size="small" color="primary">
-                  Find Room
-                </Button>
-              </CardActions>
-            </Card>
+            <div className="glow-red">
+              <Card sx={{ maxWidth: 345 }}>
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image="https://htmlcolorcodes.com/assets/images/colors/red-color-solid-background-1920x1080.png"
+                  alt="red background color"
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    Hard
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Frequently asked for firms that focus on trading-related
+                    activities. Not very common
+                  </Typography>
+                </CardContent>
+              </Card>
+            </div>
           </Grid>
         </Grid>
       </div>
+      <Button
+        className="find-room-btn"
+        size="small"
+        color="primary"
+        onClick={openEasyModal}
+      >
+        Find Room
+      </Button>
     </div>
   );
 }
