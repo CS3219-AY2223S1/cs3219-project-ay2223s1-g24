@@ -37,9 +37,12 @@ describe('Test API Routes', function () {
       .end((err, res) => {
         res.should.have.status(200);
 <<<<<<< HEAD
+<<<<<<< HEAD
         res.body["users"].length.should.be.equal(0);
 =======
 >>>>>>> 1bcc16172c14e3e653b9f3d4096e374545b8a467
+=======
+>>>>>>> 02a8056fc901d3a96929abdb5576259d7c1c5416
         done();
       });
   });

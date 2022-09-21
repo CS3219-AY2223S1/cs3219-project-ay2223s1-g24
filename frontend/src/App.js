@@ -13,12 +13,17 @@ function App() {
   // TODO: to create socket instance when matchmaking
   // var socket = io("http://localhost:8001");
   // socket.connect();
-  // socket.on("matched", () => {
-  //   console.log("MATCHED");
+  // socket.on("MATCHED", (roomID) => {
+  //   console.log("MATCHED with room ID: " + roomID);
+  //   socket.emit("JOIN_ROOM", roomID);
   // });
 
+  // const joinQueue = (difficulty) => {
+  //   socket.emit("JOIN_QUEUE", difficulty)
+  // }
+
   // const leaveQueue = () => {
-  //   socket.emit("leaveQueue");
+  //   socket.emit("LEAVE_QUEUE");
   // };
 
   return (

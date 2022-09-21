@@ -6,6 +6,8 @@ import "codemirror/theme/material.css";
 import "./editor.scss";
 
 import { Controlled as ControlledEditor } from "react-codemirror2";
+import { Button } from "@mui/material";
+import MenuItem from "@mui/material/MenuItem";
 import ControlDropdown from "../ControlDropdown/ControlDropdown";
 
 export default function Editor(props) {
