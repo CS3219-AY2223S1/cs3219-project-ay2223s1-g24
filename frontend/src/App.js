@@ -13,6 +13,10 @@ function App() {
   // TODO: to create socket instance when matchmaking
   // var socket = io("http://localhost:8001");
   // socket.connect();
+  // socket.on("connect_error", (err) => {
+  //   console.log(`connect_error due to ${err.message}`);
+  // });
+  
 
   // socket.on("MATCHED", (roomID) => {
   //   console.log("MATCHED with room ID: " + roomID);
