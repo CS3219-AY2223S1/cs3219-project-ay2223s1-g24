@@ -1,4 +1,3 @@
-import { Button } from "@mui/material";
 import React, { useState } from "react";
 import mockData from "assets/mockdata.json";
 import "./codeComponent.scss";

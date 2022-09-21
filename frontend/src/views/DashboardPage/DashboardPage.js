@@ -59,6 +59,7 @@ function DashboardPage() {
     navigate("/");
   };
 
+  // eslint-disable-next-line
   const [cookies, setCookie, removeCookie] = useCookies([
     "name",
     "email",
@@ -69,7 +70,7 @@ function DashboardPage() {
     if (!cookies.jwtToken) {
       navigate("/signin");
     }
-  }, []);
+  });
 
   const sleep = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));

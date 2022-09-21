@@ -6,7 +6,7 @@ import DashboardPage from "views/DashboardPage/DashboardPage";
 import SigninPage from "views/SigninPage/SigninPage";
 import CodingPage from "views/CodingPage/CodingPage";
 import { CookiesProvider } from "react-cookie";
-import { io } from "socket.io-client";
+// import { io } from "socket.io-client";
 
 function App() {
   // Placeholder for socket io connection and examples below:

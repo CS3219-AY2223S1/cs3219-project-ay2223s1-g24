@@ -8,13 +8,14 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Grid,
   Typography,
 } from "@mui/material";
 
 function DashboardComponent() {
+  const [EASY, MEDIUM, HARD] = ["Easy", "Medium", "Hard"];
+  const [roomDifficulty, setRoomDifficulty] = useState(null);
   const [easyModal, setEasyModal] = useState(false);
   const openEasyModal = () => {
     setEasyModal(true);
@@ -57,7 +58,12 @@ function DashboardComponent() {
           className="grid-container"
         >
           <Grid item>
-            <div className="glow-green">
+            <div
+              className={`glow-green ${
+                roomDifficulty === EASY ? "selected" : ""
+              }`}
+              onClick={() => setRoomDifficulty(EASY)}
+            >
               <Card sx={{ maxWidth: 345 }}>
                 <CardMedia
                   component="img"
@@ -79,7 +85,12 @@ function DashboardComponent() {
           </Grid>
 
           <Grid item>
-            <div className="glow-yellow">
+            <div
+              className={`glow-yellow ${
+                roomDifficulty === MEDIUM ? "selected" : ""
+              }`}
+              onClick={() => setRoomDifficulty(MEDIUM)}
+            >
               <Card sx={{ maxWidth: 345 }}>
                 <CardMedia
                   component="img"
@@ -101,7 +112,15 @@ function DashboardComponent() {
           </Grid>
 
           <Grid item>
-            <div className="glow-red">
+            <div
+              className={`glow-red ${
+                roomDifficulty === HARD ? "selected" : ""
+              }`}
+              onClick={() => {
+                console.log("selecting");
+                setRoomDifficulty(HARD);
+              }}
+            >
               <Card sx={{ maxWidth: 345 }}>
                 <CardMedia
                   component="img"
@@ -126,6 +145,7 @@ function DashboardComponent() {
       <Button
         className="find-room-btn"
         size="small"
+        variant="contained"
         color="primary"
         onClick={openEasyModal}
       >

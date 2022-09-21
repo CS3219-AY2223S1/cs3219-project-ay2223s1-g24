@@ -34,6 +34,7 @@ function SignupPage() {
   const [isEmailDuplicate, setEmailDuplicate] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  // eslint-disable-next-line
   const [cookies, setCookie, removeCookie] = useCookies([
     "name",
     "email",
@@ -45,7 +46,7 @@ function SignupPage() {
     if (cookies.jwtToken) {
       navigate("/dashboard");
     }
-  }, []);
+  });
 
   const navigateDashboard = () => {
     navigate("/dashboard");

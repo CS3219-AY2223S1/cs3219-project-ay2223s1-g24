@@ -23,7 +23,7 @@ function HomePage() {
     if (cookies.jwtToken) {
       navigateToDashboard();
     }
-  }, []);
+  });
 
   return (
     <div className="homepage">
