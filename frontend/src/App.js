@@ -33,6 +33,10 @@ function App() {
   //   socket.emit("JOIN_QUEUE", difficulty)
   // }
 
+  // const joinQueue = (difficulty) => {
+  //   socket.emit("JOIN_QUEUE", difficulty)
+  // }
+
   // const leaveQueue = () => {
   //   socket.emit("LEAVE_QUEUE");
   // };
