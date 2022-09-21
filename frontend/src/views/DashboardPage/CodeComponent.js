@@ -53,12 +53,6 @@ function CodeComponent({ returnFunc }) {
           Back{" "}
         </div>
       </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-      <div className="right"> Right</div>
-=======
-=======
->>>>>>> 2babe3d28ed1eeb3bb2054266f91b4daa5744fd6
 
       {/* To be changed */}
       <div className="code-editor"> 
@@ -69,10 +63,6 @@ function CodeComponent({ returnFunc }) {
           onChange={setJavascript}
         />
       </div>
-<<<<<<< HEAD
->>>>>>> 8c20e2a (Add a new page for the coding page, navigate to coding page after)
-=======
->>>>>>> 2babe3d28ed1eeb3bb2054266f91b4daa5744fd6
     </div>
   );
 }
