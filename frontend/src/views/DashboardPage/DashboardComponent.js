@@ -31,6 +31,16 @@ function DashboardComponent() {
     setEasyModal(false)
   }
 
+  const [easyQueue, setEasyQueue] = useState(false)
+  const easyQueueConnect = () =>{
+    console.log("Easy queue connect button pressed!")
+    setEasyQueue(true)
+  }
+  const easyQueueDisconnect = () =>{
+    console.log("Easy queue disconnect button pressed!")
+    setEasyQueue(false)
+  }
+
   return (
     <div className="main">
       <div className="flexbox-container-main">
@@ -48,11 +58,22 @@ function DashboardComponent() {
             sx={{ display: "flex", justifyContent: "space-between" }}
           >
             <Button
+              disabled={easyQueue}
               sx={{ ml: "7px" }}
-              onClick={closeEasyModal}
+              onClick={easyQueueConnect}
             >
-              CONFIRM (nothing for now)
+              Confirm
             </Button>
+
+            
+            <Button
+              disabled={!easyQueue}
+              sx={{ mr: "7px" }}
+              onClick={easyQueueDisconnect}
+            >
+              Cancel
+            </Button>
+
             <Button
               sx={{ mr: "7px" }}
               onClick={closeEasyModal}
