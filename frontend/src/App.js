@@ -6,26 +6,8 @@ import DashboardPage from "views/DashboardPage/DashboardPage";
 import SigninPage from "views/SigninPage/SigninPage";
 import CodingPage from "views/CodingPage/CodingPage";
 import { CookiesProvider } from "react-cookie";
-// import { io } from "socket.io-client";
 
 function App() {
-  // Placeholder for socket io connection and examples below:
-  // TODO: to create socket instance when matchmaking
-  // var socket = io("http://localhost:8001");
-  // socket.connect();
-  // socket.on("MATCHED", (roomID) => {
-  //   console.log("MATCHED with room ID: " + roomID);
-  //   socket.emit("JOIN_ROOM", roomID);
-  // });
-
-  // const joinQueue = (difficulty) => {
-  //   socket.emit("JOIN_QUEUE", difficulty)
-  // }
-
-  // const leaveQueue = () => {
-  //   socket.emit("LEAVE_QUEUE");
-  // };
-
   return (
     <CookiesProvider>
       <div className="App">

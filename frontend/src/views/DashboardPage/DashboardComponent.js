@@ -2,11 +2,7 @@ import React from "react";
 import "./dashboardComponent.scss";
 
 function DashboardComponent() {
-  return (
-    <div className="main">
-      <div className="flexbox-container-main">PLACEHOLDER</div>
-    </div>
-  );
+  return <div className="main">PLACEHOLDER</div>;
 }
 
 export default DashboardComponent;

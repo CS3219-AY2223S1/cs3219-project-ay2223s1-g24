@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./mainComponent.scss";
+import { useNavigate } from "react-router-dom";
 import {
+  Alert,
+  Box,
+  CircularProgress,
   Button,
   Card,
   CardContent,
@@ -12,11 +16,49 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
+import { io } from "socket.io-client";
+
+const RATIO = 100 / 30;
+
+function CircularProgressWithLabel(props) {
+  return (
+    <Box sx={{ position: "relative", display: "inline-flex" }}>
+      <CircularProgress variant="determinate" {...props} />
+      <Box
+        sx={{
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          position: "absolute",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Typography
+          variant="caption"
+          component="div"
+          color="text.secondary"
+          fontSize="2.5rem"
+        >
+          {`${Math.round(props.value / RATIO)}s`}
+        </Typography>
+      </Box>
+    </Box>
+  );
+}
 
 function DashboardComponent() {
-  const [EASY, MEDIUM, HARD] = ["Easy", "Medium", "Hard"];
+  const [EASY, MEDIUM, HARD] = ["easy", "medium", "hard"];
+  const [DEFAULT, ERROR, SUCCESS] = ["", "ERROR", "SUCCESS"];
+  const [socket, setSocket] = useState(null);
+  const [roomId, setRoomId] = useState("");
+  const [matchStatus, setMatchStatus] = useState(DEFAULT);
   const [roomDifficulty, setRoomDifficulty] = useState(null);
+  const [progress, setProgress] = useState(100);
   const [easyModal, setEasyModal] = useState(false);
+
   const openEasyModal = () => {
     setEasyModal(true);
   };
@@ -24,27 +66,119 @@ function DashboardComponent() {
     setEasyModal(false);
   };
 
+  const sleep = (ms) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  useEffect(() => {
+    const socket = io.connect("http://localhost:8001");
+    setSocket(socket);
+
+    socket.on("MATCHED", async (roomID) => {
+      setMatchStatus(SUCCESS);
+      await sleep(3000);
+      console.log("[FRONTEND] MATCHED with room ID: " + roomID);
+      setRoomId(roomID);
+      socket.emit("JOIN_ROOM", roomID);
+    });
+  }, []);
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (roomId !== "") {
+      navigate(`/coding/${roomId}`);
+    }
+  });
+
+  const connectToQueue = () => {
+    socket.emit("JOIN_QUEUE", roomDifficulty);
+    console.log(roomDifficulty + " queue connect button pressed!");
+  };
+
+  const disconnectFromQueue = () => {
+    socket.emit("LEAVE_QUEUE");
+    console.log(roomDifficulty + " queue connect button pressed!");
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prevProgress) =>
+        prevProgress <= 0 + RATIO ? 0 : prevProgress - RATIO
+      );
+      if (progress <= 0 && matchStatus !== SUCCESS) {
+        socket.emit("LEAVE_QUEUE");
+        setMatchStatus(ERROR);
+      }
+    }, 1000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
   return (
     <div className="main">
       <div className="flexbox-container-main">
         <Dialog open={easyModal}>
-          <DialogTitle>Match Service</DialogTitle>
+          <DialogTitle>Finding a match for you..</DialogTitle>
           <DialogContent
-            sx={{ display: "flex", "flex-direction": "column", width: "300px" }}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              width: "300px",
+              flexDirection: "column",
+            }}
           >
-            <span style={{ marginBottom: "20px" }}>
-              Please confirm that you want to be matched into the easy question
-              room
-            </span>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <CircularProgressWithLabel value={progress} size={"7rem"} />
+            </div>
+            {matchStatus === SUCCESS && (
+              <Alert sx={{ mt: "10px", fontSize: "14px", display: "flex" }}>
+                Match found!
+                <div style={{ paddingRight: "10px" }}>
+                  Redirecting to room..
+                  <CircularProgress
+                    color="inherit"
+                    size="12px"
+                    sx={{ ml: "5px" }}
+                  />
+                </div>
+              </Alert>
+            )}
+
+            {(matchStatus === ERROR || progress <= 0) && (
+              <Alert
+                severity={"error"}
+                sx={{ mt: "10px", fontSize: "14px", display: "flex" }}
+              >
+                Match could not be found.
+              </Alert>
+            )}
           </DialogContent>
           <DialogActions
-            sx={{ display: "flex", justifyContent: "space-between" }}
+            sx={{ display: "flex", justifyContent: "center", pb: "15px" }}
           >
-            <Button sx={{ ml: "7px" }} onClick={closeEasyModal}>
-              CONFIRM (nothing for now)
-            </Button>
-            <Button sx={{ mr: "7px" }} onClick={closeEasyModal}>
-              Go back
+            {(matchStatus === ERROR || progress <= 0) && (
+              <Button
+                variant="contained"
+                sx={{}}
+                onClick={() => {
+                  setMatchStatus(DEFAULT);
+                  setProgress(100);
+                  connectToQueue();
+                }}
+              >
+                Continue Matching
+              </Button>
+            )}
+            <Button
+              variant="contained"
+              sx={{}}
+              onClick={() => {
+                closeEasyModal();
+                disconnectFromQueue();
+              }}
+            >
+              Cancel
             </Button>
           </DialogActions>
         </Dialog>
@@ -147,7 +281,11 @@ function DashboardComponent() {
         size="small"
         variant="contained"
         color="primary"
-        onClick={openEasyModal}
+        onClick={() => {
+          openEasyModal();
+          setProgress(100);
+          connectToQueue();
+        }}
       >
         Find Room
       </Button>
