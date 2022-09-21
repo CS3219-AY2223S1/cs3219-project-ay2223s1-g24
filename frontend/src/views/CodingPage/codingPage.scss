@@ -12,7 +12,7 @@
 .left-pane {
     display: flex;
     flex-direction: column;
-    background-color: rgb(220,220,220);
+    background-color: rgb(220, 220, 220);
     color: black;
     flex-grow: 1;
     padding: 10px 15px;
@@ -27,7 +27,7 @@
     .prev-question-button {
         width: fit-content;
     }
-    
+
     .next-question-button {
         margin-left: 15px;
         margin-right: 35px;
@@ -38,7 +38,7 @@
         animation: shake 0.7s;
         background-color: rgb(11, 108, 236);
     }
-    
+
     .next-question-button:hover {
         animation: shake 0.5s;
         background-color: rgb(11, 108, 236);
@@ -55,4 +55,5 @@
     50% {
         transform: translate3d(0px, -4px, -4px);
     }
+
 }

@@ -36,7 +36,10 @@ describe('Test API Routes', function () {
       .get('/api/users/getUsers')
       .end((err, res) => {
         res.should.have.status(200);
+<<<<<<< HEAD
         res.body["users"].length.should.be.equal(0);
+=======
+>>>>>>> 1bcc16172c14e3e653b9f3d4096e374545b8a467
         done();
       });
   });
