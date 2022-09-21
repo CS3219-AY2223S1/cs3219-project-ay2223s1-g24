@@ -6,7 +6,6 @@
         border-bottom: .5px solid lightgray;
         padding-top: 5px;
         background-color: white;
-        margin-bottom: 10rem;
 
         .item:not(:nth-child(2)) {
             flex-basis: 0%;
@@ -39,9 +38,5 @@
 
     }
 
-
-    // .field {
-    //     margin-top: 20px;
-    // }
 
 }
