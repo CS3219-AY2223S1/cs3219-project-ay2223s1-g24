@@ -519,10 +519,8 @@ function DashboardPage() {
         </Dialog>
       </div>
 
-      <div>
-        {tabNumber === 0 && <MainComponent />}
-        {tabNumber === 1 && <DashboardComponent />}
-      </div>
+      {tabNumber === 0 && <MainComponent />}
+      {tabNumber === 1 && <DashboardComponent />}
     </div>
   );
 }
