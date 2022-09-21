@@ -20,6 +20,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { io } from "socket.io-client";
+
+
 
 function DashboardComponent() {
 
@@ -31,15 +34,38 @@ function DashboardComponent() {
     setEasyModal(false)
   }
 
+  const socket = io("http://localhost:8001");
+
   const [easyQueue, setEasyQueue] = useState(false)
   const easyQueueConnect = () =>{
+    socket.connect()
+    socket.emit("JOIN_QUEUE", "easy")
+
     console.log("Easy queue connect button pressed!")
     setEasyQueue(true)
   }
   const easyQueueDisconnect = () =>{
+    socket.emit("LEAVE_QUEUE");
+
     console.log("Easy queue disconnect button pressed!")
     setEasyQueue(false)
   }
+
+  // var socket = io("http://localhost:8001");
+  // socket.connect();
+
+  // socket.on("MATCHED", (roomID) => {
+  //   console.log("MATCHED with room ID: " + roomID);
+  //   socket.emit("JOIN_ROOM", roomID);
+  // });
+
+  // const joinQueue = (difficulty) => {
+  //   socket.emit("JOIN_QUEUE", difficulty)
+  // }
+
+  // const leaveQueue = () => {
+  //   socket.emit("LEAVE_QUEUE");
+  // };
 
   return (
     <div className="main">
