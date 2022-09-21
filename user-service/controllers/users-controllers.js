@@ -86,7 +86,7 @@ const signup = async (req, res, next) => {
         name: createdUser.name,
       },
       process.env.JWT_KEY,
-      { expiresIn: 30 }
+      { expiresIn: '24h' }
     );
   } catch (err) {
     res
@@ -190,7 +190,7 @@ const updatePassword = async (req, res, next) => {
         name: updatedUser.name,
       },
       process.env.JWT_KEY,
-      { expiresIn: 30 }
+      { expiresIn: '24h' }
     );
   } catch (err) {
     res
@@ -254,8 +254,7 @@ const login = async (req, res, next) => {
         name: existingUser.name,
       },
       process.env.JWT_KEY,
-      // { expiresIn: "24h" }
-      { expiresIn: 30 } //30 seconds
+      { expiresIn: '24h' } //30 seconds
     );
   } catch (err) {
     res
