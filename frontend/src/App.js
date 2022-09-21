@@ -12,21 +12,21 @@ import { useEffect } from "react";
 function App() {
   // Placeholder for socket io connection and examples below:
   // TODO: to create socket instance when matchmaking
-  useEffect(() => {
-    var socket = io("http://localhost:8001");
-    socket.connect();
+  // useEffect(() => {
+  //   var socket = io("http://localhost:8001");
+  //   socket.connect();
 
-    socket.on("MATCHED", (roomID) => {
-      console.log("MATCHED with room ID: " + roomID);
-      socket.emit("JOIN_ROOM", roomID);
-    });
+  //   socket.on("MATCHED", (roomID) => {
+  //     console.log("MATCHED with room ID: " + roomID);
+  //     socket.emit("JOIN_ROOM", roomID);
+  //   });
 
-    const joinQueue = (difficulty) => {
-      socket.emit("JOIN_QUEUE", difficulty)
-    }
-    // Just for testing for now
-    joinQueue("easy");
-  },[])
+  //   const joinQueue = (difficulty) => {
+  //     socket.emit("JOIN_QUEUE", difficulty)
+  //   }
+  //   // Just for testing for now
+  //   joinQueue("easy");
+  // },[])
   
 
   // const joinQueue = (difficulty) => {

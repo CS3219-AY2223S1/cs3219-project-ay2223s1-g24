@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import "./dashboardComponent.scss";
 import {
   Alert,
@@ -26,6 +26,18 @@ import { io } from "socket.io-client";
 
 function DashboardComponent() {
 
+  const [socket, setSocket] = useState(null);
+  
+  useEffect(() => {
+    const socket = io.connect("http://localhost:8001");
+    setSocket(socket);
+
+    socket.on("MATCHED", (roomID) => {
+      console.log("MATCHED with room ID: " + roomID);
+      socket.emit("JOIN_ROOM", roomID);
+    });
+  },[])
+
   const [easyModal, setEasyModal] = useState(false)
   const openEasyModal = () =>{
     setEasyModal(true)
@@ -34,19 +46,15 @@ function DashboardComponent() {
     setEasyModal(false)
   }
 
-  const socket = io("http://localhost:8001");
-
   const [easyQueue, setEasyQueue] = useState(false)
-  const easyQueueConnect = () =>{
-    socket.connect()
+  const easyQueueConnect = () => {
     socket.emit("JOIN_QUEUE", "easy")
-
     console.log("Easy queue connect button pressed!")
     setEasyQueue(true)
   }
   const easyQueueDisconnect = () =>{
     socket.emit("LEAVE_QUEUE");
-
+    // TODO: handle use case for then the client is no-longer in queue
     console.log("Easy queue disconnect button pressed!")
     setEasyQueue(false)
   }
