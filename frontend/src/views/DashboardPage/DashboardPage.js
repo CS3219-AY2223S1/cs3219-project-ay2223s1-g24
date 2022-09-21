@@ -30,6 +30,7 @@ import {
 } from "constants";
 import { HEROKU_ENDPOINT } from "configs";
 import axios from "axios";
+import { isExpired } from "react-jwt";
 
 function DashboardPage() {
   const [value, setValue] = useState("one");
@@ -59,17 +60,26 @@ function DashboardPage() {
     navigate("/");
   };
 
+  // eslint-disable-next-line
   const [cookies, setCookie, removeCookie] = useCookies([
     "name",
     "email",
     "jwtToken",
   ]);
 
+  const areCookiesPresent = () => {
+    return cookies.jwtToken && cookies.name && cookies.email;
+  };
+
   useEffect(() => {
-    if (!cookies.jwtToken) {
+    const hasTokenExpired = isExpired(cookies?.jwtToken);
+    if (!areCookiesPresent() || hasTokenExpired) {
       navigate("/signin");
+      removeCookie("name", { path: "/" });
+      removeCookie("email", { path: "/" });
+      removeCookie("jwtToken", { path: "/" });
     }
-  }, []);
+  });
 
   const sleep = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));

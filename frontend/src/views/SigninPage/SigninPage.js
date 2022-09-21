@@ -1,20 +1,8 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  TextField,
-  CircularProgress,
-} from "@mui/material";
+import { Alert, Box, Button, TextField, CircularProgress } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { HEROKU_ENDPOINT } from "configs";
-import { Link } from "react-router-dom";
 import mainLogo from "assets/mainlogo.png";
 import "./signin.scss";
 import SignupPage from "views/SignupPage/SignupPage";
@@ -30,13 +18,9 @@ import {
 function SigninPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [dialogTitle, setDialogTitle] = useState("");
   const [status, setStatus] = useState(STATUS_CODE_SUCCESS);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUserInputTouched, setUserInputTouched] = useState(false);
   const [isPasswordInputTouched, setPasswordInputTouched] = useState(false);
-  const [dialogMsg, setDialogMsg] = useState("");
-  const [isSigninSuccess, setIsSigninSuccess] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [cookies, setCookie] = useCookies(["name", "email", "jwtToken"]);
@@ -57,10 +41,10 @@ function SigninPage() {
   };
 
   useEffect(() => {
-    if (cookies.jwtToken) {
+    if (cookies.jwtToken && cookies.name && cookies.email) {
       navigateToDashboard();
     }
-  }, []);
+  });
 
   const isValidEmail = (email) => {
     return /\S+@\S+\.\S+/.test(email);
@@ -77,9 +61,6 @@ function SigninPage() {
   };
 
   const handleSignin = async () => {
-    setIsSigninSuccess(false);
-
-    // Check fields submitted if they are valid inputs
     if (!areValidFields()) {
       return;
     }
@@ -115,8 +96,6 @@ function SigninPage() {
       navigateToDashboard();
     }
   };
-
-  const closeDialog = () => setIsDialogOpen(false);
 
   return (
     <div className="signin">
@@ -263,22 +242,6 @@ function SigninPage() {
             <Route path="/signup/*" element={<SignupPage />} />
           </Routes>
         </Box>
-
-        <Dialog open={isDialogOpen} onClose={closeDialog}>
-          <DialogTitle>{dialogTitle}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>{dialogMsg}</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            {isSigninSuccess ? (
-              <Button component={Link} to="/login">
-                Log in
-              </Button>
-            ) : (
-              <Button onClick={closeDialog}>Done</Button>
-            )}
-          </DialogActions>
-        </Dialog>
       </Box>
     </div>
   );

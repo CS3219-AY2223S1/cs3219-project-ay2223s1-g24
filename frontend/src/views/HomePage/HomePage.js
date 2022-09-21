@@ -20,10 +20,10 @@ function HomePage() {
   const [cookies] = useCookies(["name", "email", "jwtToken"]);
 
   useEffect(() => {
-    if (cookies.jwtToken) {
+    if (cookies.jwtToken && cookies.name && cookies.email) {
       navigateToDashboard();
     }
-  }, []);
+  });
 
   return (
     <div className="homepage">

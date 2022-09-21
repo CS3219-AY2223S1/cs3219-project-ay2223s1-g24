@@ -4,10 +4,10 @@ import Box from "@mui/material/Box";
 import Button from "components/Button/Button";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
-import CodeComponent from "./CodeComponent";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function MainComponent() {
+  // eslint-disable-next-line
   const [isCodePageRendered, setCodePageRender] = useState(0);
 
   const navigate = useNavigate();
@@ -46,9 +46,6 @@ function MainComponent() {
               </Typography>
             </Box>
           </div>
-          {/*<div className="flexbox-container2 confirm-btn">
-            <Button text={"Start Matching!"} onClick={() => setCodePageRender(1)} />
-          </div>*/}
           <div className="flexbox-container2 confirm-btn">
             <Button text={"Start Matching!"} onClick={navigateToCodingPage} />
           </div>

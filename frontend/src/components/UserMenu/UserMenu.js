@@ -22,6 +22,7 @@ export default function BasicMenu({
 
   const navigate = useNavigate();
 
+  // eslint-disable-next-line
   const [cookies, setCookie, removeCookie] = useCookies([
     "name",
     "email",

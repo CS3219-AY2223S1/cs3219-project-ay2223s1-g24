@@ -34,18 +34,14 @@ function SignupPage() {
   const [isEmailDuplicate, setEmailDuplicate] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [cookies, setCookie, removeCookie] = useCookies([
-    "name",
-    "email",
-    "jwtToken",
-  ]);
+  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken"]);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (cookies.jwtToken) {
       navigate("/dashboard");
     }
-  }, []);
+  });
 
   const navigateDashboard = () => {
     navigate("/dashboard");
