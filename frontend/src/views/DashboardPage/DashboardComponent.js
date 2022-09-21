@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate } from "react-router-dom";
 import "./dashboardComponent.scss";
 import {
   Alert,
@@ -27,16 +28,25 @@ import { io } from "socket.io-client";
 function DashboardComponent() {
 
   const [socket, setSocket] = useState(null);
+  const [roomId, setRoomId] = useState('')
   
   useEffect(() => {
     const socket = io.connect("http://localhost:8001");
     setSocket(socket);
 
     socket.on("MATCHED", (roomID) => {
-      console.log("MATCHED with room ID: " + roomID);
+      console.log("[FRONTEND] MATCHED with room ID: " + roomID);
+      setRoomId(roomID)
       socket.emit("JOIN_ROOM", roomID);
     });
-  },[])
+  }, [])
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (roomId !== '') {
+      navigate(`/coding/${roomId}`);
+    }
+  }, [roomId])
 
   const [easyModal, setEasyModal] = useState(false)
   const openEasyModal = () =>{
@@ -45,7 +55,6 @@ function DashboardComponent() {
   const closeEasyModal = () =>{
     setEasyModal(false)
   }
-
   const [easyQueue, setEasyQueue] = useState(false)
   const easyQueueConnect = () => {
     socket.emit("JOIN_QUEUE", "easy")
@@ -59,21 +68,25 @@ function DashboardComponent() {
     setEasyQueue(false)
   }
 
-  // var socket = io("http://localhost:8001");
-  // socket.connect();
-
-  // socket.on("MATCHED", (roomID) => {
-  //   console.log("MATCHED with room ID: " + roomID);
-  //   socket.emit("JOIN_ROOM", roomID);
-  // });
-
-  // const joinQueue = (difficulty) => {
-  //   socket.emit("JOIN_QUEUE", difficulty)
-  // }
-
-  // const leaveQueue = () => {
-  //   socket.emit("LEAVE_QUEUE");
-  // };
+  const [mediumModal, setMediumModal] = useState(false)
+  const openMediumModal = () =>{
+    setMediumModal(true)
+  }
+  const closeMediumModal = () =>{
+    setMediumModal(false)
+  }
+  const [mediumQueue, setMediumQueue] = useState(false)
+  const mediumQueueConnect = () => {
+    socket.emit("JOIN_QUEUE", "medium")
+    console.log("medium queue connect button pressed!")
+    setMediumQueue(true)
+  }
+  const mediumQueueDisconnect = () =>{
+    socket.emit("LEAVE_QUEUE");
+    // TODO: handle use case for then the client is no-longer in queue
+    console.log("medium queue disconnect button pressed!")
+    setMediumQueue(false)
+  }
 
   return (
     <div className="main">
@@ -111,6 +124,44 @@ function DashboardComponent() {
             <Button
               sx={{ mr: "7px" }}
               onClick={closeEasyModal}
+            >
+              Go back
+            </Button>
+          </DialogActions>
+      </Dialog>
+
+      <Dialog open={mediumModal}>
+          <DialogTitle>Match Service</DialogTitle>
+          <DialogContent
+            sx={{ display: "flex", "flex-direction": "column", width: "300px" }}
+          >
+            <span style={{ marginBottom: "20px" }}>
+              Please confirm that you want to be matched into the medium question room
+            </span>
+          </DialogContent>
+          <DialogActions
+            sx={{ display: "flex", justifyContent: "space-between" }}
+          >
+            <Button
+              disabled={mediumQueue}
+              sx={{ ml: "7px" }}
+              onClick={mediumQueueConnect}
+            >
+              Confirm
+            </Button>
+
+            
+            <Button
+              disabled={!mediumQueue}
+              sx={{ mr: "7px" }}
+              onClick={mediumQueueDisconnect}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              sx={{ mr: "7px" }}
+              onClick={closeMediumModal}
             >
               Go back
             </Button>
@@ -161,9 +212,9 @@ function DashboardComponent() {
                 </Typography>
               </CardContent>
             <CardActions>
-              <Button size="small" color="primary">
-                Find Room
-              </Button>
+                <Button size="small" color="primary" onClick={openMediumModal}>
+                  Find Room
+                </Button>
             </CardActions>
           </Card>
         </Grid>
