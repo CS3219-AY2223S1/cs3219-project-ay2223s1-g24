@@ -1,39 +1,37 @@
-const { expect } = require('chai');
-var chai = require('chai');
-var chaiHttp = require('chai-http');
+const { expect } = require("chai");
+var chai = require("chai");
+var chaiHttp = require("chai-http");
 // const chaiAsPromised = require('chai-as-promised');
 const jwt = require("jsonwebtoken");
 
-const User = require('../models/user');
-var server = require('../server');
+const User = require("../models/user");
+var server = require("../server");
 
 chai.should();
 chai.use(chaiHttp);
 
-
 before((done) => {
   User.deleteMany({}).catch((err) => {
-    console.log("Some error trying to clean up test database BEFORE tests")
-    console.log(err)
+    console.log("Some error trying to clean up test database BEFORE tests");
+    console.log(err);
   });
   done();
 });
 
 after((done) => {
   User.deleteMany({}).catch((err) => {
-    console.log("Some error trying to clean up test database AFTER tests")
-    console.log(err)
+    console.log("Some error trying to clean up test database AFTER tests");
+    console.log(err);
   });
   done();
-})
+});
 
-
-describe('Test API Routes', function () {
-
+describe("Test API Routes", function () {
   // get users
-  it('Verify that there are 0 users in the DB', (done) => {
-    chai.request(server)
-      .get('/api/users/getUsers')
+  it("Verify that there are 0 users in the DB", (done) => {
+    chai
+      .request(server)
+      .get("/api/users/getUsers")
       .end((err, res) => {
         res.should.have.status(200);
         res.body["users"].length.should.be.equal(0);
@@ -41,43 +39,46 @@ describe('Test API Routes', function () {
       });
   });
 
-
   // signup
-  it('Verify that signup works for new user', (done) => {
-
+  it("Verify that signup works for new user", (done) => {
     const newUser = {
       name: "Valverdo",
       email: "valverdo@alberto.com", //note that any caps in email will be made small cap so for testing purposes, use small cap for email
-      password: "Mohammed"
-    }
+      password: "Mohammed",
+    };
 
-    chai.request(server)
-      .post('/api/users/signup')
+    chai
+      .request(server)
+      .post("/api/users/signup")
       .send(newUser)
       .end((err, res) => {
         res.should.have.status(201);
-        res.body["result"].should.be.a('object');
+        res.body["result"].should.be.a("object");
         res.body["result"]["name"].should.be.equal(newUser["name"]);
         res.body["result"]["email"].should.be.equal(newUser["email"]);
 
-        const token = res.body["token"]
+        const token = res.body["token"];
         const decodedToken = jwt.verify(token, process.env.JWT_KEY);
-        const decodedUserData = { email: decodedToken.email, name: decodedToken.name};
+        const decodedUserData = {
+          email: decodedToken.email,
+          name: decodedToken.name,
+        };
         decodedUserData["email"].should.be.equal(newUser["email"]);
         decodedUserData["name"].should.be.equal(newUser["name"]);
         done();
       });
   });
 
-  it('Verify that existing user cannot sign up again', (done) => {
+  it("Verify that existing user cannot sign up again", (done) => {
     const existingUser = {
       name: "Valverdo",
       email: "valverdo@alberto.com",
-      password: "Mohammed"
-    }
+      password: "Mohammed",
+    };
 
-    chai.request(server)
-      .post('/api/users/signup')
+    chai
+      .request(server)
+      .post("/api/users/signup")
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(409);
@@ -87,74 +88,82 @@ describe('Test API Routes', function () {
       });
   });
 
-  it('Verify that signup does not work if the request body is of the wrong format', (done) => {
+  it("Verify that signup does not work if the request body is of the wrong format", (done) => {
     const existingUser = {
       username: "Valverdo",
       email: "valverdo@alberto.com",
-      password: "Mohammed"
-    }
+      password: "Mohammed",
+    };
 
-    chai.request(server)
-      .post('/api/users/signup')
+    chai
+      .request(server)
+      .post("/api/users/signup")
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(400);
-        res.body.should.be.equal('Invalid inputs passed, please check your data.');
+        res.body.should.be.equal(
+          "Invalid inputs passed, please check your data."
+        );
         done();
       });
   });
 
-
   // login
-  it('Verify that existing user can log in', (done) => {
+  it("Verify that existing user can log in", (done) => {
     const existingUser = {
       name: "Valverdo",
       email: "valverdo@alberto.com",
-      password: "Mohammed"
-    }
+      password: "Mohammed",
+    };
 
-    chai.request(server)
-      .post('/api/users/login')
+    chai
+      .request(server)
+      .post("/api/users/login")
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(200);
         res.body["message"].should.be.equal("Logged in!");
 
-        const token = res.body["token"]
+        const token = res.body["token"];
         const decodedToken = jwt.verify(token, process.env.JWT_KEY);
-        const decodedUserData = { email: decodedToken.email, name: decodedToken.name};
+        const decodedUserData = {
+          email: decodedToken.email,
+          name: decodedToken.name,
+        };
         decodedUserData["email"].should.be.equal(existingUser["email"]);
         decodedUserData["name"].should.be.equal(existingUser["name"]);
         done();
       });
   });
 
-  it('Verify that existing user with wrong password cannot log in', (done) => {
+  it("Verify that existing user with wrong password cannot log in", (done) => {
     const existingUser = {
       name: "Valverdo",
       email: "valverdo@alberto.com",
-      password: "Salah"
-    }
+      password: "Salah",
+    };
 
-    chai.request(server)
-      .post('/api/users/login')
+    chai
+      .request(server)
+      .post("/api/users/login")
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(403);
-        res.body.should.be.equal('Wrong Password');
+        res.body.should.be.equal("Wrong Password");
         done();
       });
   });
 
-  it('Verify that non-existing user cannot log in', (done) => {
+  it("Verify that non-existing user cannot log in", (done) => {
     const existingUser = {
       name: "Stamford",
       email: "stamford@bridge.com",
-      password: "chelseaFC"
-    }
+      password: "chelseaFC",
+    };
 
-    chai.request(server)
-      .post('/api/users/login')
+    chai
+      .request(server)
+      .post("/api/users/login")
       .send(existingUser)
       .end((err, res) => {
         res.should.have.status(401);
@@ -163,36 +172,38 @@ describe('Test API Routes', function () {
       });
   });
 
-
   // update password
-  it('Verify if the request body is of wrong format, updatePassword will not proceed', (done) => {
-
+  it("Verify if the request body is of wrong format, updatePassword will not proceed", (done) => {
     const updatedUser = {
       name: "Heather Swanson",
       email: "strong@woman.com",
-      password: "notAMan"
-    }
+      password: "notAMan",
+    };
 
-    chai.request(server)
-      .put('/api/users/updatePassword')
+    chai
+      .request(server)
+      .put("/api/users/updatePassword")
       .send(updatedUser)
       .end((err, res) => {
         res.should.have.status(400);
-        res.body.should.be.equal('Invalid inputs passed, please check your data.');
+        res.body.should.be.equal(
+          "Invalid inputs passed, please check your data."
+        );
         done();
       });
   });
 
-  it('Verify that an existing user\'s password cannot be updated if the old password is wrong', (done) => {
+  it("Verify that an existing user's password cannot be updated if the old password is wrong", (done) => {
     const updatedUser = {
       name: "Valverdo",
       email: "valverdo@alberto.com",
       password: "Liverpool",
-      new_password: "Alfredo"
-    }
+      new_password: "Alfredo",
+    };
 
-    chai.request(server)
-      .put('/api/users/updatePassword')
+    chai
+      .request(server)
+      .put("/api/users/updatePassword")
       .send(updatedUser)
       .end((err, res) => {
         res.should.have.status(403);
@@ -201,75 +212,84 @@ describe('Test API Routes', function () {
       });
   });
 
-  it('Verify that an existing user\'s password is cannot be updated if the new password is not at least length 6', (done) => {
+  it("Verify that an existing user's password is cannot be updated if the new password is not at least length 6", (done) => {
     const updatedUser = {
       name: "Valverdo",
       email: "valverdo@alberto.com",
       password: "Mohammed",
-      new_password: "Jack"
-    }
+      new_password: "Jack",
+    };
 
-    chai.request(server)
-      .put('/api/users/updatePassword')
+    chai
+      .request(server)
+      .put("/api/users/updatePassword")
       .send(updatedUser)
       .end((err, res) => {
         res.should.have.status(400);
-        res.body.should.be.equal('Invalid inputs passed, please check your data.');
+        res.body.should.be.equal(
+          "Invalid inputs passed, please check your data."
+        );
         done();
       });
   });
 
-  it('Verify that an existing user\'s password is updated when the old password is correct', (done) => {
+  it("Verify that an existing user's password is updated when the old password is correct", (done) => {
     const updatedUser = {
       name: "Valverdo",
       email: "valverdo@alberto.com",
       password: "Mohammed",
-      new_password: "Alfredo"
-    }
+      new_password: "Alfredo",
+    };
 
-    chai.request(server)
-      .put('/api/users/updatePassword')
+    chai
+      .request(server)
+      .put("/api/users/updatePassword")
       .send(updatedUser)
       .end((err, res) => {
         res.should.have.status(200);
         res.body["message"].should.be.equal("User password updated!");
 
-        const token = res.body["token"]
+        const token = res.body["token"];
         const decodedToken = jwt.verify(token, process.env.JWT_KEY);
-        const decodedUserData = { email: decodedToken.email, name: decodedToken.name};
+        const decodedUserData = {
+          email: decodedToken.email,
+          name: decodedToken.name,
+        };
         decodedUserData["email"].should.be.equal(updatedUser["email"]);
         decodedUserData["name"].should.be.equal(updatedUser["name"]);
         done();
       });
   });
 
-  it('Verify that an if user does not exist in database, update password returns an error', (done) => {
-
+  it("Verify that an if user does not exist in database, update password returns an error", (done) => {
     const updatedUser = {
       name: "Heather Swanson",
       email: "strong@woman.com",
       password: "notAMan",
-      new_password: "DefinitelyNotAMan"
-    }
+      new_password: "DefinitelyNotAMan",
+    };
 
-    chai.request(server)
-      .put('/api/users/updatePassword')
+    chai
+      .request(server)
+      .put("/api/users/updatePassword")
       .send(updatedUser)
       .end((err, res) => {
         res.should.have.status(404);
-        res.body.should.be.equal("User not found in database to update password.");
+        res.body.should.be.equal(
+          "User not found in database to update password."
+        );
         done();
       });
   });
 
-
   // delete user
-  it('Verify that delete works for existing user', (done) => {
+  it("Verify that delete works for existing user", (done) => {
     const deleteUser = {
       email: "valverdo@alberto.com",
-      password: "Alfredo"
+      password: "Alfredo",
     };
-    chai.request(server)
+    chai
+      .request(server)
       .delete(`/api/users/deleteUser`)
       .send(deleteUser)
       .end((err, res) => {
@@ -279,36 +299,39 @@ describe('Test API Routes', function () {
       });
   });
 
-  it('Verify that delete returns 404 if the user does not exist', (done) => {
+  it("Verify that delete returns 404 if the user does not exist", (done) => {
     const deletedUser = {
       email: "valverdo@alberto.com",
-      password: "random, since it does not matter"
+      password: "random, since it does not matter",
     };
-    chai.request(server)
+    chai
+      .request(server)
       .delete(`/api/users/deleteUser`)
       .send(deletedUser)
       .end((err, res) => {
         res.should.have.status(404);
-        res.body.should.be.equal('User not found in database to delete account.');
+        res.body.should.be.equal(
+          "User not found in database to delete account."
+        );
         done();
       });
   });
 
-  it('Verify that delete returns 400 if the request body is of the wrong format', (done) => {
+  it("Verify that delete returns 400 if the request body is of the wrong format", (done) => {
     const deletedUser = {
       user_email: "valverdo@alberto.com",
-      password: "random, since it does not matter"
+      password: "random, since it does not matter",
     };
-    chai.request(server)
+    chai
+      .request(server)
       .delete(`/api/users/deleteUser`)
       .send(deletedUser)
       .end((err, res) => {
         res.should.have.status(400);
-        res.body.should.be.equal('Invalid inputs passed, please check your data.');
+        res.body.should.be.equal(
+          "Invalid inputs passed, please check your data."
+        );
         done();
       });
   });
-
 });
-
-

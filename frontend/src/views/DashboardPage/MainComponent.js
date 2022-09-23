@@ -1,61 +1,296 @@
-import * as React from "react";
+import { useState, useEffect } from "react";
 import "./mainComponent.scss";
-import Box from "@mui/material/Box";
-import Button from "components/Button/Button";
-import Typography from "@mui/material/Typography";
-import { useState } from "react";
-import CodeComponent from "./CodeComponent";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  Typography,
+} from "@mui/material";
+import { io } from "socket.io-client";
 
-function MainComponent() {
-  const [isCodePageRendered, setCodePageRender] = useState(0);
+const RATIO = 100 / 30;
 
-  const navigate = useNavigate();
+function CircularProgressWithLabel(props) {
+  return (
+    <Box sx={{ position: "relative", display: "inline-flex" }}>
+      <CircularProgress variant="determinate" {...props} />
+      <Box
+        sx={{
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          position: "absolute",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Typography
+          variant="caption"
+          component="div"
+          color="text.secondary"
+          fontSize="2.5rem"
+        >
+          {`${Math.round(props.value / RATIO)}s`}
+        </Typography>
+      </Box>
+    </Box>
+  );
+}
 
-  const navigateToCodingPage = () => {
-    navigate("/coding");
+function DashboardComponent() {
+  const [EASY, MEDIUM, HARD] = ["easy", "medium", "hard"];
+  const [DEFAULT, ERROR, SUCCESS] = ["", "ERROR", "SUCCESS"];
+  const [socket, setSocket] = useState(null);
+  const [roomId, setRoomId] = useState("");
+  const [matchStatus, setMatchStatus] = useState(DEFAULT);
+  const [roomDifficulty, setRoomDifficulty] = useState(null);
+  const [progress, setProgress] = useState(100);
+  const [easyModal, setEasyModal] = useState(false);
+
+  const openEasyModal = () => {
+    setEasyModal(true);
+  };
+  const closeEasyModal = () => {
+    setEasyModal(false);
   };
 
+  const sleep = (ms) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  useEffect(() => {
+    const socket = io.connect("http://localhost:8001");
+    setSocket(socket);
+
+    socket.on("MATCHED", async (roomID) => {
+      setMatchStatus(SUCCESS);
+      await sleep(3000);
+      console.log("[FRONTEND] MATCHED with room ID: " + roomID);
+      setRoomId(roomID);
+      socket.emit("JOIN_ROOM", roomID);
+    });
+  }, []);
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (roomId !== "") {
+      navigate(`/coding/${roomId}`);
+    }
+  });
+
+  const connectToQueue = () => {
+    socket.emit("JOIN_QUEUE", roomDifficulty);
+    console.log(roomDifficulty + " queue connect button pressed!");
+  };
+
+  const disconnectFromQueue = () => {
+    socket.emit("LEAVE_QUEUE");
+    console.log(roomDifficulty + " queue connect button pressed!");
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prevProgress) =>
+        prevProgress <= 0 + RATIO ? 0 : prevProgress - RATIO
+      );
+      if (progress <= 0 && matchStatus !== SUCCESS) {
+        socket.emit("LEAVE_QUEUE");
+        setMatchStatus(ERROR);
+      }
+    }, 1000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
   return (
-    <div>
-      {isCodePageRendered === 0 && (
-        <div className="dashboard">
-          <div className="flexbox-container">
-            <Box className="flexbox-item">
-              <Typography gutterBottom variant="h5" component="div">
-                Easy
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                This is the easy difficulty.
-              </Typography>
-            </Box>
-            <Box className="flexbox-item">
-              <Typography gutterBottom variant="h5" component="div">
-                Medium
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                This is the medium difficulty.
-              </Typography>
-            </Box>
-            <Box className="flexbox-item">
-              <Typography gutterBottom variant="h5" component="div">
-                Hard
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                This is the hard difficulty.
-              </Typography>
-            </Box>
-          </div>
-          {/*<div className="flexbox-container2 confirm-btn">
-            <Button text={"Start Matching!"} onClick={() => setCodePageRender(1)} />
-          </div>*/}
-          <div className="flexbox-container2 confirm-btn">
-            <Button text={"Start Matching!"} onClick={navigateToCodingPage} />
-          </div>
-        </div>
-      )}
+    <div className="main">
+      <div className="flexbox-container-main">
+        <Dialog open={easyModal}>
+          <DialogTitle>Finding a match for you..</DialogTitle>
+          <DialogContent
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              width: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <CircularProgressWithLabel value={progress} size={"7rem"} />
+            </div>
+            {matchStatus === SUCCESS && (
+              <Alert sx={{ mt: "10px", fontSize: "14px", display: "flex" }}>
+                Match found!
+                <div style={{ paddingRight: "10px" }}>
+                  Redirecting to room..
+                  <CircularProgress
+                    color="inherit"
+                    size="12px"
+                    sx={{ ml: "5px" }}
+                  />
+                </div>
+              </Alert>
+            )}
+
+            {(matchStatus === ERROR || progress <= 0) && (
+              <Alert
+                severity={"error"}
+                sx={{ mt: "10px", fontSize: "14px", display: "flex" }}
+              >
+                Match could not be found.
+              </Alert>
+            )}
+          </DialogContent>
+          <DialogActions
+            sx={{ display: "flex", justifyContent: "center", pb: "15px" }}
+          >
+            {(matchStatus === ERROR || progress <= 0) && (
+              <Button
+                variant="contained"
+                sx={{}}
+                onClick={() => {
+                  setMatchStatus(DEFAULT);
+                  setProgress(100);
+                  connectToQueue();
+                }}
+              >
+                Continue Matching
+              </Button>
+            )}
+            <Button
+              variant="contained"
+              sx={{}}
+              onClick={() => {
+                closeEasyModal();
+                disconnectFromQueue();
+              }}
+            >
+              Cancel
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Grid
+          container
+          direction="row"
+          justifyContent="space-evenly"
+          alignItems="center"
+          spacing={8}
+          className="grid-container"
+        >
+          <Grid item>
+            <div
+              className={`glow-green ${
+                roomDifficulty === EASY ? "selected" : ""
+              }`}
+              onClick={() => setRoomDifficulty(EASY)}
+            >
+              <Card sx={{ maxWidth: 345 }}>
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image="https://htmlcolorcodes.com/assets/images/colors/green-color-solid-background-1920x1080.png"
+                  alt="green background color"
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    Easy
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Questions that usually sets the tone for the concepts that
+                    will be tested subsequently
+                  </Typography>
+                </CardContent>
+              </Card>
+            </div>
+          </Grid>
+
+          <Grid item>
+            <div
+              className={`glow-yellow ${
+                roomDifficulty === MEDIUM ? "selected" : ""
+              }`}
+              onClick={() => setRoomDifficulty(MEDIUM)}
+            >
+              <Card sx={{ maxWidth: 345 }}>
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image="https://htmlcolorcodes.com/assets/images/colors/yellow-color-solid-background-1920x1080.png"
+                  alt="yellow background color"
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    Medium
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Majority of the online assessment questions and real life
+                    interview questions are of this level
+                  </Typography>
+                </CardContent>
+              </Card>
+            </div>
+          </Grid>
+
+          <Grid item>
+            <div
+              className={`glow-red ${
+                roomDifficulty === HARD ? "selected" : ""
+              }`}
+              onClick={() => {
+                console.log("selecting");
+                setRoomDifficulty(HARD);
+              }}
+            >
+              <Card sx={{ maxWidth: 345 }}>
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image="https://htmlcolorcodes.com/assets/images/colors/red-color-solid-background-1920x1080.png"
+                  alt="red background color"
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    Hard
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Frequently asked for firms that focus on trading-related
+                    activities. Not very common
+                  </Typography>
+                </CardContent>
+              </Card>
+            </div>
+          </Grid>
+        </Grid>
+      </div>
+      <Button
+        className="find-room-btn"
+        size="small"
+        variant="contained"
+        color="primary"
+        onClick={() => {
+          openEasyModal();
+          setProgress(100);
+          connectToQueue();
+        }}
+      >
+        Find Room
+      </Button>
     </div>
   );
 }
 
-export default MainComponent;
+export default DashboardComponent;
