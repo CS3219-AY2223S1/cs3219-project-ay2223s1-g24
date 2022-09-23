@@ -32,7 +32,6 @@ export default function Editor(props) {
           options={modes}
           handleDropdown={handleMode}
         />
-        <button>Fullscreen</button>
       </div>
       <ControlledEditor
         onBeforeChange={handleChange}

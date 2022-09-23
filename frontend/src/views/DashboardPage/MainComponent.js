@@ -49,7 +49,7 @@ function CircularProgressWithLabel(props) {
   );
 }
 
-function DashboardComponent() {
+function MainComponent() {
   const [EASY, MEDIUM, HARD] = ["easy", "medium", "hard"];
   const [DEFAULT, ERROR, SUCCESS] = ["", "ERROR", "SUCCESS"];
   const [socket, setSocket] = useState(null);
@@ -85,8 +85,16 @@ function DashboardComponent() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    if (roomId !== "") {
-      navigate(`/coding/${roomId}`);
+    if (roomId === "") {
+      return;
+    }
+
+    if (roomDifficulty === EASY) {
+      navigate(`/coding/easy/${roomId}`);
+    } else if (roomDifficulty === MEDIUM) {
+      navigate(`/coding/medium/${roomId}`);
+    } else {
+      navigate(`/coding/hard/${roomId}`);
     }
   });
 
@@ -293,4 +301,4 @@ function DashboardComponent() {
   );
 }
 
-export default DashboardComponent;
+export default MainComponent;
