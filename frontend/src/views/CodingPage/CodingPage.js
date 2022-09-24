@@ -33,13 +33,21 @@ function CodeComponent({ returnFunc }) {
     questionNumber.current = questionNumber.current - 1;
   };
 
-  console.log(socket);
+  const emitText = (text) => {
+    console.log("emitting");
+    // TODO: replace hardcoded room placeholder
+    socket.emit("SET_TEXT", text, "abc");
+  }
 
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
     setSocket(socket);
-    // TODO: replace placeholder
-    socket.emit("JOIN_ROOM", "abd");
+    // TODO: replace hardcoded room placeholder
+    socket.emit("JOIN_ROOM", "abc");
+
+    socket.on("UPDATE_TEXT", (text) => {
+      setText(text);
+    });
   }, []);
 
   return (
@@ -76,7 +84,12 @@ function CodeComponent({ returnFunc }) {
           setLanguage={setLanguage}
           language={language}
           value={text}
-          onChange={setText}
+          onChange={e => {
+            if (socket) {
+             emitText(e);
+            }
+            setText(e);
+          }}
         />
       </div>
     </div>

@@ -24,7 +24,15 @@ io.on("connection", (socket) => {
   console.log("Client connected with id: " + socket.id);
 
   socket.on("JOIN_ROOM", (roomID) => {
-    console.log(roomID);
+    socket.join(roomID);
+  })
+
+  socket.on("SET_TEXT", (text, roomID) => {
+    socket.to(roomID).emit("UPDATE_TEXT", text);
+  })
+
+  socket.on("SAVE_TEXT", (roomID) => {
+
   })
 });
 
