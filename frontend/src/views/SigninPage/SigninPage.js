@@ -2,7 +2,7 @@ import { Alert, Box, Button, TextField, CircularProgress } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { HEROKU_ENDPOINT } from "configs";
+import { USER_SERVICE_API_ENDPOINT } from "configs";
 import mainLogo from "assets/mainlogo.png";
 import "./signin.scss";
 import SignupPage from "views/SignupPage/SignupPage";
@@ -67,7 +67,7 @@ function SigninPage() {
     }
 
     setLoading(true);
-    const postUserEndpoint = HEROKU_ENDPOINT + "login";
+    const postUserEndpoint = USER_SERVICE_API_ENDPOINT + "login";
     const res = await axios
       .post(postUserEndpoint, { email, password })
       .catch((err) => {
@@ -86,6 +86,8 @@ function SigninPage() {
         setLoading(false);
         return;
       });
+
+      console.log(res)
 
     if (res && res.status === STATUS_CODE_SUCCESS) {
       setLoading(false);
