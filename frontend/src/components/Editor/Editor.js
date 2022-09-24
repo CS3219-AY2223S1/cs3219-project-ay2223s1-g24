@@ -9,7 +9,7 @@ import { Controlled as ControlledEditor } from "react-codemirror2";
 import ControlDropdown from "../ControlDropdown/ControlDropdown";
 
 export default function Editor(props) {
-  const { setLanguage, language, value, onChange } = props;
+  const { setLanguage, language, value, socket, onChange } = props;
 
   const modes = [
     { name: "Javascript", code: "javascript" },
@@ -22,6 +22,7 @@ export default function Editor(props) {
 
   function handleChange(editor, data, value) {
     onChange(value);
+    socket.emit("SEND_TEXT", value);
   }
 
   return (
