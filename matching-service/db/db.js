@@ -15,7 +15,6 @@ const db = new Pool(dbConfig);
 
 export const addUserToDB = async (socketId, username, difficulty) => {
   const findUser = `SELECT * FROM matching_queue WHERE username='${username}';`;
-  console.log(difficulty);
   const res = await db.query(findUser);
   if (res.rows.length > 0) {
     console.log("User already in queue!");

@@ -34,11 +34,6 @@ io.on("connection", (socket) => {
         deleteUserFromQueue(socket.id);
     });
 
-    socket.on("JOIN_ROOM", (roomID) => {
-        console.log("Client with socket id: " + socket.id + " has joined room: " + roomID);
-        socket.join(roomID);
-    })
-
     socket.on("disconnect", () => {
         console.log("Client disconnected with id: " + socket.id);
         deleteUserFromQueue(socket.id);

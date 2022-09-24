@@ -14,7 +14,9 @@ export const addUserToQueue = async (socketId, username, difficulty, io) => {
     const secondUser = users[1].socket_id;
     deleteUserPairFromDB(firstUser, secondUser).then(() => {
       const roomID = uuidv4();
-      io.to(firstUser).to(secondUser).emit("MATCHED", roomID);
+      const firstHash = Math.floor(Math.random() * 1000000);
+      const secondHash = Math.floor(Math.random() * 1000000);
+      io.to(firstUser).to(secondUser).emit("MATCHED", roomID, firstHash, secondHash);
     })
     console.log("MATCHED >> " + firstUser + " and " + secondUser + " matched");
   }

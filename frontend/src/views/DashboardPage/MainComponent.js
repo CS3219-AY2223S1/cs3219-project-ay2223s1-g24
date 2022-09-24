@@ -60,7 +60,6 @@ function DashboardComponent(props) {
   const [easyModal, setEasyModal] = useState(false);
 
   const username = props.username;
-  console.log(username);
 
   const openEasyModal = () => {
     setEasyModal(true);
@@ -76,14 +75,16 @@ function DashboardComponent(props) {
   useEffect(() => {
     const socket = io.connect("http://localhost:8001");
     setSocket(socket);
-
-    socket.on("MATCHED", async (roomID) => {
+    socket.on("MATCHED", async (roomID, firstHash, secondHash) => {
       setMatchStatus(SUCCESS);
       await sleep(3000);
-      console.log("[FRONTEND] MATCHED with room ID: " + roomID);
+      console.log("[FRONTEND] MATCHED with room ID: " + roomID + " first hash: " + firstHash + " second hash: " + secondHash);
       setRoomId(roomID);
-      socket.emit("JOIN_ROOM", roomID);
+      socket.disconnect();
     });
+    return () => {
+      socket.disconnect();
+    }
   }, []);
 
   const navigate = useNavigate();
@@ -95,12 +96,10 @@ function DashboardComponent(props) {
 
   const connectToQueue = () => {
     socket.emit("JOIN_QUEUE", username, roomDifficulty);
-    console.log(roomDifficulty + " queue connect button pressed!");
   };
 
   const disconnectFromQueue = () => {
     socket.emit("LEAVE_QUEUE");
-    console.log(roomDifficulty + " queue connect button pressed!");
   };
 
   useEffect(() => {
