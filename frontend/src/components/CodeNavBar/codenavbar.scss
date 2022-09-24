@@ -1,0 +1,13 @@
+.code-navbar {
+    display: flex;
+    flex-direction: row;
+    height: 2vh;
+    padding: 15px 10px;
+    background-color: #d3d3d3;
+    justify-content: flex-end;
+    align-items: center;
+
+    .code-actions {
+        font-size: 14px;
+    }
+}

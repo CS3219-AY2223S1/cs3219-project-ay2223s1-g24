@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@mui/material";
 import "./codingPage.scss";
 import Editor from "components/Editor/Editor";
+import CodeNavBar from "components/CodeNavBar/CodeNavBar";
 
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
@@ -90,56 +91,59 @@ function CodingPageMedium({ returnFunc }) {
   };
 
   return (
-    <div className="code-container">
-      <div className="pane left-pane">
-        <div dangerouslySetInnerHTML={{ __html: question }}></div>
-        <div className="button-container">
-          {currQuestionIndex.current === 1 && (
-            <Button
-              className="prev-question-button"
-              variant="contained"
-              onClick={() => {
-                setQuestion(questionCollection[0]);
-                handleToggleQuestion(currQuestionIndex.current - 1);
-                currQuestionIndex.current = currQuestionIndex.current - 1;
-              }}
-            >
-              Previous question
-            </Button>
-          )}
-          {currQuestionIndex.current === 0 && (
-            <Button
-              className="next-question-button"
-              variant="contained"
-              onClick={() => {
-                if (numOfQuestions.current === 1) {
-                  numOfQuestions.current = numOfQuestions.current + 1;
-                  currQuestionIndex.current = currQuestionIndex.current + 1;
-                  readNewQuestion();
-                  // console.log("Render new question!");
-                } else {
-                  setQuestion(questionCollection[1]);
-                  handleToggleQuestion(currQuestionIndex.current + 1);
-                  // console.log("Change question only!");
-                  currQuestionIndex.current = currQuestionIndex.current + 1;
-                }
-              }}
-            >
-              Next question
-            </Button>
-          )}
+    <div>
+      <CodeNavBar />
+      <div className="code-container">
+        <div className="pane left-pane">
+          <div dangerouslySetInnerHTML={{ __html: question }}></div>
+          <div className="button-container">
+            {currQuestionIndex.current === 1 && (
+              <Button
+                className="prev-question-button"
+                variant="contained"
+                onClick={() => {
+                  setQuestion(questionCollection[0]);
+                  handleToggleQuestion(currQuestionIndex.current - 1);
+                  currQuestionIndex.current = currQuestionIndex.current - 1;
+                }}
+              >
+                Previous question
+              </Button>
+            )}
+            {currQuestionIndex.current === 0 && (
+              <Button
+                className="next-question-button"
+                variant="contained"
+                onClick={() => {
+                  if (numOfQuestions.current === 1) {
+                    numOfQuestions.current = numOfQuestions.current + 1;
+                    currQuestionIndex.current = currQuestionIndex.current + 1;
+                    readNewQuestion();
+                    // console.log("Render new question!");
+                  } else {
+                    setQuestion(questionCollection[1]);
+                    handleToggleQuestion(currQuestionIndex.current + 1);
+                    // console.log("Change question only!");
+                    currQuestionIndex.current = currQuestionIndex.current + 1;
+                  }
+                }}
+              >
+                Next question
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* To be changed */}
-      <div className="pane">
-        <Editor
-          setLanguage={setLanguage}
-          language={language}
-          value={text}
-          socket={socket}
-          onChange={setText}
-        />
+        {/* To be changed */}
+        <div className="pane">
+          <Editor
+            setLanguage={setLanguage}
+            language={language}
+            value={text}
+            socket={socket}
+            onChange={setText}
+          />
+        </div>
       </div>
     </div>
   );
