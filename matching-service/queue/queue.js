@@ -1,9 +1,9 @@
 import { getUsersInDB, addUserToDB, deleteUserfromDB, deleteUserPairFromDB } from "../db/db.js";
 import { v4 as uuidv4 } from 'uuid'
 
-export const addUserToQueue = async (socketId, difficulty, io) => {
+export const addUserToQueue = async (socketId, username, difficulty, io) => {
   // add user to db
-  await addUserToDB(socketId, difficulty);
+  await addUserToDB(socketId, username, difficulty);
   // check users in db
   const res = await getUsersInDB(difficulty);
   const users = res.rows;
@@ -14,7 +14,9 @@ export const addUserToQueue = async (socketId, difficulty, io) => {
     const secondUser = users[1].socket_id;
     deleteUserPairFromDB(firstUser, secondUser).then(() => {
       const roomID = uuidv4();
-      io.to(firstUser).to(secondUser).emit("MATCHED", roomID);
+      const firstHash = Math.floor(Math.random() * 1000000);
+      const secondHash = Math.floor(Math.random() * 1000000);
+      io.to(firstUser).to(secondUser).emit("MATCHED", roomID, firstHash, secondHash);
     })
     console.log("MATCHED >> " + firstUser + " and " + secondUser + " matched");
   }

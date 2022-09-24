@@ -520,7 +520,7 @@ function DashboardPage() {
         </Dialog>
       </div>
       <div>
-        {tabNumber === 0 && <MainComponent />}
+        {tabNumber === 0 && <MainComponent username={cookies.name}/>}
         {tabNumber === 1 && <DashboardComponent />}
       </div>
     </div>

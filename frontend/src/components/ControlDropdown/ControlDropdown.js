@@ -5,8 +5,9 @@ export default function ControlDropdown(props) {
   return (
     <div className="control-dropdown">
       <select value={props.options.default} onChange={props.handleDropdown}>
-        {props.options.map((option) => (
-          <option value={option.code}>{option.name}</option>
+        {
+        props.options.map((option, i) => (
+            <option value={option.code} key={i}>{option.name}</option>
         ))}
       </select>
     </div>

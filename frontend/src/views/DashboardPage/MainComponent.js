@@ -49,7 +49,7 @@ function CircularProgressWithLabel(props) {
   );
 }
 
-function DashboardComponent() {
+function DashboardComponent(props) {
   const [EASY, MEDIUM, HARD] = ["easy", "medium", "hard"];
   const [DEFAULT, ERROR, SUCCESS] = ["", "ERROR", "SUCCESS"];
   const [socket, setSocket] = useState(null);
@@ -58,6 +58,8 @@ function DashboardComponent() {
   const [roomDifficulty, setRoomDifficulty] = useState(null);
   const [progress, setProgress] = useState(100);
   const [easyModal, setEasyModal] = useState(false);
+
+  const username = props.username;
 
   const openEasyModal = () => {
     setEasyModal(true);
@@ -73,14 +75,17 @@ function DashboardComponent() {
   useEffect(() => {
     const socket = io.connect("http://localhost:8001");
     setSocket(socket);
-
-    socket.on("MATCHED", async (roomID) => {
+    socket.on("MATCHED", async (roomID, firstHash, secondHash) => {
       setMatchStatus(SUCCESS);
       await sleep(3000);
-      console.log("[FRONTEND] MATCHED with room ID: " + roomID);
+      console.log("[FRONTEND] MATCHED with room ID: " + roomID + " first hash: " + firstHash + " second hash: " + secondHash);
       setRoomId(roomID);
-      socket.emit("JOIN_ROOM", roomID);
+      socket.disconnect();
     });
+    return () => {
+      socket.disconnect();
+    }
+    // eslint-disable-next-line
   }, []);
 
   const navigate = useNavigate();
@@ -91,13 +96,11 @@ function DashboardComponent() {
   });
 
   const connectToQueue = () => {
-    socket.emit("JOIN_QUEUE", roomDifficulty);
-    console.log(roomDifficulty + " queue connect button pressed!");
+    socket.emit("JOIN_QUEUE", username, roomDifficulty);
   };
 
   const disconnectFromQueue = () => {
     socket.emit("LEAVE_QUEUE");
-    console.log(roomDifficulty + " queue connect button pressed!");
   };
 
   useEffect(() => {
@@ -113,6 +116,7 @@ function DashboardComponent() {
     return () => {
       clearInterval(timer);
     };
+    // eslint-disable-next-line
   }, []);
 
   return (
