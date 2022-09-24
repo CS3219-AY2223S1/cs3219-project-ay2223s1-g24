@@ -85,6 +85,7 @@ function DashboardComponent(props) {
     return () => {
       socket.disconnect();
     }
+    // eslint-disable-next-line
   }, []);
 
   const navigate = useNavigate();
@@ -115,6 +116,7 @@ function DashboardComponent(props) {
     return () => {
       clearInterval(timer);
     };
+    // eslint-disable-next-line
   }, []);
 
   return (
