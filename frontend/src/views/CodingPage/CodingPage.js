@@ -1,7 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@mui/material";
 import "./codingPage.scss";
 import Editor from "components/Editor/Editor";
+import { io } from "socket.io-client";
 
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
@@ -14,6 +15,7 @@ function CodeComponent({ returnFunc }) {
   const [text, setText] = useState('print("hello world")');
   // Can change this in future to randomise starting question
   const [question, setQuestion] = useState(Q1.question);
+  const [socket, setSocket] = useState(null);
   const questionNumber = useRef(1);
 
   const readNewQuestion = async () => {
@@ -30,6 +32,15 @@ function CodeComponent({ returnFunc }) {
   const decreaseQuestionNumberByOne = () => {
     questionNumber.current = questionNumber.current - 1;
   };
+
+  console.log(socket);
+
+  useEffect(() => {
+    const socket = io.connect("http://localhost:8080");
+    setSocket(socket);
+    // TODO: replace placeholder
+    socket.emit("JOIN_ROOM", "abd");
+  }, []);
 
   return (
     <div className="code-container">
