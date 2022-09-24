@@ -9,7 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { HEROKU_ENDPOINT } from "configs";
+import { USER_SERVICE_API_ENDPOINT } from "configs";
 import {
   STATUS_CODE_CONFLICT,
   STATUS_CODE_CREATED,
@@ -90,7 +90,7 @@ function SignupPage() {
     setLoading(true);
     const payload = { name: username, password, email };
     const res = await axios
-      .post(HEROKU_ENDPOINT + "signup", payload)
+      .post(USER_SERVICE_API_ENDPOINT + "signup", payload)
       .catch((err) => {
         setLoading(false);
         console.log(err.response);

@@ -28,7 +28,7 @@ import {
   ERROR_WRONG_PASSWORD,
   ERROR_UNEXPECTED,
 } from "constants";
-import { HEROKU_ENDPOINT } from "configs";
+import { USER_SERVICE_API_ENDPOINT } from "configs";
 import axios from "axios";
 
 function DashboardPage() {
@@ -125,7 +125,7 @@ function DashboardPage() {
     setLoading(true);
     const payload = { name: cookies.name, email: cookies.email, password };
     const res = await axios
-      .delete(HEROKU_ENDPOINT + "deleteUser", { data: payload })
+      .delete(USER_SERVICE_API_ENDPOINT + "deleteUser", { data: payload })
       .catch((err) => {
         setLoading(false);
         if (err.response.status === STATUS_CODE_INCORRECT_PARAMS) {
@@ -159,7 +159,7 @@ function DashboardPage() {
       new_password: newPassword,
     };
     const res = await axios
-      .put(HEROKU_ENDPOINT + "updatePassword", payload)
+      .put(USER_SERVICE_API_ENDPOINT + "updatePassword", payload)
       .catch((err) => {
         setLoading(false);
         console.log(payload);
