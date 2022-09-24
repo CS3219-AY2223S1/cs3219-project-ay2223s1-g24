@@ -49,7 +49,7 @@ function CircularProgressWithLabel(props) {
   );
 }
 
-function DashboardComponent() {
+function DashboardComponent(props) {
   const [EASY, MEDIUM, HARD] = ["easy", "medium", "hard"];
   const [DEFAULT, ERROR, SUCCESS] = ["", "ERROR", "SUCCESS"];
   const [socket, setSocket] = useState(null);
@@ -58,6 +58,9 @@ function DashboardComponent() {
   const [roomDifficulty, setRoomDifficulty] = useState(null);
   const [progress, setProgress] = useState(100);
   const [easyModal, setEasyModal] = useState(false);
+
+  const username = props.username;
+  console.log(username);
 
   const openEasyModal = () => {
     setEasyModal(true);
@@ -91,7 +94,7 @@ function DashboardComponent() {
   });
 
   const connectToQueue = () => {
-    socket.emit("JOIN_QUEUE", roomDifficulty);
+    socket.emit("JOIN_QUEUE", username, roomDifficulty);
     console.log(roomDifficulty + " queue connect button pressed!");
   };
 
