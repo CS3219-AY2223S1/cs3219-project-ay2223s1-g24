@@ -30,6 +30,7 @@ import {
 } from "constants";
 import { USER_SERVICE_API_ENDPOINT } from "configs";
 import axios from "axios";
+import { decodeToken, isExpired } from "react-jwt";
 
 function DashboardPage() {
   const [value, setValue] = useState("one");
@@ -67,7 +68,16 @@ function DashboardPage() {
   ]);
 
   useEffect(() => {
-    if (!cookies.jwtToken) {
+    const decodedToken = decodeToken(cookies?.jwtToken);
+    if (
+      !cookies.jwtToken ||
+      decodedToken?.email !== cookies?.email ||
+      decodedToken?.name !== cookies?.name ||
+      isExpired(cookies.jwtToken)
+    ) {
+      removeCookie("name", { path: "/" });
+      removeCookie("email", { path: "/" });
+      removeCookie("jwtToken", { path: "/" });
       navigate("/signin");
     }
   });
@@ -520,7 +530,7 @@ function DashboardPage() {
         </Dialog>
       </div>
       <div>
-        {tabNumber === 0 && <MainComponent username={cookies.name}/>}
+        {tabNumber === 0 && <MainComponent username={cookies.name} />}
         {tabNumber === 1 && <DashboardComponent />}
       </div>
     </div>
