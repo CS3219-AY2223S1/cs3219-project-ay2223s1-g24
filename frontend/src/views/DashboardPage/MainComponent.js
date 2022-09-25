@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./mainComponent.scss";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Alert,
   Box,
@@ -58,6 +58,7 @@ function DashboardComponent(props) {
   const [roomDifficulty, setRoomDifficulty] = useState(null);
   const [progress, setProgress] = useState(100);
   const [easyModal, setEasyModal] = useState(false);
+  const location = useLocation();
 
   const username = props.username;
 
@@ -78,13 +79,20 @@ function DashboardComponent(props) {
     socket.on("MATCHED", async (roomID, firstHash, secondHash) => {
       setMatchStatus(SUCCESS);
       await sleep(3000);
-      console.log("[FRONTEND] MATCHED with room ID: " + roomID + " first hash: " + firstHash + " second hash: " + secondHash);
+      console.log(
+        "[FRONTEND] MATCHED with room ID: " +
+          roomID +
+          " first hash: " +
+          firstHash +
+          " second hash: " +
+          secondHash
+      );
       setRoomId(roomID);
       socket.disconnect();
     });
     return () => {
       socket.disconnect();
-    }
+    };
     // eslint-disable-next-line
   }, []);
 
@@ -94,6 +102,13 @@ function DashboardComponent(props) {
       navigate(`/coding/${roomId}`);
     }
   });
+
+  useEffect(() => {
+    if (location.pathname !== "/dashboard") {
+      socket.disconnect();
+    }
+    // eslint-disable-next-line
+  }, [location]);
 
   const connectToQueue = () => {
     socket.emit("JOIN_QUEUE", username, roomDifficulty);
