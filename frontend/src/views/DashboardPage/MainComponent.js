@@ -17,6 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import { io } from "socket.io-client";
+import { useUsername } from "selectors/usernameSelector";
 
 const RATIO = 100 / 30;
 
@@ -49,7 +50,7 @@ function CircularProgressWithLabel(props) {
   );
 }
 
-function DashboardComponent(props) {
+function DashboardComponent() {
   const [EASY, MEDIUM, HARD] = ["easy", "medium", "hard"];
   const [DEFAULT, ERROR, SUCCESS] = ["", "ERROR", "SUCCESS"];
   const [socket, setSocket] = useState(null);
@@ -60,7 +61,7 @@ function DashboardComponent(props) {
   const [easyModal, setEasyModal] = useState(false);
   const location = useLocation();
 
-  const username = props.username;
+  const username = useUsername();
 
   const openEasyModal = () => {
     setEasyModal(true);
