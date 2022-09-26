@@ -3,6 +3,8 @@ import { Button } from "@mui/material";
 import "./codingPage.scss";
 import Editor from "components/Editor/Editor";
 import { io } from "socket.io-client";
+import { useUsername } from "slices/usernameSlice";
+import { useRoom } from "slices/roomSlice";
 
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
@@ -33,21 +35,21 @@ function CodeComponent({ returnFunc }) {
     questionNumber.current = questionNumber.current - 1;
   };
 
+  const username = useUsername();
+  const room = useRoom();
+
   const emitText = (text) => {
-    console.log("emitting");
-    // TODO: replace hardcoded room placeholder
-    socket.emit("SET_TEXT", text, "abc");
+    socket.emit("SET_TEXT", text, room.roomID);
   }
 
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
     setSocket(socket);
-    // TODO: replace hardcoded room placeholder
-    socket.emit("JOIN_ROOM", "abc");
-
+    socket.emit("JOIN_ROOM", room.roomID, username);
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
     });
+    // eslint-disable-next-line
   }, []);
 
   return (

@@ -17,6 +17,9 @@ import {
   Typography,
 } from "@mui/material";
 import { io } from "socket.io-client";
+import { useUsername } from "slices/usernameSlice";
+import { setRoom } from "slices/roomSlice";
+import { useDispatch } from "react-redux";
 
 const RATIO = 100 / 30;
 
@@ -49,7 +52,7 @@ function CircularProgressWithLabel(props) {
   );
 }
 
-function DashboardComponent(props) {
+function DashboardComponent() {
   const [EASY, MEDIUM, HARD] = ["easy", "medium", "hard"];
   const [DEFAULT, ERROR, SUCCESS] = ["", "ERROR", "SUCCESS"];
   const [socket, setSocket] = useState(null);
@@ -59,8 +62,8 @@ function DashboardComponent(props) {
   const [progress, setProgress] = useState(100);
   const [easyModal, setEasyModal] = useState(false);
   const location = useLocation();
-
-  const username = props.username;
+  const dispatch = useDispatch();
+  const username = useUsername();
 
   const openEasyModal = () => {
     setEasyModal(true);
@@ -87,6 +90,11 @@ function DashboardComponent(props) {
           " second hash: " +
           secondHash
       );
+      dispatch(setRoom({
+        roomID,
+        firstQuestionHash: firstHash,
+        secondQuestionHash: secondHash
+      }));
       setRoomId(roomID);
       socket.disconnect();
     });

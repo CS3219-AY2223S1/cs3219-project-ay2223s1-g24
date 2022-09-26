@@ -31,6 +31,8 @@ import {
 import { USER_SERVICE_API_ENDPOINT } from "configs";
 import axios from "axios";
 import { isExpired } from "react-jwt";
+import { resetUsername, setUsername } from "slices/usernameSlice";
+import { useDispatch } from "react-redux";
 
 function DashboardPage() {
   const [value, setValue] = useState("one");
@@ -66,6 +68,17 @@ function DashboardPage() {
     "email",
     "jwtToken",
   ]);
+  
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!cookies.name) {
+      dispatch(resetUsername());
+    } else {
+      dispatch(setUsername(cookies.name));
+    }
+    // eslint-disable-next-line
+  },[cookies])
 
   useEffect(() => {
     // const decodedToken = decodeToken(cookies?.jwtToken);
@@ -525,7 +538,7 @@ function DashboardPage() {
         </Dialog>
       </div>
       <div>
-        {tabNumber === 0 && <MainComponent username={cookies.name} />}
+        {tabNumber === 0 && <MainComponent />}
         {tabNumber === 1 && <DashboardComponent />}
       </div>
     </div>

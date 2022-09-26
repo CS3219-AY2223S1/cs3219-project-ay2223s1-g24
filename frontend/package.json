@@ -6,6 +6,7 @@
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@mui/material": "^5.10.3",
+    "@reduxjs/toolkit": "^1.8.5",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "12.1.5",
     "@testing-library/react-hooks": "^8.0.1",
@@ -16,8 +17,10 @@
     "react-cookie": "^4.1.1",
     "react-dom": "^17.0",
     "react-jwt": "^1.1.7",
+    "react-redux": "^8.0.4",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
+    "redux": "^4.2.0",
     "sass": "^1.54.5",
     "socket.io-client": "^4.5.2",
     "web-vitals": "^2.1.4"
