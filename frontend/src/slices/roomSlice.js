@@ -10,7 +10,6 @@ export const roomSlice = createSlice({
   },
   reducers: {
     setRoom: (state, action) => {
-      console.log(action);
       state.roomID = action.payload.roomID;
       state.firstQuestionHash = action.payload.firstQuestionHash;
       state.secondQuestionHash = action.payload.secondQuestionHash;

@@ -8,7 +8,6 @@ export const usernameSlice = createSlice({
   },
   reducers: {
     setUsername: (state, action) => {
-      console.log(action);
       state.value = action.payload;
     },
     resetUsername: (state) => {

@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { addUserToRoomDB } from './db/db';
+import { addUserToRoomDB } from './db/db.js';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }))
@@ -26,8 +26,8 @@ io.on("connection", (socket) => {
 
   socket.on("JOIN_ROOM", (roomID, username) => {
     socket.join(roomID);
-    addUserToRoomDB(roomID, username);
-    console.log("User with username: " + username + "has joined room: " + roomID);
+    // addUserToRoomDB(roomID, username);
+    console.log("User with username: " + username + " has joined room: " + roomID);
   })
 
   socket.on("SET_TEXT", (text, roomID) => {
@@ -35,9 +35,13 @@ io.on("connection", (socket) => {
   })
 
   socket.on("SAVE_CODE", (roomID, code) => {
-    saveCodeToDB(roomID, code);
+    // saveCodeToDB(roomID, code);
     console.log("Saved code for room: " + roomID);
   })
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected with id: " + socket.id);
+  });
 });
 
 httpServer.listen(8080);

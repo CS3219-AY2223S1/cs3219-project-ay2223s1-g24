@@ -24,9 +24,9 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
     console.log("Client connected with id: " + socket.id);
     // client to pass a difficulty parameter through socket in the future
-    socket.on("JOIN_QUEUE", (username, difficulty) => {
+    socket.on("JOIN_QUEUE", async (username, difficulty) => {
         console.log("Client joined the queue with id: " + socket.id);
-        addUserToQueue(socket.id, username, difficulty, io);
+        await addUserToQueue(socket.id, username, difficulty, io);
     })
 
     socket.on("LEAVE_QUEUE", () => {

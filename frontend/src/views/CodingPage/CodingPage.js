@@ -37,24 +37,19 @@ function CodeComponent({ returnFunc }) {
 
   const username = useUsername();
   const room = useRoom();
-  console.log(username);
-  console.log(room);
 
   const emitText = (text) => {
-    console.log("emitting");
-    // TODO: replace hardcoded room placeholder
-    socket.emit("SET_TEXT", text, "abc");
+    socket.emit("SET_TEXT", text, room.roomID);
   }
 
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
     setSocket(socket);
-    // TODO: replace hardcoded room placeholder
-    socket.emit("JOIN_ROOM", "abc");
-
+    socket.emit("JOIN_ROOM", room.roomID, username);
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
     });
+    // eslint-disable-next-line
   }, []);
 
   return (
