@@ -9,7 +9,7 @@ import { useRoom } from "slices/roomSlice";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
 
-function CodingPageHard() {
+function CodingPage() {
   const [language, setLanguage] = useState("python");
   const [text, setText] = useState('print("hello world")');
   const [question, setQuestion] = useState();
@@ -17,22 +17,29 @@ function CodingPageHard() {
   const questionNumber = useRef(1);
   const qnOne = useRef();
   const qnTwo = useRef();
+  const questionSize = {
+    "easy": 456,
+    "medium": 388,
+    "hard": 424
+  };
 
-  const readNewQuestion = async (firstQuestionHash, secondQuestionHash) => {
-    const firstQuestionNumber = (firstQuestionHash % 424) + 1;
-    let secondQuestionNumber = (secondQuestionHash % 424) + 1;
+  const readNewQuestion = async (firstQuestionHash, secondQuestionHash, difficulty) => {
+
+    const firstQuestionNumber = (firstQuestionHash % questionSize[difficulty]) + 1;
+    let secondQuestionNumber = (secondQuestionHash % questionSize[difficulty]) + 1;
 
     const questionOne = await import(
-      `questions/hard/q${firstQuestionNumber}.js`
+      `questions/${difficulty}/q${firstQuestionNumber}.js`
     );
 
     if (firstQuestionNumber === secondQuestionNumber) {
-      secondQuestionNumber = (firstQuestionNumber + 1) % 424;
+      secondQuestionNumber = (firstQuestionNumber + 1) % questionSize[difficulty];
     }
 
     const questionTwo = await import(
-      `questions/hard/q${secondQuestionNumber}.js`
+      `questions/${difficulty}/q${secondQuestionNumber}.js`
     );
+    
     setQuestion(questionOne.question);
     qnOne.current = questionOne.question;
     qnTwo.current = questionTwo.question;
@@ -58,7 +65,7 @@ function CodingPageHard() {
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
     setSocket(socket);
-    readNewQuestion(room.firstQuestionHash, room.secondQuestionHash);
+    readNewQuestion(room.firstQuestionHash, room.secondQuestionHash, room.difficulty);
     socket.emit("JOIN_ROOM", room.roomID, username);
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
@@ -114,4 +121,4 @@ function CodingPageHard() {
   );
 }
 
-export default CodingPageHard;
+export default CodingPage;

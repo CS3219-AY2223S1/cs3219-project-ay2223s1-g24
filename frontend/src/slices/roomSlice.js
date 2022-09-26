@@ -6,18 +6,21 @@ export const roomSlice = createSlice({
   initialState: {
     roomID: "",
     firstQuestionHash: 0,
-    secondQuestionHash: 0
+    secondQuestionHash: 0,
+    difficulty: ""
   },
   reducers: {
     setRoom: (state, action) => {
       state.roomID = action.payload.roomID;
       state.firstQuestionHash = action.payload.firstQuestionHash;
       state.secondQuestionHash = action.payload.secondQuestionHash;
+      state.difficulty = action.payload.difficulty;
     },
     resetRoom: (state) => {
       state.roomID = "";
       state.firstQuestionHash = 0;
       state.secondQuestionHash = 0;
+      state.difficulty = "";
     }
   },
 })
