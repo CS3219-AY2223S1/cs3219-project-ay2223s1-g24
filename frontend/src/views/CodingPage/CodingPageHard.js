@@ -20,23 +20,19 @@ function CodingPageHard() {
 
   const readNewQuestion = async (firstQuestionHash, secondQuestionHash) => {
     const firstQuestionNumber = (firstQuestionHash % 424) + 1;
-    const secondQuestionNumber = (secondQuestionHash % 424) + 1;
+    let secondQuestionNumber = (secondQuestionHash % 424) + 1;
 
     const questionOne = await import(
       `questions/hard/q${firstQuestionNumber}.js`
     );
-    let questionTwo;
+
     if (firstQuestionNumber === secondQuestionNumber) {
-      questionTwo = await import(
-        `questions/hard/q${
-          secondQuestionNumber + 1 <= 424
-            ? secondQuestionNumber + 1
-            : secondQuestionNumber - 1
-        }.js`
-      );
-    } else {
-      questionTwo = await import(`questions/hard/q${secondQuestionNumber}.js`);
+      secondQuestionNumber = (firstQuestionNumber + 1) % 424;
     }
+
+    const questionTwo = await import(
+      `questions/hard/q${secondQuestionNumber}.js`
+    );
     setQuestion(questionOne.question);
     qnOne.current = questionOne.question;
     qnTwo.current = questionTwo.question;

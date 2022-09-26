@@ -20,25 +20,18 @@ function CodingPageMedium() {
 
   const readNewQuestion = async (firstQuestionHash, secondQuestionHash) => {
     const firstQuestionNumber = (firstQuestionHash % 388) + 1;
-    const secondQuestionNumber = (secondQuestionHash % 388) + 1;
+    let secondQuestionNumber = (secondQuestionHash % 388) + 1;
 
     const questionOne = await import(
       `questions/medium/q${firstQuestionNumber}.js`
     );
-    let questionTwo;
     if (firstQuestionNumber === secondQuestionNumber) {
-      questionTwo = await import(
-        `questions/medium/q${
-          secondQuestionNumber + 1 <= 388
-            ? secondQuestionNumber + 1
-            : secondQuestionNumber - 1
-        }.js`
-      );
-    } else {
-      questionTwo = await import(
-        `questions/medium/q${secondQuestionNumber}.js`
-      );
+      secondQuestionNumber = (firstQuestionNumber + 1) % 388;
     }
+
+    const questionTwo = await import(
+      `questions/medium/q${secondQuestionNumber}.js`
+    );
     setQuestion(questionOne.question);
     qnOne.current = questionOne.question;
     qnTwo.current = questionTwo.question;

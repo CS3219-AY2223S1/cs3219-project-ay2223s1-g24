@@ -20,23 +20,19 @@ function CodingPageEasy() {
 
   const readNewQuestion = async (firstQuestionHash, secondQuestionHash) => {
     const firstQuestionNumber = (firstQuestionHash % 456) + 1;
-    const secondQuestionNumber = (secondQuestionHash % 456) + 1;
+    let secondQuestionNumber = (secondQuestionHash % 456) + 1;
 
     const questionOne = await import(
       `questions/easy/q${firstQuestionNumber}.js`
     );
-    let questionTwo;
+
     if (firstQuestionNumber === secondQuestionNumber) {
-      questionTwo = await import(
-        `questions/easy/q${
-          secondQuestionNumber + 1 <= 456
-            ? secondQuestionNumber + 1
-            : secondQuestionNumber - 1
-        }.js`
-      );
-    } else {
-      questionTwo = await import(`questions/easy/q${secondQuestionNumber}.js`);
+      secondQuestionNumber = (firstQuestionNumber + 1) % 456;
     }
+
+    const questionTwo = await import(
+      `questions/easy/q${secondQuestionNumber}.js`
+    );
     setQuestion(questionOne.question);
     qnOne.current = questionOne.question;
     qnTwo.current = questionTwo.question;
