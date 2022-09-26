@@ -9,7 +9,7 @@ import { useRoom } from "slices/roomSlice";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
 
-function CodeComponent({ returnFunc }) {
+function CodingPageEasy({ returnFunc }) {
   const [language, setLanguage] = useState("python");
   const [text, setText] = useState('print("hello world")');
   // Can change this in future to randomise starting question
@@ -120,4 +120,4 @@ function CodeComponent({ returnFunc }) {
   );
 }
 
-export default CodeComponent;
+export default CodingPageEasy;
