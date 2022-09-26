@@ -21,11 +21,11 @@ function CodingPageEasy({ returnFunc }) {
 
   const readNewQuestion = async (firstQuestionHash, secondQuestionHash) => {
     const questionOne = await import(
-      `questions/easy/q${firstQuestionHash % 456}.js`
+      `questions/easy/q${firstQuestionHash % 457}.js`
     );
 
     const questionTwo = await import(
-      `questions/easy/q${secondQuestionHash % 456}.js`
+      `questions/easy/q${secondQuestionHash % 457}.js`
     );
     setQuestion(questionOne.question);
     qnOne.current = questionOne.question;

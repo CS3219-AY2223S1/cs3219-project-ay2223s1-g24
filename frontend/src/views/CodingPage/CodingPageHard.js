@@ -21,11 +21,11 @@ function CodingPageHard({ returnFunc }) {
 
   const readNewQuestion = async (firstQuestionHash, secondQuestionHash) => {
     const questionOne = await import(
-      `questions/hard/q${firstQuestionHash % 424}.js`
+      `questions/hard/q${firstQuestionHash % 425}.js`
     );
 
     const questionTwo = await import(
-      `questions/hard/q${secondQuestionHash % 424}.js`
+      `questions/hard/q${secondQuestionHash % 425}.js`
     );
     setQuestion(questionOne.question);
     qnOne.current = questionOne.question;

@@ -21,11 +21,11 @@ function CodingPageMedium({ returnFunc }) {
 
   const readNewQuestion = async (firstQuestionHash, secondQuestionHash) => {
     const questionOne = await import(
-      `questions/medium/q${firstQuestionHash % 388}.js`
+      `questions/medium/q${firstQuestionHash % 389}.js`
     );
 
     const questionTwo = await import(
-      `questions/medium/q${secondQuestionHash % 388}.js`
+      `questions/medium/q${secondQuestionHash % 389}.js`
     );
     setQuestion(questionOne.question);
     qnOne.current = questionOne.question;
