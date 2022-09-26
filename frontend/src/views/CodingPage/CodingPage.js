@@ -9,30 +9,37 @@ import { useRoom } from "slices/roomSlice";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
 
-// Import questions
-import Q1 from "questions/easy/q1.js";
-
 function CodeComponent({ returnFunc }) {
   const [language, setLanguage] = useState("python");
   const [text, setText] = useState('print("hello world")');
   // Can change this in future to randomise starting question
-  const [question, setQuestion] = useState(Q1.question);
+  const [question, setQuestion] = useState();
   const [socket, setSocket] = useState(null);
   const questionNumber = useRef(1);
+  const qnOne = useRef();
+  const qnTwo = useRef();
 
-  const readNewQuestion = async () => {
-    const newQuestion = await import(
-      `questions/easy/q${questionNumber.current}.js`
+  const readNewQuestion = async (firstQuestionHash, secondQuestionHash) => {
+    const questionOne = await import(
+      `questions/easy/q${firstQuestionHash % 456}.js`
     );
-    setQuestion(newQuestion.question);
+
+    const questionTwo = await import(
+      `questions/easy/q${secondQuestionHash % 456}.js`
+    );
+    setQuestion(questionOne.question);
+    qnOne.current = questionOne.question;
+    qnTwo.current = questionTwo.question;
   };
 
-  const increaseQuestionNumberByOne = () => {
-    questionNumber.current = questionNumber.current + 1;
-  };
-
-  const decreaseQuestionNumberByOne = () => {
+  const loadQuestionOne = () => {
     questionNumber.current = questionNumber.current - 1;
+    setQuestion(qnOne.current);
+  };
+
+  const loadQuestionTwo = () => {
+    questionNumber.current = questionNumber.current + 1;
+    setQuestion(qnTwo.current);
   };
 
   const username = useUsername();
@@ -40,11 +47,12 @@ function CodeComponent({ returnFunc }) {
 
   const emitText = (text) => {
     socket.emit("SET_TEXT", text, room.roomID);
-  }
+  };
 
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
     setSocket(socket);
+    readNewQuestion(room.firstQuestionHash, room.secondQuestionHash);
     socket.emit("JOIN_ROOM", room.roomID, username);
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
@@ -61,8 +69,7 @@ function CodeComponent({ returnFunc }) {
             className="prev-question-button"
             variant="contained"
             onClick={() => {
-              decreaseQuestionNumberByOne();
-              readNewQuestion();
+              loadQuestionOne();
             }}
           >
             Previous question
@@ -71,8 +78,7 @@ function CodeComponent({ returnFunc }) {
             className="next-question-button"
             variant="contained"
             onClick={() => {
-              increaseQuestionNumberByOne();
-              readNewQuestion();
+              loadQuestionTwo();
             }}
           >
             Next question
@@ -86,9 +92,9 @@ function CodeComponent({ returnFunc }) {
           setLanguage={setLanguage}
           language={language}
           value={text}
-          onChange={e => {
+          onChange={(e) => {
             if (socket) {
-             emitText(e);
+              emitText(e);
             }
             setText(e);
           }}

@@ -90,11 +90,13 @@ function DashboardComponent() {
           " second hash: " +
           secondHash
       );
-      dispatch(setRoom({
-        roomID,
-        firstQuestionHash: firstHash,
-        secondQuestionHash: secondHash
-      }));
+      dispatch(
+        setRoom({
+          roomID,
+          firstQuestionHash: firstHash,
+          secondQuestionHash: secondHash,
+        })
+      );
       setRoomId(roomID);
       socket.disconnect();
     });
