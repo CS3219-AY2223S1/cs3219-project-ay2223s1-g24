@@ -90,11 +90,13 @@ function DashboardComponent() {
           " second hash: " +
           secondHash
       );
-      dispatch(setRoom({
-        roomID,
-        firstQuestionHash: firstHash,
-        secondQuestionHash: secondHash
-      }));
+      dispatch(
+        setRoom({
+          roomID,
+          firstQuestionHash: firstHash,
+          secondQuestionHash: secondHash,
+        })
+      );
       setRoomId(roomID);
       socket.disconnect();
     });
@@ -106,8 +108,16 @@ function DashboardComponent() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    if (roomId !== "") {
-      navigate(`/coding/${roomId}`);
+    if (roomId === "") {
+      return;
+    }
+
+    if (roomDifficulty === EASY) {
+      navigate(`/coding/easy/${roomId}`);
+    } else if (roomDifficulty === MEDIUM) {
+      navigate(`/coding/medium/${roomId}`);
+    } else {
+      navigate(`/coding/hard/${roomId}`);
     }
   });
 
