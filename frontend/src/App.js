@@ -4,7 +4,6 @@ import HomePage from "./views/HomePage/HomePage";
 import { Box } from "@mui/material";
 import DashboardPage from "views/DashboardPage/DashboardPage";
 import SigninPage from "views/SigninPage/SigninPage";
-import CodingPage from "views/CodingPage/CodingPageEasy";
 import { CookiesProvider } from "react-cookie";
 import CodingPageEasy from "views/CodingPage/CodingPageEasy";
 import CodingPageMedium from "views/CodingPage/CodingPageMedium";
