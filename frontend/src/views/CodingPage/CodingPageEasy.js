@@ -29,7 +29,7 @@ function CodingPageEasy() {
     if (firstQuestionNumber === secondQuestionNumber) {
       questionTwo = await import(
         `questions/easy/q${
-          secondQuestionNumber + 1 <= 424
+          secondQuestionNumber + 1 <= 456
             ? secondQuestionNumber + 1
             : secondQuestionNumber - 1
         }.js`
