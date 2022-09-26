@@ -5,7 +5,7 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
 import "./editor.scss";
 
-import { Controlled as ControlledEditor } from "react-codemirror2";
+import { Controlled as ControlledEditor } from "react-codemirror2-react-17";
 import ControlDropdown from "../ControlDropdown/ControlDropdown";
 
 export default function Editor(props) {
