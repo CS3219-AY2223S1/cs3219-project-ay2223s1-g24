@@ -4,10 +4,8 @@ import HomePage from "./views/HomePage/HomePage";
 import { Box } from "@mui/material";
 import DashboardPage from "views/DashboardPage/DashboardPage";
 import SigninPage from "views/SigninPage/SigninPage";
+import CodingPage from "views/CodingPage/CodingPage";
 import { CookiesProvider } from "react-cookie";
-import CodingPageEasy from "views/CodingPage/CodingPage";
-import CodingPageMedium from "views/CodingPage/CodingPageMedium";
-import CodingPageHard from "views/CodingPage/CodingPageHard";
 
 function App() {
   return (
@@ -20,9 +18,7 @@ function App() {
               <Route path="/signup/*" element={<SignupPage />} />
               <Route path="/dashboard/*" element={<DashboardPage />} />
               <Route path="/signin/*" element={<SigninPage />} />
-              <Route path="/coding/easy/*" element={<CodingPageEasy />} />
-              <Route path="/coding/medium/*" element={<CodingPageMedium />} />
-              <Route path="/coding/hard/*" element={<CodingPageHard />} />
+              <Route path="/coding/*" element={<CodingPage />} />
             </Routes>
           </Router>
         </Box>

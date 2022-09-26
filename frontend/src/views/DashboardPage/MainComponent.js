@@ -108,16 +108,8 @@ function DashboardComponent() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    if (roomId === "") {
-      return;
-    }
-
-    if (roomDifficulty === EASY) {
-      navigate(`/coding/easy/${roomId}`);
-    } else if (roomDifficulty === MEDIUM) {
-      navigate(`/coding/medium/${roomId}`);
-    } else {
-      navigate(`/coding/hard/${roomId}`);
+    if (roomId !== "") {
+      navigate(`/coding/${roomId}`);
     }
   });
 
