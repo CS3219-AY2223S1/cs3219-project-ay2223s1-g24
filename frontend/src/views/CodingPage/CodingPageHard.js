@@ -9,10 +9,9 @@ import { useRoom } from "slices/roomSlice";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
 
-function CodingPageHard({ returnFunc }) {
+function CodingPageHard() {
   const [language, setLanguage] = useState("python");
   const [text, setText] = useState('print("hello world")');
-  // Can change this in future to randomise starting question
   const [question, setQuestion] = useState();
   const [socket, setSocket] = useState(null);
   const questionNumber = useRef(1);
@@ -21,11 +20,11 @@ function CodingPageHard({ returnFunc }) {
 
   const readNewQuestion = async (firstQuestionHash, secondQuestionHash) => {
     const questionOne = await import(
-      `questions/hard/q${firstQuestionHash % 425}.js`
+      `questions/hard/q${(firstQuestionHash % 424) + 1}.js`
     );
 
     const questionTwo = await import(
-      `questions/hard/q${secondQuestionHash % 425}.js`
+      `questions/hard/q${(secondQuestionHash % 424) + 1}.js`
     );
     setQuestion(questionOne.question);
     qnOne.current = questionOne.question;
