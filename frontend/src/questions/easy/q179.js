@@ -21,6 +21,6 @@ module.exports.question = `<!DOCTYPE html> <html><style>pre{white-space:pre-wrap
 <ul>
 <li><code>1 &lt;= s.length &lt;= 100</code></li>
 <li><code>s</code> consists of characters with ASCII values in the range <code>[33, 122]</code>.</li>
-<li><code>s</code> does not contain <code>'\"'</code> or <code>'\\'</code>.</li>
+<li><code>s</code> does not contain <code>'"'</code> or <code>'\\'</code>.</li>
 </ul>
 </div></div><br><br></html> `;
