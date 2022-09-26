@@ -31,7 +31,7 @@ import {
 import { USER_SERVICE_API_ENDPOINT } from "configs";
 import axios from "axios";
 import { isExpired } from "react-jwt";
-import { reset, set } from "slices/usernameSlice";
+import { resetUsername, setUsername } from "slices/usernameSlice";
 import { useDispatch } from "react-redux";
 
 function DashboardPage() {
@@ -73,9 +73,9 @@ function DashboardPage() {
 
   useEffect(() => {
     if (!cookies.name) {
-      dispatch(reset);
+      dispatch(resetUsername());
     } else {
-      dispatch(set(cookies.name));
+      dispatch(setUsername(cookies.name));
     }
     // eslint-disable-next-line
   },[cookies])

@@ -17,7 +17,9 @@ import {
   Typography,
 } from "@mui/material";
 import { io } from "socket.io-client";
-import { useUsername } from "selectors/usernameSelector";
+import { useUsername } from "slices/usernameSlice";
+import { setRoom } from "slices/roomSlice";
+import { useDispatch } from "react-redux";
 
 const RATIO = 100 / 30;
 
@@ -60,7 +62,7 @@ function DashboardComponent() {
   const [progress, setProgress] = useState(100);
   const [easyModal, setEasyModal] = useState(false);
   const location = useLocation();
-
+  const dispatch = useDispatch();
   const username = useUsername();
 
   const openEasyModal = () => {
@@ -88,6 +90,11 @@ function DashboardComponent() {
           " second hash: " +
           secondHash
       );
+      dispatch(setRoom({
+        roomID,
+        firstQuestionHash: firstHash,
+        secondQuestionHash: secondHash
+      }));
       setRoomId(roomID);
       socket.disconnect();
     });

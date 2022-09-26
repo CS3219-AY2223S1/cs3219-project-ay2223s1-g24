@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { useSelector } from 'react-redux';
 
 export const usernameSlice = createSlice({
   name: 'username',
@@ -6,18 +7,20 @@ export const usernameSlice = createSlice({
     value: "",
   },
   reducers: {
-    set: (state, action) => {
+    setUsername: (state, action) => {
       console.log(action);
       state.value = action.payload;
     },
-    reset: (state) => {
+    resetUsername: (state) => {
       state.value = "";
     }
   },
 })
 
-export const { set, reset } = usernameSlice.actions;
+export const { setUsername, resetUsername } = usernameSlice.actions;
 
-export const selectUsername = (state) => state.username.value;
+export function useUsername() {
+  return useSelector((state) => state.username.value);
+};
 
 export default usernameSlice.reducer;

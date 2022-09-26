@@ -3,6 +3,8 @@ import { Button } from "@mui/material";
 import "./codingPage.scss";
 import Editor from "components/Editor/Editor";
 import { io } from "socket.io-client";
+import { useUsername } from "slices/usernameSlice";
+import { useRoom } from "slices/roomSlice";
 
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
@@ -32,6 +34,11 @@ function CodeComponent({ returnFunc }) {
   const decreaseQuestionNumberByOne = () => {
     questionNumber.current = questionNumber.current - 1;
   };
+
+  const username = useUsername();
+  const room = useRoom();
+  console.log(username);
+  console.log(room);
 
   const emitText = (text) => {
     console.log("emitting");
