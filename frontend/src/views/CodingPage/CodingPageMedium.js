@@ -19,13 +19,26 @@ function CodingPageMedium() {
   const qnTwo = useRef();
 
   const readNewQuestion = async (firstQuestionHash, secondQuestionHash) => {
-    const questionOne = await import(
-      `questions/medium/q${(firstQuestionHash % 388) + 1}.js`
-    );
+    const firstQuestionNumber = (firstQuestionHash % 388) + 1;
+    const secondQuestionNumber = (secondQuestionHash % 388) + 1;
 
-    const questionTwo = await import(
-      `questions/medium/q${(secondQuestionHash % 388) + 1}.js`
+    const questionOne = await import(
+      `questions/medium/q${firstQuestionNumber}.js`
     );
+    let questionTwo;
+    if (firstQuestionNumber === secondQuestionNumber) {
+      questionTwo = await import(
+        `questions/medium/q${
+          secondQuestionNumber + 1 <= 388
+            ? secondQuestionNumber + 1
+            : secondQuestionNumber - 1
+        }.js`
+      );
+    } else {
+      questionTwo = await import(
+        `questions/medium/q${secondQuestionNumber}.js`
+      );
+    }
     setQuestion(questionOne.question);
     qnOne.current = questionOne.question;
     qnTwo.current = questionTwo.question;
@@ -39,18 +52,6 @@ function CodingPageMedium() {
   const loadQuestionTwo = () => {
     questionNumber.current = questionNumber.current + 1;
     setQuestion(qnTwo.current);
-  };
-
-  // Utility functions
-  const saveToJson = () => {
-    // TODO: Emit json data after saving
-    const jsonData = JSON.stringify(text);
-  };
-
-  const parseFromJson = () => {
-    // TODO: Take in JSON data as input
-    const jsonData = JSON.stringify(text);
-    const parsedData = JSON.parse(jsonData);
   };
 
   const username = useUsername();

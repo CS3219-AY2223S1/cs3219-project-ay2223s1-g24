@@ -12,6 +12,7 @@ import "codemirror/mode/python/python";
 function CodingPageEasy() {
   const [language, setLanguage] = useState("python");
   const [text, setText] = useState('print("hello world")');
+  // Can change this in future to randomise starting question
   const [question, setQuestion] = useState();
   const [socket, setSocket] = useState(null);
   const questionNumber = useRef(1);
@@ -19,13 +20,24 @@ function CodingPageEasy() {
   const qnTwo = useRef();
 
   const readNewQuestion = async (firstQuestionHash, secondQuestionHash) => {
-    const questionOne = await import(
-      `questions/easy/q${(firstQuestionHash % 456) + 1}.js`
-    );
+    const firstQuestionNumber = (firstQuestionHash % 456) + 1;
+    const secondQuestionNumber = (secondQuestionHash % 456) + 1;
 
-    const questionTwo = await import(
-      `questions/easy/q${(secondQuestionHash % 456) + 1}.js`
+    const questionOne = await import(
+      `questions/easy/q${firstQuestionNumber}.js`
     );
+    let questionTwo;
+    if (firstQuestionNumber === secondQuestionNumber) {
+      questionTwo = await import(
+        `questions/easy/q${
+          secondQuestionNumber + 1 <= 424
+            ? secondQuestionNumber + 1
+            : secondQuestionNumber - 1
+        }.js`
+      );
+    } else {
+      questionTwo = await import(`questions/easy/q${secondQuestionNumber}.js`);
+    }
     setQuestion(questionOne.question);
     qnOne.current = questionOne.question;
     qnTwo.current = questionTwo.question;
@@ -39,18 +51,6 @@ function CodingPageEasy() {
   const loadQuestionTwo = () => {
     questionNumber.current = questionNumber.current + 1;
     setQuestion(qnTwo.current);
-  };
-
-  // Utility functions
-  const saveToJson = () => {
-    // TODO: Emit json data after saving
-    const jsonData = JSON.stringify(text);
-  };
-
-  const parseFromJson = () => {
-    // TODO: Take in JSON data as input
-    const jsonData = JSON.stringify(text);
-    const parsedData = JSON.parse(jsonData);
   };
 
   const username = useUsername();
