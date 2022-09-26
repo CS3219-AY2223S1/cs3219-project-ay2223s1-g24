@@ -12,7 +12,6 @@ import "codemirror/mode/python/python";
 function CodingPageEasy() {
   const [language, setLanguage] = useState("python");
   const [text, setText] = useState('print("hello world")');
-  // Can change this in future to randomise starting question
   const [question, setQuestion] = useState();
   const [socket, setSocket] = useState(null);
   const questionNumber = useRef(1);
