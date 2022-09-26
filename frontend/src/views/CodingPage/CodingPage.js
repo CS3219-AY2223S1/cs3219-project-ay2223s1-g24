@@ -42,6 +42,18 @@ function CodeComponent({ returnFunc }) {
     setQuestion(qnTwo.current);
   };
 
+  // Utility functions
+  const saveToJson = () => {
+    // TODO: Emit json data after saving
+    const jsonData = JSON.stringify(text);
+  };
+
+  const parseFromJson = () => {
+    // TODO: Take in JSON data as input
+    const jsonData = JSON.stringify(text);
+    const parsedData = JSON.parse(jsonData);
+  };
+
   const username = useUsername();
   const room = useRoom();
 
@@ -65,24 +77,28 @@ function CodeComponent({ returnFunc }) {
       <div className="pane left-pane">
         <div dangerouslySetInnerHTML={{ __html: question }}></div>
         <div className="button-container">
-          <Button
-            className="prev-question-button"
-            variant="contained"
-            onClick={() => {
-              loadQuestionOne();
-            }}
-          >
-            Previous question
-          </Button>
-          <Button
-            className="next-question-button"
-            variant="contained"
-            onClick={() => {
-              loadQuestionTwo();
-            }}
-          >
-            Next question
-          </Button>
+          {questionNumber.current === 2 && (
+            <Button
+              className="prev-question-button"
+              variant="contained"
+              onClick={() => {
+                loadQuestionOne();
+              }}
+            >
+              Previous question
+            </Button>
+          )}
+          {questionNumber.current === 1 && (
+            <Button
+              className="next-question-button"
+              variant="contained"
+              onClick={() => {
+                loadQuestionTwo();
+              }}
+            >
+              Next question
+            </Button>
+          )}
         </div>
       </div>
 
