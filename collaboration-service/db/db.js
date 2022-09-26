@@ -13,8 +13,10 @@ const dbConfig = {
 const db = new Pool(dbConfig);
 
 
-export const addUserToRoomDB = async (roomID, username, socketID) => {
-  const text = `INSERT INTO rooms (username, room_id, socket_id) VALUES ('${username}', '${roomID}', '${socketID}') ON CONFLICT (username)
+export const addUserToRoomDB = async (roomID, username, difficulty, firstQuestion, secondQuestion, socketID) => {
+  const text = `INSERT INTO 
+    rooms (username, room_id, difficulty, first_question, second_question, socket_id) 
+    VALUES ('${username}', '${roomID}', '${difficulty}', ${firstQuestion}, ${secondQuestion}, '${socketID}') ON CONFLICT (username)
     DO UPDATE SET socket_id='${socketID}'`;
   return db.query(text);
 }

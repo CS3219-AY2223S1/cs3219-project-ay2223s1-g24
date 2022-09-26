@@ -74,8 +74,8 @@ function CodingPage() {
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
     setCurrentSocket(socket);
-    readNewQuestion(room.firstQuestionHash, room.secondQuestionHash);
-    socket.emit("JOIN_ROOM", room.roomID, username);
+    readNewQuestion(room.firstQuestionHash, room.secondQuestionHash, room.difficulty);
+    socket.emit("JOIN_ROOM", room.roomID, username, room.difficulty, room.firstQuestionHash, room.secondQuestionHash);
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
     });

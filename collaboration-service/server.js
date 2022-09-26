@@ -24,9 +24,9 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
   console.log("Client connected with id: " + socket.id);
 
-  socket.on("JOIN_ROOM", (roomID, username) => {
+  socket.on("JOIN_ROOM", (roomID, username, difficulty, firstQuestion, secondQuestion) => {
     socket.join(roomID);
-    addUserToRoomDB(roomID, username, socket.id);
+    addUserToRoomDB(roomID, username, difficulty, firstQuestion, secondQuestion, socket.id);
     console.log("User with username: " + username + " has joined room: " + roomID);
   })
 
