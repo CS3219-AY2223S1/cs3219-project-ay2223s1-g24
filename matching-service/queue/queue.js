@@ -16,7 +16,7 @@ export const addUserToQueue = async (socketId, username, difficulty, io) => {
       const roomID = uuidv4();
       const firstHash = Math.floor(Math.random() * 1000000);
       const secondHash = Math.floor(Math.random() * 1000000);
-      io.to(firstUser).to(secondUser).emit("MATCHED", roomID, firstHash, secondHash);
+      io.to(firstUser).to(secondUser).emit("MATCHED", roomID, firstHash, secondHash, difficulty);
     })
     console.log("MATCHED >> " + firstUser + " and " + secondUser + " matched");
   }

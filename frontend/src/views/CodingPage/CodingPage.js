@@ -3,51 +3,74 @@ import { Button } from "@mui/material";
 import "./codingPage.scss";
 import Editor from "components/Editor/Editor";
 import { io } from "socket.io-client";
+import { useUsername } from "slices/usernameSlice";
+import { useRoom } from "slices/roomSlice";
 
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
 
-// Import questions
-import Q1 from "questions/easy/q1.js";
-
-function CodeComponent({ returnFunc }) {
+function CodingPage() {
   const [language, setLanguage] = useState("python");
   const [text, setText] = useState('print("hello world")');
-  // Can change this in future to randomise starting question
-  const [question, setQuestion] = useState(Q1.question);
+  const [question, setQuestion] = useState();
   const [socket, setSocket] = useState(null);
   const questionNumber = useRef(1);
+  const qnOne = useRef();
+  const qnTwo = useRef();
+  const questionSize = {
+    "easy": 456,
+    "medium": 388,
+    "hard": 424
+  };
 
-  const readNewQuestion = async () => {
-    const newQuestion = await import(
-      `questions/easy/q${questionNumber.current}.js`
+  const readNewQuestion = async (firstQuestionHash, secondQuestionHash, difficulty) => {
+
+    const firstQuestionNumber = (firstQuestionHash % questionSize[difficulty]) + 1;
+    let secondQuestionNumber = (secondQuestionHash % questionSize[difficulty]) + 1;
+
+    const questionOne = await import(
+      `questions/${difficulty}/q${firstQuestionNumber}.js`
     );
-    setQuestion(newQuestion.question);
+
+    if (firstQuestionNumber === secondQuestionNumber) {
+      secondQuestionNumber = (firstQuestionNumber + 1) % questionSize[difficulty];
+    }
+
+    const questionTwo = await import(
+      `questions/${difficulty}/q${secondQuestionNumber}.js`
+    );
+    
+    setQuestion(questionOne.question);
+    qnOne.current = questionOne.question;
+    qnTwo.current = questionTwo.question;
   };
 
-  const increaseQuestionNumberByOne = () => {
-    questionNumber.current = questionNumber.current + 1;
-  };
-
-  const decreaseQuestionNumberByOne = () => {
+  const loadQuestionOne = () => {
     questionNumber.current = questionNumber.current - 1;
+    setQuestion(qnOne.current);
   };
+
+  const loadQuestionTwo = () => {
+    questionNumber.current = questionNumber.current + 1;
+    setQuestion(qnTwo.current);
+  };
+
+  const username = useUsername();
+  const room = useRoom();
 
   const emitText = (text) => {
-    console.log("emitting");
-    // TODO: replace hardcoded room placeholder
-    socket.emit("SET_TEXT", text, "abc");
-  }
+    socket.emit("SET_TEXT", text, room.roomID);
+  };
 
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
     setSocket(socket);
-    // TODO: replace hardcoded room placeholder
-    socket.emit("JOIN_ROOM", "abc");
-
+    readNewQuestion(room.firstQuestionHash, room.secondQuestionHash, room.difficulty);
+    socket.emit("JOIN_ROOM", room.roomID, username);
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
     });
+    // eslint-disable-next-line
   }, []);
 
   return (
@@ -55,26 +78,28 @@ function CodeComponent({ returnFunc }) {
       <div className="pane left-pane">
         <div dangerouslySetInnerHTML={{ __html: question }}></div>
         <div className="button-container">
-          <Button
-            className="prev-question-button"
-            variant="contained"
-            onClick={() => {
-              decreaseQuestionNumberByOne();
-              readNewQuestion();
-            }}
-          >
-            Previous question
-          </Button>
-          <Button
-            className="next-question-button"
-            variant="contained"
-            onClick={() => {
-              increaseQuestionNumberByOne();
-              readNewQuestion();
-            }}
-          >
-            Next question
-          </Button>
+          {questionNumber.current === 2 && (
+            <Button
+              className="prev-question-button"
+              variant="contained"
+              onClick={() => {
+                loadQuestionOne();
+              }}
+            >
+              Previous question
+            </Button>
+          )}
+          {questionNumber.current === 1 && (
+            <Button
+              className="next-question-button"
+              variant="contained"
+              onClick={() => {
+                loadQuestionTwo();
+              }}
+            >
+              Next question
+            </Button>
+          )}
         </div>
       </div>
 
@@ -84,9 +109,9 @@ function CodeComponent({ returnFunc }) {
           setLanguage={setLanguage}
           language={language}
           value={text}
-          onChange={e => {
+          onChange={(e) => {
             if (socket) {
-             emitText(e);
+              emitText(e);
             }
             setText(e);
           }}
@@ -96,4 +121,4 @@ function CodeComponent({ returnFunc }) {
   );
 }
 
-export default CodeComponent;
+export default CodingPage;

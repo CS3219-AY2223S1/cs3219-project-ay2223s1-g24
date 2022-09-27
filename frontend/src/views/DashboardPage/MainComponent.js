@@ -17,6 +17,9 @@ import {
   Typography,
 } from "@mui/material";
 import { io } from "socket.io-client";
+import { useUsername } from "slices/usernameSlice";
+import { setRoom } from "slices/roomSlice";
+import { useDispatch } from "react-redux";
 
 const RATIO = 100 / 30;
 
@@ -49,7 +52,7 @@ function CircularProgressWithLabel(props) {
   );
 }
 
-function DashboardComponent(props) {
+function DashboardComponent() {
   const [EASY, MEDIUM, HARD] = ["easy", "medium", "hard"];
   const [DEFAULT, ERROR, SUCCESS] = ["", "ERROR", "SUCCESS"];
   const [socket, setSocket] = useState(null);
@@ -59,8 +62,8 @@ function DashboardComponent(props) {
   const [progress, setProgress] = useState(100);
   const [easyModal, setEasyModal] = useState(false);
   const location = useLocation();
-
-  const username = props.username;
+  const dispatch = useDispatch();
+  const username = useUsername();
 
   const openEasyModal = () => {
     setEasyModal(true);
@@ -76,7 +79,7 @@ function DashboardComponent(props) {
   useEffect(() => {
     const socket = io.connect("http://localhost:8001");
     setSocket(socket);
-    socket.on("MATCHED", async (roomID, firstHash, secondHash) => {
+    socket.on("MATCHED", async (roomID, firstHash, secondHash, difficulty) => {
       setMatchStatus(SUCCESS);
       await sleep(3000);
       console.log(
@@ -85,7 +88,17 @@ function DashboardComponent(props) {
           " first hash: " +
           firstHash +
           " second hash: " +
-          secondHash
+          secondHash +
+          " of difficulty: " +
+          difficulty
+      );
+      dispatch(
+        setRoom({
+          roomID,
+          firstQuestionHash: firstHash,
+          secondQuestionHash: secondHash,
+          difficulty
+        })
       );
       setRoomId(roomID);
       socket.disconnect();
@@ -98,9 +111,10 @@ function DashboardComponent(props) {
 
   const navigate = useNavigate();
   useEffect(() => {
-    if (roomId !== "") {
-      navigate(`/coding/${roomId}`);
+    if (roomId === "") {
+      return;
     }
+    navigate(`/coding/${roomId}`);
   });
 
   useEffect(() => {
