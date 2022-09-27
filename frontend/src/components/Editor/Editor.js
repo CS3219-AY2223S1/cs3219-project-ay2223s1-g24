@@ -2,7 +2,8 @@ import React from "react";
 
 // The following imports is for the theme.
 import "codemirror/lib/codemirror.css";
-import "codemirror/theme/material.css";
+import "codemirror/theme/xq-light.css";
+import "codemirror/theme/elegant.css";
 import "./editor.scss";
 
 import { Controlled as ControlledEditor } from "react-codemirror2-react-17";
@@ -32,7 +33,6 @@ export default function Editor(props) {
           options={modes}
           handleDropdown={handleMode}
         />
-        <button>Fullscreen</button>
       </div>
       <ControlledEditor
         onBeforeChange={handleChange}
@@ -42,7 +42,7 @@ export default function Editor(props) {
           lineWrapping: true,
           lint: true,
           mode: language,
-          theme: "material",
+          theme: "elegant",
           lineNumbers: true,
         }}
       />

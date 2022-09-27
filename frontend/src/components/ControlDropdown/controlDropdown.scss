@@ -1,22 +1,23 @@
 .control-dropdown {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   flex: 1;
-  background-color: #808080;
   padding: 0;
 
   select {
-    width: 100%;
     appearance: none;
-    background-color: #898989;
-    color: #fff;
-    font-size: inherit;
-    padding: 0.5em;
+    background-color: #c0c0c0;
     border: none;
+    border-radius: 0.2em;
+    color: black;
+    font-size: inherit;
+    padding: 0.5em 0.8em;
     transition: 0.2s ease;
+    width: fit-content;
 
     &:hover {
-      background-color: #9d9d9d;
+      background-color: #9f9f9f;
     }
   }
 }

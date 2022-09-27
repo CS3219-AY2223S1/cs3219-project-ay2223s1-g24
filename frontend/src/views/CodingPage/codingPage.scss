@@ -1,7 +1,15 @@
+.navbar-top {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    border-bottom: .5px solid lightgray;
+    z-index: 1;
+}
+
 .code-container {
     display: flex;
     flex-direction: row;
-    height: 100vh;
+    height: 92.5vh;
 }
 
 .pane {
@@ -12,11 +20,16 @@
 .left-pane {
     display: flex;
     flex-direction: column;
-    background-color: rgb(220, 220, 220);
+    background-color: white;
     color: black;
     flex-grow: 1;
     padding: 10px 15px;
     overflow: auto;
+}
+
+.right-pane {
+    display: flex;
+    overflow-y: hidden;
 }
 
 .button-container {

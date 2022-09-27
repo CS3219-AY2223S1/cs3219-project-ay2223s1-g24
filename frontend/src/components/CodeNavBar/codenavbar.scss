@@ -1,0 +1,13 @@
+.code-navbar {
+    display: flex;
+    flex-direction: row;
+    max-height: fit-content;
+    background-color: white;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 10px 10px;
+
+    .save-button {
+        margin-right: 15px;
+    }
+}
