@@ -22,7 +22,7 @@ import { setRoom } from "slices/roomSlice";
 import { setMatching, useMatching } from "slices/matchingSlice";
 import { useDispatch } from "react-redux";
 
-const RATIO = 100 / 10;
+const RATIO = 100 / 30;
 
 function CircularProgressWithLabel(props) {
   return (
@@ -166,7 +166,6 @@ function DashboardComponent() {
           prevProgress <= 0 + RATIO ? 0 : prevProgress - RATIO
         );
       }, 1000);
-
       return () => {
         clearInterval(timer);
       };
@@ -340,6 +339,7 @@ function DashboardComponent() {
         variant="contained"
         color="primary"
         onClick={() => {
+          setMatchStatus(DEFAULT);
           openEasyModal();
           setIsQueueing(true);
           setProgress(100);
