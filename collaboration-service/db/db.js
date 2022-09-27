@@ -13,20 +13,27 @@ const dbConfig = {
 const db = new Pool(dbConfig);
 
 
-export const addUserToRoomDB = async (username, roomID) => {
-  // TODO: add checks to ensure max 2 users in each room
-  const findUser = `SELECT * FROM rooms WHERE username='${username}';`;
-  const res = await db.query(findUser);
-  if (res.rows.length > 0) {
-    console.log("User already in room!");
-    return;
-  }
-  const text = `INSERT INTO rooms (username, room_id) VALUES ('${username}', '${roomID}')`;
+export const addUserToRoomDB = async (roomID, username, difficulty, firstQuestion, secondQuestion, socketID) => {
+  const text = `INSERT INTO 
+    rooms (username, room_id, difficulty, first_question, second_question, socket_id) 
+    VALUES ('${username}', '${roomID}', '${difficulty}', ${firstQuestion}, ${secondQuestion}, '${socketID}') ON CONFLICT (username)
+    DO UPDATE SET socket_id='${socketID}'`;
+  return db.query(text);
+}
+
+export const removeUserFromRoomDB = async (socketID) => {
+  const text = `DELETE FROM rooms WHERE socket_id='${socketID}'`;
   return db.query(text);
 }
 
 export const saveCodeToDB = async (roomID, code) => {
-  const text = `INSERT INTO code (room_id, code) VALUES ('${roomID}', ${code}) ON CONFLICT (room_id) 
-    DO UPDATE SET code= ${code};`;
+  const text = `INSERT INTO code (room_id, code) VALUES ('${roomID}', '${code}') ON CONFLICT (room_id) 
+    DO UPDATE SET code= '${code}';`;
   return db.query(text);
+}
+
+export const retrieveCodeFromDB = async (roomID) => {
+  const text = `SELECT code FROM code where room_id='${roomID}'`;
+  const res = await db.query(text);
+  return res.rows[0].code;
 }

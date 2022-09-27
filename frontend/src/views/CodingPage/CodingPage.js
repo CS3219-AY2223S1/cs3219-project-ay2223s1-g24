@@ -14,7 +14,7 @@ function CodingPage() {
   const [language, setLanguage] = useState("python");
   const [text, setText] = useState('print("hello world")');
   const [question, setQuestion] = useState();
-  const [socket, setSocket] = useState(null);
+  const [currentSocket, setCurrentSocket] = useState(null);
   const questionNumber = useRef(1);
   const qnOne = useRef();
   const qnTwo = useRef();
@@ -66,23 +66,46 @@ function CodingPage() {
   const room = useRoom();
 
   const emitText = (text) => {
-    socket.emit("SET_TEXT", text, room.roomID);
+    currentSocket.emit("SET_TEXT", text, room.roomID);
   };
 
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
-    setSocket(socket);
+    setCurrentSocket(socket);
     readNewQuestion(
       room.firstQuestionHash,
       room.secondQuestionHash,
       room.difficulty
     );
-    socket.emit("JOIN_ROOM", room.roomID, username);
+    socket.emit(
+      "JOIN_ROOM",
+      room.roomID,
+      username,
+      room.difficulty,
+      room.firstQuestionHash,
+      room.secondQuestionHash
+    );
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
     });
     // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    const keydownHandler = (e) => {
+      let charCode = String.fromCharCode(e.which).toLowerCase();
+      if ((e.ctrlKey || e.metaKey) && charCode === "s") {
+        e.preventDefault();
+        console.log("Saving code to " + room.roomID);
+        currentSocket.emit("SAVE_CODE", room.roomID, text);
+      }
+    };
+    document.addEventListener("keydown", keydownHandler);
+    return () => {
+      document.removeEventListener("keydown", keydownHandler);
+    };
+    // eslint-disable-next-line
+  }, [text]);
 
   return (
     <div>
@@ -118,14 +141,13 @@ function CodingPage() {
           </div>
         </div>
 
-        {/* To be changed */}
-        <div className="pane right-pane">
+        <div className="pane">
           <Editor
             setLanguage={setLanguage}
             language={language}
             value={text}
             onChange={(e) => {
-              if (socket) {
+              if (currentSocket) {
                 emitText(e);
               }
               setText(e);
