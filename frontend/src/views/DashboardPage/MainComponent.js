@@ -21,7 +21,7 @@ import { useUsername } from "slices/usernameSlice";
 import { setRoom } from "slices/roomSlice";
 import { useDispatch } from "react-redux";
 
-const RATIO = 100 / 10;
+const RATIO = 100 / 30;
 
 function CircularProgressWithLabel(props) {
   return (
@@ -144,15 +144,17 @@ function DashboardComponent() {
   }, [progress]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) =>
-        prevProgress <= 0 + RATIO ? 0 : prevProgress - RATIO
-      );
-    }, 1000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
+    if (easyModal) {
+      const timer = setInterval(() => {
+        setProgress((prevProgress) =>
+          prevProgress <= 0 + RATIO ? 0 : prevProgress - RATIO
+        );
+      }, 1000);
+      return () => {
+        clearInterval(timer);
+      };
+    }
+  }, [easyModal]);
 
   return (
     <div className="main">
@@ -321,6 +323,7 @@ function DashboardComponent() {
         variant="contained"
         color="primary"
         onClick={() => {
+          setMatchStatus(DEFAULT);
           openEasyModal();
           setIsQueueing(true);
           setProgress(100);
