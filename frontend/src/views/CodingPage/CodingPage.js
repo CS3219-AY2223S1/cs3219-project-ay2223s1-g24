@@ -84,7 +84,7 @@ function CodingPage() {
       document.removeEventListener('keydown', keydownHandler);
     }
     // eslint-disable-next-line
-  }, [text]);
+  }, []);
 
   return (
     <div className="code-container">
