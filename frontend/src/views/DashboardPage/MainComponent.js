@@ -21,7 +21,7 @@ import { useUsername } from "slices/usernameSlice";
 import { setRoom } from "slices/roomSlice";
 import { useDispatch } from "react-redux";
 
-const RATIO = 100 / 30;
+const RATIO = 100 / 10;
 
 function CircularProgressWithLabel(props) {
   return (
@@ -61,6 +61,7 @@ function DashboardComponent() {
   const [roomDifficulty, setRoomDifficulty] = useState(null);
   const [progress, setProgress] = useState(100);
   const [easyModal, setEasyModal] = useState(false);
+  const [isQueueing, setIsQueueing] = useState(false);
   const location = useLocation();
   const dispatch = useDispatch();
   const username = useUsername();
@@ -72,36 +73,33 @@ function DashboardComponent() {
     setEasyModal(false);
   };
 
-  const sleep = (ms) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  };
-
   useEffect(() => {
     const socket = io.connect("http://localhost:8001");
     setSocket(socket);
-    socket.on("MATCHED", async (roomID, firstHash, secondHash, difficulty) => {
+    socket.on("MATCHED", (roomID, firstHash, secondHash, difficulty) => {
       setMatchStatus(SUCCESS);
-      await sleep(3000);
-      console.log(
-        "[FRONTEND] MATCHED with room ID: " +
-          roomID +
-          " first hash: " +
-          firstHash +
-          " second hash: " +
-          secondHash +
-          " of difficulty: " +
-          difficulty
-      );
-      dispatch(
-        setRoom({
-          roomID,
-          firstQuestionHash: firstHash,
-          secondQuestionHash: secondHash,
-          difficulty
-        })
-      );
-      setRoomId(roomID);
-      socket.disconnect();
+      setTimeout(() => {
+        console.log(
+          "[FRONTEND] MATCHED with room ID: " +
+            roomID +
+            " first hash: " +
+            firstHash +
+            " second hash: " +
+            secondHash +
+            " of difficulty: " +
+            difficulty
+        );
+        dispatch(
+          setRoom({
+            roomID,
+            firstQuestionHash: firstHash,
+            secondQuestionHash: secondHash,
+            difficulty,
+          })
+        );
+        setRoomId(roomID);
+        socket.disconnect();
+      }, 3000);
     });
     return () => {
       socket.disconnect();
@@ -124,28 +122,36 @@ function DashboardComponent() {
     // eslint-disable-next-line
   }, [location]);
 
-  const connectToQueue = () => {
-    socket.emit("JOIN_QUEUE", username, roomDifficulty);
-  };
+  useEffect(() => {
+    if (socket == null) {
+      return;
+    }
 
-  const disconnectFromQueue = () => {
-    socket.emit("LEAVE_QUEUE");
-  };
+    if (isQueueing) {
+      socket.emit("JOIN_QUEUE", username, roomDifficulty);
+    } else {
+      socket.emit("LEAVE_QUEUE");
+    }
+    // eslint-disable-next-line
+  }, [isQueueing]);
+
+  useEffect(() => {
+    if (progress <= 0 && matchStatus !== SUCCESS) {
+      setIsQueueing(false);
+      setMatchStatus(ERROR);
+    }
+    // eslint-disable-next-line
+  }, [progress]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setProgress((prevProgress) =>
         prevProgress <= 0 + RATIO ? 0 : prevProgress - RATIO
       );
-      if (progress <= 0 && matchStatus !== SUCCESS) {
-        socket.emit("LEAVE_QUEUE");
-        setMatchStatus(ERROR);
-      }
     }, 1000);
     return () => {
       clearInterval(timer);
     };
-    // eslint-disable-next-line
   }, []);
 
   return (
@@ -178,7 +184,7 @@ function DashboardComponent() {
               </Alert>
             )}
 
-            {(matchStatus === ERROR || progress <= 0) && (
+            {matchStatus === ERROR && progress <= 0 && (
               <Alert
                 severity={"error"}
                 sx={{ mt: "10px", fontSize: "14px", display: "flex" }}
@@ -190,14 +196,14 @@ function DashboardComponent() {
           <DialogActions
             sx={{ display: "flex", justifyContent: "center", pb: "15px" }}
           >
-            {(matchStatus === ERROR || progress <= 0) && (
+            {matchStatus === ERROR && (
               <Button
                 variant="contained"
                 sx={{}}
                 onClick={() => {
                   setMatchStatus(DEFAULT);
+                  setIsQueueing(true);
                   setProgress(100);
-                  connectToQueue();
                 }}
               >
                 Continue Matching
@@ -208,7 +214,7 @@ function DashboardComponent() {
               sx={{}}
               onClick={() => {
                 closeEasyModal();
-                disconnectFromQueue();
+                setIsQueueing(false);
               }}
             >
               Cancel
@@ -316,8 +322,8 @@ function DashboardComponent() {
         color="primary"
         onClick={() => {
           openEasyModal();
+          setIsQueueing(true);
           setProgress(100);
-          connectToQueue();
         }}
       >
         Find Room
