@@ -62,15 +62,6 @@ function CodingPage() {
     currentSocket.emit("SET_TEXT", text, room.roomID);
   };
 
-  const keydownHandler = (e) => {
-    let charCode = String.fromCharCode(e.which).toLowerCase();
-    if ((e.ctrlKey || e.metaKey) && charCode === 's') {
-      e.preventDefault();
-      console.log("Saving code to " + room.roomID);
-      currentSocket.emit("SAVE_CODE", room.roomID, text);
-    }
-  };
-
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
     setCurrentSocket(socket);
@@ -79,12 +70,24 @@ function CodingPage() {
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
     });
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
+    const keydownHandler = (e) => {
+      let charCode = String.fromCharCode(e.which).toLowerCase();
+      if ((e.ctrlKey || e.metaKey) && charCode === 's') {
+        e.preventDefault();
+        console.log("Saving code to " + room.roomID);
+        currentSocket.emit("SAVE_CODE", room.roomID, text);
+      }
+    };
     document.addEventListener('keydown', keydownHandler);
     return () => {
       document.removeEventListener('keydown', keydownHandler);
     }
     // eslint-disable-next-line
-  }, []);
+  }, [text])
 
   return (
     <div className="code-container">
