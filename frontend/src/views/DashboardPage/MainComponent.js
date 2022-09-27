@@ -79,7 +79,7 @@ function DashboardComponent() {
   useEffect(() => {
     const socket = io.connect("http://localhost:8001");
     setSocket(socket);
-    socket.on("MATCHED", async (roomID, firstHash, secondHash) => {
+    socket.on("MATCHED", async (roomID, firstHash, secondHash, difficulty) => {
       setMatchStatus(SUCCESS);
       await sleep(3000);
       console.log(
@@ -88,13 +88,16 @@ function DashboardComponent() {
           " first hash: " +
           firstHash +
           " second hash: " +
-          secondHash
+          secondHash +
+          " of difficulty: " +
+          difficulty
       );
       dispatch(
         setRoom({
           roomID,
           firstQuestionHash: firstHash,
           secondQuestionHash: secondHash,
+          difficulty
         })
       );
       setRoomId(roomID);
@@ -111,14 +114,7 @@ function DashboardComponent() {
     if (roomId === "") {
       return;
     }
-
-    if (roomDifficulty === EASY) {
-      navigate(`/coding/easy/${roomId}`);
-    } else if (roomDifficulty === MEDIUM) {
-      navigate(`/coding/medium/${roomId}`);
-    } else {
-      navigate(`/coding/hard/${roomId}`);
-    }
+    navigate(`/coding/${roomId}`);
   });
 
   useEffect(() => {
