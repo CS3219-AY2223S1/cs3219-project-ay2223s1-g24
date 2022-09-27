@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { addUserToRoomDB } from './db/db.js';
+import { addUserToRoomDB, removeUserFromRoomDB, saveCodeToDB, retrieveCodeFromDB } from './db/db.js';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }))
@@ -24,9 +24,9 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
   console.log("Client connected with id: " + socket.id);
 
-  socket.on("JOIN_ROOM", (roomID, username) => {
+  socket.on("JOIN_ROOM", (roomID, username, difficulty, firstQuestion, secondQuestion) => {
     socket.join(roomID);
-    // addUserToRoomDB(roomID, username);
+    addUserToRoomDB(roomID, username, difficulty, firstQuestion, secondQuestion, socket.id);
     console.log("User with username: " + username + " has joined room: " + roomID);
   })
 
@@ -35,12 +35,20 @@ io.on("connection", (socket) => {
   })
 
   socket.on("SAVE_CODE", (roomID, code) => {
-    // saveCodeToDB(roomID, code);
+    saveCodeToDB(roomID, code);
     console.log("Saved code for room: " + roomID);
   })
 
+  socket.on("RETRIEVE_CODE", async (roomID) => {
+    const code = await retrieveCodeFromDB(roomID);
+    console.log("Retrieved code for room: " + roomID);
+    socket.emit("UPDATE_TEXT", code);
+  })
+
   socket.on("disconnect", () => {
+    removeUserFromRoomDB(socket.id);
     console.log("Client disconnected with id: " + socket.id);
+    socket.emit()
   });
 });
 
