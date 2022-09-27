@@ -19,6 +19,7 @@ import {
 import { io } from "socket.io-client";
 import { useUsername } from "slices/usernameSlice";
 import { setRoom } from "slices/roomSlice";
+import { setMatching, useMatching } from "slices/matchingSlice";
 import { useDispatch } from "react-redux";
 
 const RATIO = 100 / 10;
@@ -57,7 +58,8 @@ function DashboardComponent() {
   const [DEFAULT, ERROR, SUCCESS] = ["", "ERROR", "SUCCESS"];
   const [socket, setSocket] = useState(null);
   const [roomId, setRoomId] = useState("");
-  const [matchStatus, setMatchStatus] = useState(DEFAULT);
+  const matching = useMatching();
+  const [matchStatus, setMatchStatus] = useState(matching.difficulty);
   const [roomDifficulty, setRoomDifficulty] = useState(null);
   const [progress, setProgress] = useState(100);
   const [easyModal, setEasyModal] = useState(false);
@@ -76,6 +78,7 @@ function DashboardComponent() {
   useEffect(() => {
     const socket = io.connect("http://localhost:8001");
     setSocket(socket);
+
     socket.on("MATCHED", (roomID, firstHash, secondHash, difficulty) => {
       setMatchStatus(SUCCESS);
       setTimeout(() => {
@@ -113,7 +116,8 @@ function DashboardComponent() {
       return;
     }
     navigate(`/coding/${roomId}`);
-  });
+    // eslint-disable-next-line
+  }, [roomId]);
 
   useEffect(() => {
     if (location.pathname !== "/dashboard") {
@@ -144,15 +148,30 @@ function DashboardComponent() {
   }, [progress]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) =>
-        prevProgress <= 0 + RATIO ? 0 : prevProgress - RATIO
-      );
-    }, 1000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
+    dispatch(
+      setMatching({
+        isQueueing,
+        matchStatus,
+        progress,
+        easyModal,
+      })
+    );
+    // eslint-disable-next-line
+  }, [isQueueing, matchStatus, progress, easyModal]);
+
+  useEffect(() => {
+    if (easyModal) {
+      const timer = setInterval(() => {
+        setProgress((prevProgress) =>
+          prevProgress <= 0 + RATIO ? 0 : prevProgress - RATIO
+        );
+      }, 1000);
+
+      return () => {
+        clearInterval(timer);
+      };
+    }
+  }, [easyModal]);
 
   return (
     <div className="main">
