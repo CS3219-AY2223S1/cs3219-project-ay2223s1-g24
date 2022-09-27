@@ -27,8 +27,13 @@ export const removeUserFromRoomDB = async (socketID) => {
 }
 
 export const saveCodeToDB = async (roomID, code) => {
-  console.log(code);
   const text = `INSERT INTO code (room_id, code) VALUES ('${roomID}', '${code}') ON CONFLICT (room_id) 
     DO UPDATE SET code= '${code}';`;
   return db.query(text);
+}
+
+export const retrieveCodeFromDB = async (roomID) => {
+  const text = `SELECT code FROM code where room_id='${roomID}'`;
+  const res = await db.query(text);
+  return res.rows[0].code;
 }

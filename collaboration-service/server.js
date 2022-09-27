@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { addUserToRoomDB, removeUserFromRoomDB, saveCodeToDB } from './db/db.js';
+import { addUserToRoomDB, removeUserFromRoomDB, saveCodeToDB, retrieveCodeFromDB } from './db/db.js';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }))
@@ -39,9 +39,16 @@ io.on("connection", (socket) => {
     console.log("Saved code for room: " + roomID);
   })
 
+  socket.on("RETRIEVE_CODE", async (roomID) => {
+    const code = await retrieveCodeFromDB(roomID);
+    console.log("Retrieved code for room: " + roomID);
+    socket.emit("UPDATE_TEXT", code);
+  })
+
   socket.on("disconnect", () => {
     removeUserFromRoomDB(socket.id);
     console.log("Client disconnected with id: " + socket.id);
+    socket.emit()
   });
 });
 
