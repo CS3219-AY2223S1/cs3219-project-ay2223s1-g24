@@ -58,12 +58,13 @@ function DashboardComponent() {
   const [DEFAULT, ERROR, SUCCESS] = ["", "ERROR", "SUCCESS"];
   const [socket, setSocket] = useState(null);
   const [roomId, setRoomId] = useState("");
+  const [roomDifficulty, setRoomDifficulty] = useState(EASY);
   const matching = useMatching();
-  const [matchStatus, setMatchStatus] = useState(matching.difficulty);
-  const [roomDifficulty, setRoomDifficulty] = useState(null);
+  const [isQueueing, setIsQueueing] = useState(matching.isQueueing);
+  const [matchStatus, setMatchStatus] = useState(false);
   const [progress, setProgress] = useState(100);
   const [easyModal, setEasyModal] = useState(false);
-  const [isQueueing, setIsQueueing] = useState(false);
+  const [errorMsgShown, setErrorMsgShown] = useState(false);
   const location = useLocation();
   const dispatch = useDispatch();
   const username = useUsername();
@@ -71,8 +72,23 @@ function DashboardComponent() {
   const openEasyModal = () => {
     setEasyModal(true);
   };
+
   const closeEasyModal = () => {
     setEasyModal(false);
+  };
+
+  const findRoom = () => {
+    if (isQueueing) {
+      closeEasyModal();
+      setErrorMsgShown(true);
+      setTimeout(() => {
+        setErrorMsgShown(false);
+      }, 3000);
+    } else {
+      openEasyModal();
+      setIsQueueing(true);
+      setProgress(100);
+    }
   };
 
   useEffect(() => {
@@ -151,13 +167,17 @@ function DashboardComponent() {
     dispatch(
       setMatching({
         isQueueing,
-        matchStatus,
-        progress,
-        easyModal,
+        // progress,
       })
     );
     // eslint-disable-next-line
-  }, [isQueueing, matchStatus, progress, easyModal]);
+  }, [isQueueing]);
+
+  useEffect(() => {
+    setIsQueueing(matching.isQueueing);
+    // setProgress(matching.progress);
+    // eslint-disable-next-line
+  }, [matching.isQueueing]);
 
   useEffect(() => {
     if (easyModal) {
@@ -174,6 +194,11 @@ function DashboardComponent() {
 
   return (
     <div className="main">
+      <div className={`error-msg ${errorMsgShown ? "hide" : ""}`}>
+        <Alert severity="error">
+          <strong>Queue is already in progress. </strong>
+        </Alert>
+      </div>
       <div className="flexbox-container-main">
         <Dialog open={easyModal}>
           <DialogTitle>Finding a match for you..</DialogTitle>
@@ -220,8 +245,7 @@ function DashboardComponent() {
                 sx={{}}
                 onClick={() => {
                   setMatchStatus(DEFAULT);
-                  setIsQueueing(true);
-                  setProgress(100);
+                  findRoom();
                 }}
               >
                 Continue Matching
@@ -340,9 +364,7 @@ function DashboardComponent() {
         color="primary"
         onClick={() => {
           setMatchStatus(DEFAULT);
-          openEasyModal();
-          setIsQueueing(true);
-          setProgress(100);
+          findRoom();
         }}
       >
         Find Room

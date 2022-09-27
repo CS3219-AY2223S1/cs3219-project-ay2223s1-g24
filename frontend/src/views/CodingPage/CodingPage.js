@@ -18,28 +18,34 @@ function CodingPage() {
   const qnOne = useRef();
   const qnTwo = useRef();
   const questionSize = {
-    "easy": 456,
-    "medium": 388,
-    "hard": 424
+    easy: 456,
+    medium: 388,
+    hard: 424,
   };
 
-  const readNewQuestion = async (firstQuestionHash, secondQuestionHash, difficulty) => {
-
-    const firstQuestionNumber = (firstQuestionHash % questionSize[difficulty]) + 1;
-    let secondQuestionNumber = (secondQuestionHash % questionSize[difficulty]) + 1;
+  const readNewQuestion = async (
+    firstQuestionHash,
+    secondQuestionHash,
+    difficulty
+  ) => {
+    const firstQuestionNumber =
+      (firstQuestionHash % questionSize[difficulty]) + 1;
+    let secondQuestionNumber =
+      (secondQuestionHash % questionSize[difficulty]) + 1;
 
     const questionOne = await import(
       `questions/${difficulty}/q${firstQuestionNumber}.js`
     );
 
     if (firstQuestionNumber === secondQuestionNumber) {
-      secondQuestionNumber = (firstQuestionNumber + 1) % questionSize[difficulty];
+      secondQuestionNumber =
+        (firstQuestionNumber + 1) % questionSize[difficulty];
     }
 
     const questionTwo = await import(
       `questions/${difficulty}/q${secondQuestionNumber}.js`
     );
-    
+
     setQuestion(questionOne.question);
     qnOne.current = questionOne.question;
     qnTwo.current = questionTwo.question;
@@ -63,13 +69,13 @@ function CodingPage() {
   };
 
   useEffect(() => {
-    const socket = io.connect("http://localhost:8080");
-    setSocket(socket);
-    readNewQuestion(room.firstQuestionHash, room.secondQuestionHash, room.difficulty);
-    socket.emit("JOIN_ROOM", room.roomID, username);
-    socket.on("UPDATE_TEXT", (text) => {
-      setText(text);
-    });
+    // const socket = io.connect("http://localhost:8080");
+    // setSocket(socket);
+    // readNewQuestion(room.firstQuestionHash, room.secondQuestionHash, room.difficulty);
+    // socket.emit("JOIN_ROOM", room.roomID, username);
+    // socket.on("UPDATE_TEXT", (text) => {
+    //   setText(text);
+    // });
     // eslint-disable-next-line
   }, []);
 
