@@ -14,7 +14,8 @@ import CodeNavBar from "components/CodeNavBar/CodeNavBar";
 
 function CodingPage() {
   const [language, setLanguage] = useState("python");
-  const [text, setText] = useState('print("hello world")');
+  // const [text, setText] = useState('print("hello world")');
+  const [text, setText] = useState('');
   const [question, setQuestion] = useState();
   const [currentSocket, setCurrentSocket] = useState(null);
   const questionNumber = useRef(1);
