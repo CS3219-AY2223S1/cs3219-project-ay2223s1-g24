@@ -25,7 +25,7 @@ function CodingPage() {
     medium: 388,
     hard: 424,
   };
-  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["name", "email", "jwtToken", "roomID", "firstQuestionHash", "secondQuestionHash", "difficulty"]);
 
   const readNewQuestion = async (
     firstQuestionHash,
@@ -68,6 +68,10 @@ function CodingPage() {
   const navigate = useNavigate();
   const quitSession = () => {
     setCookie("roomID", "", { path: `/` });
+    setCookie("firstQuestionHash", "", { path: `/` });
+    setCookie("secondQuestionHash", "", { path: `/` });
+    setCookie("difficulty", "", { path: `/` });
+    // removeCookie("roomID", { path: "/" });
     navigate(`/`);
   };
 

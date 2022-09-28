@@ -69,7 +69,7 @@ function DashboardComponent() {
   const location = useLocation();
   const dispatch = useDispatch();
   const username = useUsername();
-  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID"]);
+  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID" ,"firstQuestionHash", "secondQuestionHash", "difficulty"]);
 
   const openEasyModal = () => {
     setEasyModal(true);
@@ -119,6 +119,12 @@ function DashboardComponent() {
             difficulty,
           })
         );
+
+        setCookie("roomID", roomID, { path: `/` });
+        setCookie("firstQuestionHash", firstHash, { path: `/` });
+        setCookie("secondQuestionHash", secondHash, { path: `/` });
+        setCookie("difficulty", difficulty, { path: `/` });
+
         setRoomId(roomID);
         socket.disconnect();
       }, 3000);
@@ -134,8 +140,6 @@ function DashboardComponent() {
     if (roomId === "") {
       return;
     }
-    
-    setCookie("roomID", roomId, { path: `/` });
     navigate(`/coding/${roomId}`);
     // eslint-disable-next-line
   }, [roomId]);
