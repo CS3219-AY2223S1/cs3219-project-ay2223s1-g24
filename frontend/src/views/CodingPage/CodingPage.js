@@ -27,11 +27,14 @@ function CodingPage() {
     medium: 388,
     hard: 424,
   };
-  const [cookies, setCookie] = useCookies([
+  const [cookies, setCookie, removeCookie] = useCookies([
     "name",
     "email",
     "jwtToken",
     "roomID",
+    "firstQuestionHash",
+    "secondQuestionHash",
+    "difficulty",
   ]);
 
   const readNewQuestion = async (
@@ -88,6 +91,10 @@ function CodingPage() {
   const endSession = () => {
     console.log("Telling Client 2 to leave page...");
     setCookie("roomID", "", { path: `/` });
+    setCookie("firstQuestionHash", "", { path: `/` });
+    setCookie("secondQuestionHash", "", { path: `/` });
+    setCookie("difficulty", "", { path: `/` });
+    // removeCookie("roomID", { path: "/" });
     currentSocket.emit("END_SESSION", room.roomID);
   };
 
