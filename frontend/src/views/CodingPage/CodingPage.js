@@ -25,6 +25,7 @@ function CodingPage() {
     medium: 388,
     hard: 424,
   };
+  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID"]);
 
   const readNewQuestion = async (
     firstQuestionHash,
@@ -63,6 +64,13 @@ function CodingPage() {
     questionNumber.current = questionNumber.current + 1;
     setQuestion(qnTwo.current);
   };
+
+  const navigate = useNavigate();
+  const quitSession = () => {
+    setCookie("roomID", "", { path: `/` });
+    navigate(`/`);
+  };
+
 
   const username = useUsername();
   const room = useRoom();
@@ -153,9 +161,43 @@ function CodingPage() {
   }, [text]);
 
   return (
-    <div>
-      <div className="navbar-top">
-        <CodeNavBar />
+    <div className="code-container">
+      <div className="pane left-pane">
+        <div dangerouslySetInnerHTML={{ __html: question }}></div>
+        <div className="button-container">
+          {questionNumber.current === 2 && (
+            <Button
+              className="prev-question-button"
+              variant="contained"
+              onClick={() => {
+                loadQuestionOne();
+              }}
+            >
+              Previous question
+            </Button>
+          )}
+          {questionNumber.current === 1 && (
+            <Button
+              className="next-question-button"
+              variant="contained"
+              onClick={() => {
+                loadQuestionTwo();
+              }}
+            >
+              Next question
+            </Button>
+          )}
+          
+          <Button
+              className="next-question-button"
+              variant="contained"
+              onClick={() => {
+                quitSession();
+              }}
+            >
+              Quit
+            </Button>
+        </div>
       </div>
       <div className="code-container">
         <div className="pane left-pane">
