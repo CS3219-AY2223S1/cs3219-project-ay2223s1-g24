@@ -21,6 +21,7 @@ import { useUsername } from "slices/usernameSlice";
 import { setRoom } from "slices/roomSlice";
 import { setMatching, useMatching } from "slices/matchingSlice";
 import { useDispatch } from "react-redux";
+import { useCookies } from "react-cookie";
 
 const RATIO = 100 / 30;
 
@@ -68,6 +69,7 @@ function DashboardComponent() {
   const location = useLocation();
   const dispatch = useDispatch();
   const username = useUsername();
+  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID"]);
 
   const openEasyModal = () => {
     setEasyModal(true);
@@ -97,6 +99,7 @@ function DashboardComponent() {
 
     socket.on("MATCHED", (roomID, firstHash, secondHash, difficulty) => {
       setMatchStatus(SUCCESS);
+
       setTimeout(() => {
         console.log(
           "[FRONTEND] MATCHED with room ID: " +
@@ -131,6 +134,8 @@ function DashboardComponent() {
     if (roomId === "") {
       return;
     }
+    
+    setCookie("roomID", roomId, { path: `/` });
     navigate(`/coding/${roomId}`);
     // eslint-disable-next-line
   }, [roomId]);
