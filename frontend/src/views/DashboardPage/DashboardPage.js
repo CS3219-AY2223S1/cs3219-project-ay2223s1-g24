@@ -82,7 +82,10 @@ function DashboardPage() {
 
   useEffect(() => {
     // const decodedToken = decodeToken(cookies?.jwtToken);
-    if (!cookies.jwtToken || isExpired(cookies.jwtToken)) {
+    if (cookies.jwtToken && !isExpired(cookies.jwtToken) && (cookies.roomID !== null && cookies.roomID !== '')) {
+      navigate(`/coding/${cookies.roomID}`);
+    }
+    else if (!cookies.jwtToken || isExpired(cookies.jwtToken)) {
       removeCookie("name", { path: "/" });
       removeCookie("email", { path: "/" });
       removeCookie("jwtToken", { path: "/" });
