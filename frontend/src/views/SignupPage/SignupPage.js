@@ -43,7 +43,10 @@ function SignupPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (cookies.jwtToken) {
+    if (cookies.roomID !== null && cookies.roomID !== '') {
+      navigate(`/coding/${cookies.roomID}`);
+    }
+    else if (cookies.jwtToken) {
       navigate("/dashboard");
     }
   });
