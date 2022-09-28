@@ -27,6 +27,12 @@ function CodingPage() {
     medium: 388,
     hard: 424,
   };
+  const [cookies, setCookie] = useCookies([
+    "name",
+    "email",
+    "jwtToken",
+    "roomID",
+  ]);
 
   const readNewQuestion = async (
     firstQuestionHash,
@@ -68,7 +74,6 @@ function CodingPage() {
 
   const username = useUsername();
   const room = useRoom();
-  const [cookies] = useCookies(["name"]);
   const dispatch = useDispatch();
 
   const emitText = (text) => {
@@ -82,6 +87,7 @@ function CodingPage() {
 
   const endSession = () => {
     console.log("Telling Client 2 to leave page...");
+    setCookie("roomID", "", { path: `/` });
     currentSocket.emit("END_SESSION", room.roomID);
   };
 
