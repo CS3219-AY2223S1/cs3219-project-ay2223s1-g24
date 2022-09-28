@@ -5,6 +5,8 @@ import Editor from "components/Editor/Editor";
 import { io } from "socket.io-client";
 import { useUsername } from "slices/usernameSlice";
 import { useRoom } from "slices/roomSlice";
+import { useCookies } from "react-cookie";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
@@ -22,6 +24,7 @@ function CodingPage() {
     "medium": 388,
     "hard": 424
   };
+  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID"]);
 
   const readNewQuestion = async (firstQuestionHash, secondQuestionHash, difficulty) => {
 
@@ -54,6 +57,13 @@ function CodingPage() {
     questionNumber.current = questionNumber.current + 1;
     setQuestion(qnTwo.current);
   };
+
+  const navigate = useNavigate();
+  const quitSession = () => {
+    setCookie("roomID", "", { path: `/` });
+    navigate(`/`);
+  };
+
 
   const username = useUsername();
   const room = useRoom();
@@ -116,6 +126,16 @@ function CodingPage() {
               Next question
             </Button>
           )}
+          
+          <Button
+              className="next-question-button"
+              variant="contained"
+              onClick={() => {
+                quitSession();
+              }}
+            >
+              Quit
+            </Button>
         </div>
       </div>
 
