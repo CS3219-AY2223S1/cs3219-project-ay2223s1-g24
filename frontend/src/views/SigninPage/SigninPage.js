@@ -14,6 +14,8 @@ import {
   STATUS_CODE_WRONG_PASSWORD,
   STATUS_CODE_UNEXPECTED_ERROR,
 } from "constants";
+import { useDispatch } from "react-redux";
+import { setRoom } from "slices/roomSlice";
 
 function SigninPage() {
   const [email, setEmail] = useState("");
@@ -23,8 +25,9 @@ function SigninPage() {
   const [isPasswordInputTouched, setPasswordInputTouched] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken"]);
+  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID" ,"firstQuestionHash", "secondQuestionHash", "difficulty"]);
   const SINGLE_DAY_EXPIRY = 86400 * 1000;
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
@@ -42,6 +45,14 @@ function SigninPage() {
 
   useEffect(() => {
     if (cookies.roomID !== null && cookies.roomID !== '') {
+      dispatch(
+        setRoom({
+          roomID: cookies.roomID,
+          firstQuestionHash: cookies.firstQuestionHash,
+          secondQuestionHash: cookies.secondQuestionHash,
+          difficulty: cookies.difficulty,
+        })
+      );
       navigate(`/coding/${cookies.roomID}`);
     }
     else if (cookies.jwtToken) {
