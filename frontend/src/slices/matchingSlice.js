@@ -8,7 +8,6 @@ export const matchingSlice = createSlice({
     matchStatus: "",
     progress: 100,
     easyModal: false,
-    difficulty: "easy",
   },
   reducers: {
     setMatching: (state, action) => {
