@@ -28,7 +28,6 @@ function SigninPage() {
   const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID" ,"firstQuestionHash", "secondQuestionHash", "difficulty"]);
   const SINGLE_DAY_EXPIRY = 86400 * 1000;
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
 
   const navigateToSignup = () => {
@@ -43,17 +42,21 @@ function SigninPage() {
     navigate("/");
   };
 
+  function loadRoom() {
+    dispatch(
+      setRoom({
+        roomID: cookies.roomID,
+        firstQuestionHash: cookies.firstQuestionHash,
+        secondQuestionHash: cookies.secondQuestionHash,
+        difficulty: cookies.difficulty,
+      })
+    );
+    navigate(`/coding/${cookies.roomID}`);
+  }
+
   useEffect(() => {
     if (cookies.roomID !== null && cookies.roomID !== '') {
-      dispatch(
-        setRoom({
-          roomID: cookies.roomID,
-          firstQuestionHash: cookies.firstQuestionHash,
-          secondQuestionHash: cookies.secondQuestionHash,
-          difficulty: cookies.difficulty,
-        })
-      );
-      navigate(`/coding/${cookies.roomID}`);
+      loadRoom();
     }
     else if (cookies.jwtToken) {
       navigateToDashboard();
