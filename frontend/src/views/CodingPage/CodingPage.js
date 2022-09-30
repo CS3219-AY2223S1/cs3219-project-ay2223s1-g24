@@ -17,6 +17,7 @@ function CodingPage() {
   const [text, setText] = useState('print("hello world")');
   const [question, setQuestion] = useState();
   const [currentSocket, setCurrentSocket] = useState(null);
+  const [isSavingCode, setIsSavingCode] = useState(false);
   const questionNumber = useRef(1);
   const qnOne = useRef();
   const qnTwo = useRef();
@@ -66,9 +67,7 @@ function CodingPage() {
 
   const username = useUsername();
   const room = useRoom();
-  const [cookies] = useCookies([
-    "name",
-  ]);
+  const [cookies] = useCookies(["name"]);
   const dispatch = useDispatch();
 
   const emitText = (text) => {
@@ -77,41 +76,46 @@ function CodingPage() {
 
   const quitSession = () => {
     currentSocket.emit("END_SESSION", room.roomID);
-  }
+  };
+  const saveCode = () => {
+    console.log("Save is working!");
+    currentSocket.emit("SAVE_CODE", room.roomID, text);
+  };
 
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
     setCurrentSocket(socket);
-    if (room.roomID === '' || room.difficulty ===  '' || room.firstQuestionHash === 0 || room.secondQuestionHash === 0) {
+    if (
+      room.roomID === "" ||
+      room.difficulty === "" ||
+      room.firstQuestionHash === 0 ||
+      room.secondQuestionHash === 0
+    ) {
       // case where user refreshes, sends a call to DB to check if username in room
       // if in room: retrieve question hashes and rejoins the room
       // TODO: cookies giving issue when multiple tabs of different usernames open
       console.log("retrieving for username: " + cookies.name);
-      socket.emit(
-        "RETRIEVE_ROOM",
-        cookies.name
-      );
-      socket.on("RECEIVE_ROOM_DATA", (roomID, difficulty, firstQuestion, secondQuestion) => {
-        if (!roomID || !difficulty || !firstQuestion || !secondQuestion) {
-          // TODO: room not found, redirect user back to dashboard
-          console.log("Room not found! Redirecting back to main page...");
-        } else {
-          readNewQuestion(
-            firstQuestion,
-            secondQuestion,
-            difficulty
-          );
-          socket.emit("RETRIEVE_CODE", roomID);
-          dispatch(
-            setRoom({
-              roomID: roomID,
-              firstQuestionHash: firstQuestion,
-              secondQuestionHash: secondQuestion,
-              difficulty: difficulty,
-            })
-          );
+      socket.emit("RETRIEVE_ROOM", cookies.name);
+      socket.on(
+        "RECEIVE_ROOM_DATA",
+        (roomID, difficulty, firstQuestion, secondQuestion) => {
+          if (!roomID || !difficulty || !firstQuestion || !secondQuestion) {
+            // TODO: room not found, redirect user back to dashboard
+            console.log("Room not found! Redirecting back to main page...");
+          } else {
+            readNewQuestion(firstQuestion, secondQuestion, difficulty);
+            socket.emit("RETRIEVE_CODE", roomID);
+            dispatch(
+              setRoom({
+                roomID: roomID,
+                firstQuestionHash: firstQuestion,
+                secondQuestionHash: secondQuestion,
+                difficulty: difficulty,
+              })
+            );
+          }
         }
-      })
+      );
     } else {
       readNewQuestion(
         room.firstQuestionHash,
@@ -132,7 +136,7 @@ function CodingPage() {
     });
     socket.on("SESSION_ENDED", () => {
       console.log("BYEBYE");
-    })
+    });
     // eslint-disable-next-line
   }, []);
 
@@ -141,8 +145,15 @@ function CodingPage() {
       let charCode = String.fromCharCode(e.which).toLowerCase();
       if ((e.ctrlKey || e.metaKey) && charCode === "s") {
         e.preventDefault();
-        console.log("Saving code to " + room.roomID);
-        currentSocket.emit("SAVE_CODE", room.roomID, text);
+        // Error handling for when socket not initialised yet
+        if (currentSocket) {
+          console.log("Saving code to " + room.roomID);
+          currentSocket.emit("SAVE_CODE", room.roomID, text);
+          setIsSavingCode(true);
+        } else {
+          console.log("Socket not initialised yet!");
+          return;
+        }
       }
     };
     document.addEventListener("keydown", keydownHandler);
@@ -155,7 +166,11 @@ function CodingPage() {
   return (
     <div>
       <div className="navbar-top">
-        <CodeNavBar />
+        <CodeNavBar
+          isSavingCode={isSavingCode}
+          saveCode={saveCode}
+          setIsSavingCode={setIsSavingCode}
+        />
       </div>
       <div className="code-container">
         <div className="pane left-pane">
@@ -186,7 +201,7 @@ function CodingPage() {
           </div>
         </div>
 
-        <div className="pane">
+        <div className="pane right-pane">
           <Editor
             setLanguage={setLanguage}
             language={language}
