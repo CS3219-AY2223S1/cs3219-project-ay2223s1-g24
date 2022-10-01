@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { addUserToRoomDB, removeUserFromRoomDB, saveCodeToDB, retrieveCodeFromDB } from './db/db.js';
+import { addUserToRoomDB, removeUserFromRoomDB, saveCodeToDB, retrieveCodeFromDB, retrieveRoomDataFromDB, deleteRoomInDB } from './db/db.js';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -26,8 +26,18 @@ io.on("connection", (socket) => {
 
   socket.on("JOIN_ROOM", (roomID, username, difficulty, firstQuestion, secondQuestion) => {
     socket.join(roomID);
-    addUserToRoomDB(roomID, username, difficulty, firstQuestion, secondQuestion, socket.id);
+    addUserToRoomDB(roomID, username, difficulty, firstQuestion, secondQuestion);
     console.log("User with username: " + username + " has joined room: " + roomID);
+  })
+
+  socket.on("RETRIEVE_ROOM", async (username) => {
+    const roomData = await retrieveRoomDataFromDB(username);
+    if (roomData) {
+      socket.join(roomData.room_id);
+      socket.emit("RECEIVE_ROOM_DATA", roomData.room_id, roomData.difficulty, roomData.first_question, roomData.second_question);
+    } else {
+      socket.emit("RECEIVE_ROOM_DATA");
+    }
   })
 
   socket.on("SET_TEXT", (text, roomID) => {
@@ -43,12 +53,15 @@ io.on("connection", (socket) => {
     const code = await retrieveCodeFromDB(roomID);
     console.log("Retrieved code for room: " + roomID);
     socket.emit("UPDATE_TEXT", code);
+  });
+
+  socket.on("END_SESSION", (roomID) => {
+    deleteRoomInDB(roomID);
+    socket.to(roomID).emit("SESSION_ENDED");
   })
 
   socket.on("disconnect", () => {
-    removeUserFromRoomDB(socket.id);
     console.log("Client disconnected with id: " + socket.id);
-    socket.emit()
   });
 });
 
