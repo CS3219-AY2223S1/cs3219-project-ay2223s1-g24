@@ -68,6 +68,7 @@ function DashboardComponent() {
   const [errorMsgShown, setErrorMsgShown] = useState(false);
   const location = useLocation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const username = useUsername();
   const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID" ,"firstQuestionHash", "secondQuestionHash", "difficulty"]);
 
@@ -135,14 +136,23 @@ function DashboardComponent() {
     // eslint-disable-next-line
   }, []);
 
-  const navigate = useNavigate();
+  function loadRoom() {
+    dispatch(
+      setRoom({
+        roomID: cookies.roomID,
+        firstQuestionHash: cookies.firstQuestionHash,
+        secondQuestionHash: cookies.secondQuestionHash,
+        difficulty: cookies.difficulty,
+      })
+    );
+    navigate(`/coding/${cookies.roomID}`);
+  }
+  
   useEffect(() => {
-    if (roomId === "") {
-      return;
+    if (cookies.roomID !== null && cookies.roomID !== '') {
+      loadRoom();
     }
-    navigate(`/coding/${roomId}`);
-    // eslint-disable-next-line
-  }, [roomId]);
+  });
 
   useEffect(() => {
     if (location.pathname !== "/dashboard") {
