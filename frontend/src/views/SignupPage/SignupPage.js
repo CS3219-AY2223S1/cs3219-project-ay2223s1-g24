@@ -18,6 +18,8 @@ import {
 } from "constants";
 import "./signup.scss";
 import { useCookies } from "react-cookie";
+import { useDispatch } from "react-redux";
+import { setRoom } from "slices/roomSlice";
 import mainLogo from "assets/mainlogo.png";
 
 function SignupPage() {
@@ -41,10 +43,22 @@ function SignupPage() {
     "jwtToken",
   ]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
+  function loadRoom() {
+    dispatch(
+      setRoom({
+        roomID: cookies.roomID,
+        firstQuestionHash: cookies.firstQuestionHash,
+        secondQuestionHash: cookies.secondQuestionHash,
+        difficulty: cookies.difficulty,
+      })
+    );
+    navigate(`/coding/${cookies.roomID}`);
+  }
   useEffect(() => {
     if (cookies.roomID !== null && cookies.roomID !== '') {
-      navigate(`/coding/${cookies.roomID}`);
+      loadRoom();
     }
     else if (cookies.jwtToken) {
       navigate("/dashboard");

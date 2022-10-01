@@ -230,6 +230,15 @@ function CodingPage() {
                 Next question
               </Button>
             )}
+            <Button
+                className="next-question-button"
+                variant="contained"
+                onClick={() => {
+                  quitSession();
+                }}
+              >
+                Quit
+              </Button>
           </div>
         </div>
 
