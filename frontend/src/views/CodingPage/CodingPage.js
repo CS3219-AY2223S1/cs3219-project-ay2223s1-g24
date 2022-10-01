@@ -4,7 +4,9 @@ import "./codingPage.scss";
 import Editor from "components/Editor/Editor";
 import { io } from "socket.io-client";
 import { useUsername } from "slices/usernameSlice";
-import { useRoom } from "slices/roomSlice";
+import { useRoom, setRoom } from "slices/roomSlice";
+import { useCookies } from "react-cookie";
+import { useDispatch } from "react-redux";
 
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
@@ -64,6 +66,10 @@ function CodingPage() {
 
   const username = useUsername();
   const room = useRoom();
+  const [cookies] = useCookies([
+    "name",
+  ]);
+  const dispatch = useDispatch();
 
   const emitText = (text) => {
     currentSocket.emit("SET_TEXT", text, room.roomID);
@@ -72,19 +78,51 @@ function CodingPage() {
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
     setCurrentSocket(socket);
-    readNewQuestion(
-      room.firstQuestionHash,
-      room.secondQuestionHash,
-      room.difficulty
-    );
-    socket.emit(
-      "JOIN_ROOM",
-      room.roomID,
-      username,
-      room.difficulty,
-      room.firstQuestionHash,
-      room.secondQuestionHash
-    );
+    if (room.roomID === '' || room.difficulty ===  '' || room.firstQuestionHash === 0 || room.secondQuestionHash === 0) {
+      // case where user refreshes, sends a call to DB to check if username in room
+      // if in room: retrieve question hashes and rejoins the room
+      // TODO: cookies giving issue when multiple tabs of different usernames open
+      console.log("retrieving for username: " + cookies.name);
+      socket.emit(
+        "RETRIEVE_ROOM",
+        cookies.name
+      );
+      socket.on("RECEIVE_ROOM_DATA", (roomID, difficulty, firstQuestion, secondQuestion) => {
+
+        if (!roomID || !difficulty || !firstQuestion || !secondQuestion) {
+          // TODO: room not found, redirect user back to dashboard
+          console.log("Room not found! Redirecting back to main page...");
+        } else {
+          readNewQuestion(
+            firstQuestion,
+            secondQuestion,
+            difficulty
+          );
+          dispatch(
+            setRoom({
+              roomID: roomID,
+              firstQuestionHash: firstQuestion,
+              secondQuestionHash: secondQuestion,
+              difficulty: difficulty,
+            })
+          );
+        }
+      })
+    } else {
+      readNewQuestion(
+        room.firstQuestionHash,
+        room.secondQuestionHash,
+        room.difficulty
+      );
+      socket.emit(
+        "JOIN_ROOM",
+        room.roomID,
+        username,
+        room.difficulty,
+        room.firstQuestionHash,
+        room.secondQuestionHash
+      );
+    }
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
     });
