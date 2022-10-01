@@ -1,16 +1,18 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@mui/material";
-import "./codingPage.scss";
-import Editor from "components/Editor/Editor";
 import { io } from "socket.io-client";
-import { useUsername } from "slices/usernameSlice";
-import { useRoom, setRoom } from "slices/roomSlice";
 import { useCookies } from "react-cookie";
 import { useDispatch } from "react-redux";
-
+import { Routes, Route, useNavigate} from "react-router-dom";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
-import CodeNavBar from "components/CodeNavBar/CodeNavBar";
+
+import { useUsername } from "slices/usernameSlice";
+import { useRoom, setRoom } from "slices/roomSlice";
+import Editor from "components/Editor/Editor";
+import "./codingPage.scss";
+import mainLogo from "assets/logo.png";
+//import CodeNavBar from "components/CodeNavBar/CodeNavBar";
 
 function CodingPage() {
   const [language, setLanguage] = useState("python");
@@ -26,8 +28,8 @@ function CodingPage() {
     medium: 388,
     hard: 424,
   };
-  const [cookies, setCookie, removeCookie] = useCookies(["name", "email", "jwtToken", "roomID", "firstQuestionHash", "secondQuestionHash", "difficulty"]);
-
+  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID" ,"firstQuestionHash", "secondQuestionHash", "difficulty"]);
+  
   const readNewQuestion = async (
     firstQuestionHash,
     secondQuestionHash,
@@ -72,6 +74,7 @@ function CodingPage() {
     setCookie("firstQuestionHash", "", { path: `/` });
     setCookie("secondQuestionHash", "", { path: `/` });
     setCookie("difficulty", "", { path: `/` });
+    currentSocket.emit("END_SESSION", room.roomID);
     // removeCookie("roomID", { path: "/" });
     navigate(`/`);
   };
@@ -79,18 +82,11 @@ function CodingPage() {
 
   const username = useUsername();
   const room = useRoom();
-  const [cookies] = useCookies([
-    "name",
-  ]);
   const dispatch = useDispatch();
 
   const emitText = (text) => {
     currentSocket.emit("SET_TEXT", text, room.roomID);
   };
-
-  const quitSession = () => {
-    currentSocket.emit("END_SESSION", room.roomID);
-  }
 
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
@@ -140,6 +136,7 @@ function CodingPage() {
         room.secondQuestionHash
       );
     }
+    socket.emit("RETRIEVE_CODE", room.roomID);
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
     });
@@ -166,43 +163,42 @@ function CodingPage() {
   }, [text]);
 
   return (
-    <div className="code-container">
-      <div className="pane left-pane">
-        <div dangerouslySetInnerHTML={{ __html: question }}></div>
-        <div className="button-container">
-          {questionNumber.current === 2 && (
-            <Button
-              className="prev-question-button"
-              variant="contained"
-              onClick={() => {
-                loadQuestionOne();
-              }}
-            >
-              Previous question
-            </Button>
-          )}
-          {questionNumber.current === 1 && (
-            <Button
-              className="next-question-button"
-              variant="contained"
-              onClick={() => {
-                loadQuestionTwo();
-              }}
-            >
-              Next question
-            </Button>
-          )}
-          
-          <Button
-              className="next-question-button"
-              variant="contained"
-              onClick={() => {
-                quitSession();
-              }}
-            >
-              Quit
-            </Button>
+    <div>
+      <div className="navbar-top">
+        <div className="code-navbar">
+          <div className="left">
+            <div className="img-container">
+              <img src={mainLogo} alt="main-logo" />
+            </div>
+          </div>
+          {/*OnClick behaviour to be changed*/}
+          <div className="right">
+            <div className="buttons">
+              <Button
+                className="save-button"
+                onClick={() => console.log("Saved successfully!")}
+                color="success"
+                variant="contained"
+                size="small"
+              >
+                Save
+              </Button>
+              <Button
+                className="end-button"
+                onClick={quitSession}
+                color="error"
+                variant="contained"
+                size="small"
+              >
+                End Session
+              </Button>
+            </div>
+          </div>
+          {/* <Routes>
+            <Route path="/dashboard/*" element={<DashboardPage />} />
+          </Routes> */}
         </div>
+        
       </div>
       <div className="code-container">
         <div className="pane left-pane">
@@ -230,15 +226,6 @@ function CodingPage() {
                 Next question
               </Button>
             )}
-            <Button
-                className="next-question-button"
-                variant="contained"
-                onClick={() => {
-                  quitSession();
-                }}
-              >
-                Quit
-              </Button>
           </div>
         </div>
 
