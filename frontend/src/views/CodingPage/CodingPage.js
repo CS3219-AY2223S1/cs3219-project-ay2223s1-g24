@@ -1,21 +1,23 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@mui/material";
-import "./codingPage.scss";
-import Editor from "components/Editor/Editor";
 import { io } from "socket.io-client";
-import { useUsername } from "slices/usernameSlice";
-import { useRoom, setRoom } from "slices/roomSlice";
 import { useCookies } from "react-cookie";
 import { useDispatch } from "react-redux";
-
+import { Routes, Route, useNavigate } from "react-router-dom";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
+
+import { useUsername } from "slices/usernameSlice";
+import { useRoom, setRoom } from "slices/roomSlice";
+import Editor from "components/Editor/Editor";
+import "./codingPage.scss";
+import mainLogo from "assets/logo.png";
 import CodeNavBar from "components/CodeNavBar/CodeNavBar";
 
 function CodingPage() {
   const [language, setLanguage] = useState("python");
   // const [text, setText] = useState('print("hello world")');
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [question, setQuestion] = useState();
   const [currentSocket, setCurrentSocket] = useState(null);
   const [isSavingCode, setIsSavingCode] = useState(false);
@@ -28,7 +30,7 @@ function CodingPage() {
     medium: 388,
     hard: 424,
   };
-  const [cookies, setCookie, removeCookie] = useCookies([
+  const [cookies, setCookie] = useCookies([
     "name",
     "email",
     "jwtToken",
@@ -148,6 +150,7 @@ function CodingPage() {
         room.secondQuestionHash
       );
     }
+    socket.emit("RETRIEVE_CODE", room.roomID);
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
     });
@@ -217,15 +220,6 @@ function CodingPage() {
                 Next question
               </Button>
             )}
-            <Button
-                className="next-question-button"
-                variant="contained"
-                onClick={() => {
-                  quitSession();
-                }}
-              >
-                Quit
-              </Button>
           </div>
         </div>
 
