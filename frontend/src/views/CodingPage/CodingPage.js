@@ -75,6 +75,10 @@ function CodingPage() {
     currentSocket.emit("SET_TEXT", text, room.roomID);
   };
 
+  const quitSession = () => {
+    currentSocket.emit("END_SESSION", room.roomID);
+  }
+
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
     setCurrentSocket(socket);
@@ -88,7 +92,6 @@ function CodingPage() {
         cookies.name
       );
       socket.on("RECEIVE_ROOM_DATA", (roomID, difficulty, firstQuestion, secondQuestion) => {
-
         if (!roomID || !difficulty || !firstQuestion || !secondQuestion) {
           // TODO: room not found, redirect user back to dashboard
           console.log("Room not found! Redirecting back to main page...");
@@ -126,6 +129,9 @@ function CodingPage() {
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
     });
+    socket.on("SESSION_ENDED", () => {
+      console.log("BYEBYE");
+    })
     // eslint-disable-next-line
   }, []);
 

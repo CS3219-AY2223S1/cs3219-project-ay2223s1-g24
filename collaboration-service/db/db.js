@@ -14,6 +14,9 @@ const db = new Pool(dbConfig);
 
 
 export const addUserToRoomDB = async (roomID, username, difficulty, firstQuestion, secondQuestion) => {
+  const createCode = `INSERT INTO code (room_id) VALUES ('${roomID}') ON CONFLICT (room_id)
+    DO NOTHING`;
+  await db.query(createCode);
   const text = `INSERT INTO 
     rooms (username, room_id, difficulty, first_question, second_question) 
     VALUES ('${username}', '${roomID}', '${difficulty}', ${firstQuestion}, ${secondQuestion}) ON CONFLICT (username)
@@ -35,6 +38,11 @@ export const removeUserFromRoomDB = async (username) => {
 export const saveCodeToDB = async (roomID, code) => {
   const text = `INSERT INTO code (room_id, code) VALUES ('${roomID}', '${code}') ON CONFLICT (room_id) 
     DO UPDATE SET code= '${code}';`;
+  return db.query(text);
+}
+
+export const deleteRoomInDB = async (roomID) => {
+  const text = `DELETE FROM code WHERE room_id='${roomID}'`;
   return db.query(text);
 }
 
