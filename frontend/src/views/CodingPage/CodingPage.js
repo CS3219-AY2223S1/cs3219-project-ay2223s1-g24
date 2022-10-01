@@ -101,6 +101,7 @@ function CodingPage() {
             secondQuestion,
             difficulty
           );
+          socket.emit("RETRIEVE_CODE", roomID);
           dispatch(
             setRoom({
               roomID: roomID,
