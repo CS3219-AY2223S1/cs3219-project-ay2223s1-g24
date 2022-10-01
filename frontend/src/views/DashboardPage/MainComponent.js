@@ -68,8 +68,8 @@ function DashboardComponent() {
   const [errorMsgShown, setErrorMsgShown] = useState(false);
   const location = useLocation();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const username = useUsername();
+  const navigate = useNavigate();
   const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID" ,"firstQuestionHash", "secondQuestionHash", "difficulty"]);
 
   const openEasyModal = () => {
@@ -93,14 +93,36 @@ function DashboardComponent() {
       setProgress(100);
     }
   };
+  function loadRoom() {
+    dispatch(
+      setRoom({
+        roomID: cookies.roomID,
+        firstQuestionHash: cookies.firstQuestionHash,
+        secondQuestionHash: cookies.secondQuestionHash,
+        difficulty: cookies.difficulty,
+      })
+    );
+  }
 
   useEffect(() => {
+    console.log("heya!")
+    if (cookies.roomID !== null && cookies.roomID !== '' && roomId === "") {
+      loadRoom();
+    }
+    return () => {
+      navigate(`/coding/${cookies.roomID}`);
+    };
+  }, [cookies]);
+
+
+
+  useEffect(() => {
+
     const socket = io.connect("http://localhost:8001");
     setSocket(socket);
 
     socket.on("MATCHED", (roomID, firstHash, secondHash, difficulty) => {
       setMatchStatus(SUCCESS);
-
       setTimeout(() => {
         console.log(
           "[FRONTEND] MATCHED with room ID: " +
@@ -121,12 +143,11 @@ function DashboardComponent() {
           })
         );
 
+        setRoomId(roomID);
         setCookie("roomID", roomID, { path: `/` });
         setCookie("firstQuestionHash", firstHash, { path: `/` });
         setCookie("secondQuestionHash", secondHash, { path: `/` });
         setCookie("difficulty", difficulty, { path: `/` });
-
-        setRoomId(roomID);
         socket.disconnect();
       }, 3000);
     });
@@ -134,25 +155,7 @@ function DashboardComponent() {
       socket.disconnect();
     };
     // eslint-disable-next-line
-  }, []);
-
-  function loadRoom() {
-    dispatch(
-      setRoom({
-        roomID: cookies.roomID,
-        firstQuestionHash: cookies.firstQuestionHash,
-        secondQuestionHash: cookies.secondQuestionHash,
-        difficulty: cookies.difficulty,
-      })
-    );
-    navigate(`/coding/${cookies.roomID}`);
-  }
-  
-  useEffect(() => {
-    if (cookies.roomID !== null && cookies.roomID !== '') {
-      loadRoom();
-    }
-  });
+  }, [matchStatus]);
 
   useEffect(() => {
     if (location.pathname !== "/dashboard") {
