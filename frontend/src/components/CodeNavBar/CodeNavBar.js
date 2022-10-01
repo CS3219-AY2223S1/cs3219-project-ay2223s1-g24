@@ -1,5 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Alert, Button } from "@mui/material";
+import {
+  Alert,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import "./codenavbar.scss";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import DashboardPage from "views/DashboardPage/DashboardPage";
@@ -13,6 +21,8 @@ function CodeNavBar(props) {
   };
   const [errorMsgShown, setErrorMsgShown] = useState(false);
   const [saveMsgShown, setSaveMsgShown] = useState(false);
+  const [leaveAlertOpen, setLeaveAlertOpen] = useState(false);
+
   const leaveRoom = () => {
     setErrorMsgShown(true);
     setTimeout(() => {
@@ -28,6 +38,19 @@ function CodeNavBar(props) {
     }, 2000);
   }, []);
 
+  const handleClickOpen = () => {
+    setLeaveAlertOpen(true);
+  };
+
+  const handleClose = (confirmLeaveRoom) => {
+    if (confirmLeaveRoom === true) {
+      console.log("Leaving room!");
+      setLeaveAlertOpen(false);
+      leaveRoom();
+    }
+    setLeaveAlertOpen(false);
+  };
+
   useEffect(() => {
     if (isSavingCode === true) {
       savingCode();
@@ -38,6 +61,43 @@ function CodeNavBar(props) {
 
   return (
     <div className="code-navbar">
+      <Dialog
+        open={leaveAlertOpen}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Do you want to end the session?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Ending the session will redirect you to the difficulty selection
+            page.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color="error"
+            variant="outlined"
+            onClick={() => {
+              handleClose(true);
+            }}
+          >
+            Confirm
+          </Button>
+          <Button
+            color="primary"
+            variant="outlined"
+            autoFocus
+            onClick={() => {
+              handleClose(false);
+            }}
+          >
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
       <div className={`leaving-page-msg ${errorMsgShown ? "show" : ""}`}>
         <Alert severity="error">
           <strong>Leaving coding page... </strong>
@@ -70,7 +130,8 @@ function CodeNavBar(props) {
           <Button
             className="end-button"
             onClick={() => {
-              leaveRoom();
+              handleClickOpen();
+              // leaveRoom();
             }}
             color="error"
             variant="contained"
