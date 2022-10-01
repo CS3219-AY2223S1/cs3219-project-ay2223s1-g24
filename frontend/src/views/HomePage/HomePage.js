@@ -6,9 +6,14 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import SignupPage from "views/SignupPage/SignupPage";
 import { useCookies } from "react-cookie";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setRoom } from "slices/roomSlice";
 
 function HomePage() {
+  const [cookies] = useCookies(["name", "email", "jwtToken"]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const navigateSignup = () => {
     navigate("/signup");
   };
@@ -17,11 +22,21 @@ function HomePage() {
     navigate("/dashboard");
   };
 
-  const [cookies] = useCookies(["name", "email", "jwtToken"]);
+  function loadRoom() {
+    dispatch(
+      setRoom({
+        roomID: cookies.roomID,
+        firstQuestionHash: cookies.firstQuestionHash,
+        secondQuestionHash: cookies.secondQuestionHash,
+        difficulty: cookies.difficulty,
+      })
+    );
+    navigate(`/coding/${cookies.roomID}`);
+  }
 
   useEffect(() => {
     if (cookies.roomID !== null && cookies.roomID !== '') {
-      navigate(`/coding/${cookies.roomID}`);
+      loadRoom();
     }
     else if (cookies.jwtToken) {
       navigateToDashboard();
