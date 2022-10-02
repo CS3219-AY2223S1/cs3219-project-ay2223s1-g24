@@ -4,6 +4,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
+const Token = require("../models/token");
+const crypto = require("crypto");
+const sendEmail = require("../utils/email-service");
 
 const getUsers = async (req, res, next) => {
   let users;
@@ -78,6 +81,24 @@ const signup = async (req, res, next) => {
     return;
   }
 
+  try {
+    const token = await new Token({
+      userId: createdUser._id,
+      token: crypto.randomBytes(32).toString("hex"),
+    }).save();
+    const url = `${process.env.BASE_URL}users/${createdUser.id}/verify/${token.token}`;
+    await sendEmail(createdUser.email, "Verify Email", url);
+    res
+      .status(201)
+      .send({ message: "An Email sent to your account please verify" });
+  } catch (err) {
+    res
+      .status(503)
+      .json(
+        "Something went wrong while trying to send verification email. likely network error."
+      );
+  }
+
   let jwtToken;
   try {
     jwtToken = jwt.sign(
@@ -86,7 +107,7 @@ const signup = async (req, res, next) => {
         name: createdUser.name,
       },
       process.env.JWT_KEY,
-      { expiresIn: '24h' }
+      { expiresIn: "24h" }
     );
   } catch (err) {
     res
@@ -103,7 +124,6 @@ const signup = async (req, res, next) => {
     token: jwtToken,
   });
 };
-
 
 const updatePassword = async (req, res, next) => {
   const errors = validationResult(req);
@@ -190,7 +210,7 @@ const updatePassword = async (req, res, next) => {
         name: updatedUser.name,
       },
       process.env.JWT_KEY,
-      { expiresIn: '24h' }
+      { expiresIn: "24h" }
     );
   } catch (err) {
     res
@@ -246,6 +266,22 @@ const login = async (req, res, next) => {
     return;
   }
 
+  if (!existingUser.verified) {
+    let token = await Token.findOne({ userId: existingUser._id });
+    if (!token) {
+      token = await new Token({
+        userId: existingUser._id,
+        token: crypto.randomBytes(32).toString("hex"),
+      }).save();
+      const url = `${process.env.BASE_URL}users/${existingUser.id}/verify/${token.token}`;
+      await sendEmail(existingUser.email, "Verify Email", url);
+    }
+
+    return res
+      .status(400)
+      .send({ message: "An Email sent to your account please verify" });
+  }
+
   let jwtToken;
   try {
     jwtToken = jwt.sign(
@@ -254,7 +290,7 @@ const login = async (req, res, next) => {
         name: existingUser.name,
       },
       process.env.JWT_KEY,
-      { expiresIn: '24h' } //30 seconds
+      { expiresIn: "24h" } //30 seconds
     );
   } catch (err) {
     res
@@ -283,7 +319,11 @@ const deleteUser = async (req, res, next) => {
   try {
     existingUser = await User.findOne({ email: req.body.email });
   } catch (err) {
-    res.status(503).json('Something went wrong (likely network issue). Could not delete user.');
+    res
+      .status(503)
+      .json(
+        "Something went wrong (likely network issue). Could not delete user."
+      );
     return;
   }
 
