@@ -19,6 +19,7 @@ import {
 import { io } from "socket.io-client";
 import { useUsername } from "slices/usernameSlice";
 import { setRoom } from "slices/roomSlice";
+import { setMatching, useMatching } from "slices/matchingSlice";
 import { useDispatch } from "react-redux";
 
 const RATIO = 100 / 30;
@@ -57,11 +58,13 @@ function DashboardComponent() {
   const [DEFAULT, ERROR, SUCCESS] = ["", "ERROR", "SUCCESS"];
   const [socket, setSocket] = useState(null);
   const [roomId, setRoomId] = useState("");
-  const [matchStatus, setMatchStatus] = useState(DEFAULT);
-  const [roomDifficulty, setRoomDifficulty] = useState(null);
+  const [roomDifficulty, setRoomDifficulty] = useState(EASY);
+  const matching = useMatching();
+  const [isQueueing, setIsQueueing] = useState(matching.isQueueing);
+  const [matchStatus, setMatchStatus] = useState(false);
   const [progress, setProgress] = useState(100);
   const [easyModal, setEasyModal] = useState(false);
-  const [isQueueing, setIsQueueing] = useState(false);
+  const [errorMsgShown, setErrorMsgShown] = useState(false);
   const location = useLocation();
   const dispatch = useDispatch();
   const username = useUsername();
@@ -69,13 +72,29 @@ function DashboardComponent() {
   const openEasyModal = () => {
     setEasyModal(true);
   };
+
   const closeEasyModal = () => {
     setEasyModal(false);
+  };
+
+  const findRoom = () => {
+    if (isQueueing) {
+      closeEasyModal();
+      setErrorMsgShown(true);
+      setTimeout(() => {
+        setErrorMsgShown(false);
+      }, 3000);
+    } else {
+      openEasyModal();
+      setIsQueueing(true);
+      setProgress(100);
+    }
   };
 
   useEffect(() => {
     const socket = io.connect("http://localhost:8001");
     setSocket(socket);
+
     socket.on("MATCHED", (roomID, firstHash, secondHash, difficulty) => {
       setMatchStatus(SUCCESS);
       setTimeout(() => {
@@ -113,7 +132,8 @@ function DashboardComponent() {
       return;
     }
     navigate(`/coding/${roomId}`);
-  });
+    // eslint-disable-next-line
+  }, [roomId]);
 
   useEffect(() => {
     if (location.pathname !== "/dashboard") {
@@ -144,6 +164,22 @@ function DashboardComponent() {
   }, [progress]);
 
   useEffect(() => {
+    dispatch(
+      setMatching({
+        isQueueing,
+        // progress,
+      })
+    );
+    // eslint-disable-next-line
+  }, [isQueueing]);
+
+  useEffect(() => {
+    setIsQueueing(matching.isQueueing);
+    // setProgress(matching.progress);
+    // eslint-disable-next-line
+  }, [matching.isQueueing]);
+
+  useEffect(() => {
     if (easyModal) {
       const timer = setInterval(() => {
         setProgress((prevProgress) =>
@@ -158,6 +194,11 @@ function DashboardComponent() {
 
   return (
     <div className="main">
+      <div className={`error-msg ${errorMsgShown ? "hide" : ""}`}>
+        <Alert severity="error">
+          <strong>Queue is already in progress. </strong>
+        </Alert>
+      </div>
       <div className="flexbox-container-main">
         <Dialog open={easyModal}>
           <DialogTitle>Finding a match for you..</DialogTitle>
@@ -204,8 +245,7 @@ function DashboardComponent() {
                 sx={{}}
                 onClick={() => {
                   setMatchStatus(DEFAULT);
-                  setIsQueueing(true);
-                  setProgress(100);
+                  findRoom();
                 }}
               >
                 Continue Matching
@@ -324,9 +364,7 @@ function DashboardComponent() {
         color="primary"
         onClick={() => {
           setMatchStatus(DEFAULT);
-          openEasyModal();
-          setIsQueueing(true);
-          setProgress(100);
+          findRoom();
         }}
       >
         Find Room
