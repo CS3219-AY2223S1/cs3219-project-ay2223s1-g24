@@ -89,6 +89,11 @@ function CodingPage() {
   };
 
   useEffect(() => {
+    if (cookies.roomId === '' || cookies.roomId === null || !cookies.roomId || cookies.roomId === undefined) {
+      navigate('/')
+      return
+    }
+    
     const socket = io.connect("http://localhost:8080");
     setCurrentSocket(socket);
     if (room.roomID === '' || room.difficulty ===  '' || room.firstQuestionHash === 0 || room.secondQuestionHash === 0) {
@@ -102,7 +107,7 @@ function CodingPage() {
       );
       socket.on("RECEIVE_ROOM_DATA", (roomID, difficulty, firstQuestion, secondQuestion) => {
         if (!roomID || !difficulty || !firstQuestion || !secondQuestion) {
-          // TODO: room not found, redirect user back to dashboard
+          navigate('/')
           console.log("Room not found! Redirecting back to main page...");
         } else {
           readNewQuestion(

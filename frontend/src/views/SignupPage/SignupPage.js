@@ -57,7 +57,7 @@ function SignupPage() {
     navigate(`/coding/${cookies.roomID}`);
   }
   useEffect(() => {
-    if (cookies.roomID !== null && cookies.roomID !== '') {
+    if (cookies.roomId && cookies.roomID !== '') {
       loadRoom();
     }
     else if (cookies.jwtToken) {
