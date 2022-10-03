@@ -155,7 +155,7 @@ function DashboardComponent() {
       socket.disconnect();
     };
     // eslint-disable-next-line
-  }, [matchStatus]);
+  }, []);
 
   useEffect(() => {
     if (location.pathname !== "/dashboard") {
