@@ -14,7 +14,8 @@ import DashboardPage from "views/DashboardPage/DashboardPage";
 import mainLogo from "assets/logo.png";
 
 function CodeNavBar(props) {
-  const { isSavingCode, saveCode, setIsSavingCode } = props;
+  const { isSavingCode, saveCode, setIsSavingCode, leaveSession, endSession } =
+    props;
   const navigate = useNavigate();
   const navigateDashboard = () => {
     navigate("/dashboard");
@@ -23,13 +24,14 @@ function CodeNavBar(props) {
   const [saveMsgShown, setSaveMsgShown] = useState(false);
   const [leaveAlertOpen, setLeaveAlertOpen] = useState(false);
 
-  const leaveRoom = () => {
+  const leaveRoom = useCallback(() => {
     setErrorMsgShown(true);
     setTimeout(() => {
       setErrorMsgShown(false);
       navigateDashboard();
     }, 3000);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const savingCode = useCallback(() => {
     setSaveMsgShown(true);
@@ -45,6 +47,8 @@ function CodeNavBar(props) {
   const handleClose = (confirmLeaveRoom) => {
     if (confirmLeaveRoom === true) {
       console.log("Leaving room!");
+      // Experimental
+      endSession();
       setLeaveAlertOpen(false);
       leaveRoom();
     }
@@ -58,6 +62,13 @@ function CodeNavBar(props) {
       console.log("Code has been saved!");
     }
   }, [isSavingCode, savingCode, setIsSavingCode]);
+
+  useEffect(() => {
+    if (leaveSession === true) {
+      console.log("Client 2 leaving the room...");
+      leaveRoom();
+    }
+  }, [leaveSession, leaveRoom]);
 
   return (
     <div className="code-navbar">

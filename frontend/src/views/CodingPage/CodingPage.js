@@ -18,6 +18,7 @@ function CodingPage() {
   const [question, setQuestion] = useState();
   const [currentSocket, setCurrentSocket] = useState(null);
   const [isSavingCode, setIsSavingCode] = useState(false);
+  const [leaveSession, setLeaveSession] = useState(false);
   const questionNumber = useRef(1);
   const qnOne = useRef();
   const qnTwo = useRef();
@@ -82,6 +83,11 @@ function CodingPage() {
     currentSocket.emit("SAVE_CODE", room.roomID, text);
   };
 
+  const endSession = () => {
+    console.log("Telling Client 2 to leave page...");
+    currentSocket.emit("LEAVE_SESSION");
+  };
+
   useEffect(() => {
     const socket = io.connect("http://localhost:8080");
     setCurrentSocket(socket);
@@ -135,7 +141,7 @@ function CodingPage() {
       setText(text);
     });
     socket.on("SESSION_ENDED", () => {
-      console.log("BYEBYE");
+      setLeaveSession(true);
     });
     // eslint-disable-next-line
   }, []);
@@ -170,6 +176,8 @@ function CodingPage() {
           isSavingCode={isSavingCode}
           saveCode={saveCode}
           setIsSavingCode={setIsSavingCode}
+          leaveSession={leaveSession}
+          endSession={endSession}
         />
       </div>
       <div className="code-container">
