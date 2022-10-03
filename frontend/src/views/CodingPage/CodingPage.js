@@ -75,9 +75,6 @@ function CodingPage() {
     currentSocket.emit("SET_TEXT", text, room.roomID);
   };
 
-  const quitSession = () => {
-    currentSocket.emit("END_SESSION", room.roomID);
-  };
   const saveCode = () => {
     console.log("Save is working!");
     currentSocket.emit("SAVE_CODE", room.roomID, text);
@@ -85,7 +82,7 @@ function CodingPage() {
 
   const endSession = () => {
     console.log("Telling Client 2 to leave page...");
-    currentSocket.emit("LEAVE_SESSION");
+    currentSocket.emit("END_SESSION", room.roomID);
   };
 
   useEffect(() => {
