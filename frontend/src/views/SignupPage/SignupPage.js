@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { USER_SERVICE_API_ENDPOINT } from "configs";
 import {
@@ -36,6 +36,7 @@ function SignupPage() {
   const [isEmailDuplicate, setEmailDuplicate] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [isSignupSuccess, setSignupSuccess] = useState(false);
   // eslint-disable-next-line
   const [cookies, setCookie, removeCookie] = useCookies([
     "name",
@@ -44,6 +45,7 @@ function SignupPage() {
   ]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const signupButton = useRef(null);
 
   function loadRoom() {
     dispatch(
@@ -64,10 +66,6 @@ function SignupPage() {
       navigate("/dashboard");
     }
   });
-
-  const navigateDashboard = () => {
-    navigate("/dashboard");
-  };
 
   const navigateSignin = () => {
     navigate("/signin");
@@ -91,6 +89,17 @@ function SignupPage() {
       confirmationPassword !== "" &&
       password === confirmationPassword
     );
+  };
+
+  const resetFormFields = () => {
+    setUsername("");
+    setEmail("");
+    setPassword("");
+    setConfirmationPassword("");
+    setUserInputTouched(false);
+    setEmailInputTouched(false);
+    setPasswordInputTouched(false);
+    setPasswordConfirmationTouched(false);
   };
 
   const handleKeyDown = (event) => {
@@ -122,12 +131,9 @@ function SignupPage() {
 
     if (res && res.status === STATUS_CODE_CREATED) {
       setLoading(false);
-      let expires = new Date();
-      expires.setTime(expires.getTime() + SINGLE_DAY_EXPIRY);
-      setCookie("jwtToken", res.data.token, { path: "/", expires });
-      setCookie("email", res.data.result.email, { path: "/", expires });
-      setCookie("name", res.data.result.name, { path: "/", expires });
-      navigateDashboard();
+      resetFormFields();
+      setSignupSuccess(true);
+      signupButton.current.focus();
     }
   };
 
@@ -310,7 +316,7 @@ function SignupPage() {
         </div>
 
         <Alert
-          className={`alert ${hasUnexpectedError ? "" : "hide"}`}
+          className={`alert red-border ${hasUnexpectedError ? "" : "hide"}`}
           severity="error"
           onClose={() => {
             setUnexpectedError(false);
@@ -319,9 +325,20 @@ function SignupPage() {
           Something went wrong. Try again later!
         </Alert>
 
+        <Alert
+          className={`alert green-border ${isSignupSuccess ? "" : "hide"}`}
+          severity="success"
+          onClose={() => {
+            setSignupSuccess(false);
+          }}
+        >
+          Thank you for signing up. An email has been sent for verification.
+        </Alert>
+
         <Box>
           <Button
             className="signup-btn"
+            rootRef={signupButton}
             onClick={() => {
               setUserInputTouched(true);
               setEmailInputTouched(true);

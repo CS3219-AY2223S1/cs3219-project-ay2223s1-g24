@@ -1,4 +1,5 @@
 import React from "react";
+import { Alert } from "@mui/material";
 import "./homepage.scss";
 import Navbar from "components/Navbar/Navbar";
 import Button from "components/Button/Button";
@@ -8,6 +9,8 @@ import { useCookies } from "react-cookie";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setRoom } from "slices/roomSlice";
+import { resetVerification, useVerification } from "slices/verificationSlice";
+import { useDispatch } from "react-redux";
 
 function HomePage() {
   const [cookies] = useCookies(["name", "email", "jwtToken"]);
@@ -33,6 +36,8 @@ function HomePage() {
     );
     navigate(`/coding/${cookies.roomID}`);
   }
+  const verificationStatus = useVerification();
+
 
   useEffect(() => {
     if (cookies.roomId && cookies.roomID !== '') {
@@ -41,6 +46,8 @@ function HomePage() {
     else if (cookies.jwtToken) {
       navigateToDashboard();
     }
+
+    setTimeout(() => dispatch(resetVerification()), 4000);
   });
 
   return (
@@ -49,6 +56,18 @@ function HomePage() {
         <Navbar />
       </div>
       <div className="main-body">
+        <div className={`msg ${verificationStatus === "ERROR" ? "hide" : ""}`}>
+          <Alert severity="error">
+            <strong>Verification link is invalid or has expired.</strong>
+          </Alert>
+        </div>
+        <div
+          className={`msg ${verificationStatus === "SUCCESS" ? "hide" : ""}`}
+        >
+          <Alert severity="success">
+            <strong>Account has been successfully verified.</strong>
+          </Alert>
+        </div>
         <div className="tagline">
           {" "}
           <span>Organize </span> and <span>Visualize</span> coding practice{" "}
