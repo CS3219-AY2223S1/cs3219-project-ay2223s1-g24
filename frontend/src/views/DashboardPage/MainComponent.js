@@ -125,6 +125,7 @@ function DashboardComponent() {
 
     socket.on("MATCHED", (roomID, firstHash, secondHash, difficulty) => {
       setMatchStatus(SUCCESS);
+      setIsQueueing(false);
       setTimeout(() => {
         console.log(
           "[FRONTEND] MATCHED with room ID: " +
