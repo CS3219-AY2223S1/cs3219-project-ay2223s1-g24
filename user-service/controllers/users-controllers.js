@@ -88,41 +88,20 @@ const signup = async (req, res, next) => {
     }).save();
     const url = `${process.env.BASE_URL}users/${createdUser.id}/verify/${token.token}`;
     await sendEmail(createdUser.email, "Verify Email", url);
-    res
-      .status(201)
-      .send({ message: "An Email sent to your account please verify" });
+    res.status(201).send({
+      message: "An Email sent to your account please verify",
+      token: token.token,
+      userId: createdUser.id,
+    });
+    return;
   } catch (err) {
-    res
-      .status(503)
-      .json(
-        "Something went wrong while trying to send verification email. likely network error."
-      );
-  }
-
-  let jwtToken;
-  try {
-    jwtToken = jwt.sign(
-      {
-        email: createdUser.email,
-        name: createdUser.name,
-      },
-      process.env.JWT_KEY,
-      { expiresIn: "24h" }
-    );
-  } catch (err) {
-    res
-      .status(503)
-      .json(
-        "Something went wrong while trying create token for signed up user."
-      );
+    console.log(err);
+    res.status(503).json({
+      message:
+        "Something went wrong while trying to send verification email. likely network error.",
+    });
     return;
   }
-
-  res.status(201).json({
-    message: "Signup done!",
-    result: retrievedResult,
-    token: jwtToken,
-  });
 };
 
 const updatePassword = async (req, res, next) => {
@@ -247,7 +226,7 @@ const login = async (req, res, next) => {
   }
 
   if (!existingUser) {
-    res.status(401).json("No such account.");
+    res.status(404).json("No such account.");
     return;
   }
 
@@ -276,10 +255,9 @@ const login = async (req, res, next) => {
       const url = `${process.env.BASE_URL}users/${existingUser.id}/verify/${token.token}`;
       await sendEmail(existingUser.email, "Verify Email", url);
     }
-
     return res
-      .status(400)
-      .send({ message: "An Email sent to your account please verify" });
+      .status(401)
+      .json({ message: "An email sent to your account please verify" });
   }
 
   let jwtToken;
@@ -369,8 +347,49 @@ const deleteUser = async (req, res, next) => {
   res.status(200).json(`Deleted: (email: ${req.body.email})`);
 };
 
+const verifyEmail = async (req, res, next) => {
+  try {
+    User.findById(req.params.id, async function (err, user) {
+      if (!user) {
+        res.status(404).json({
+          message: "Invalid link",
+        });
+        return;
+      }
+
+      if (err) {
+        console.log(err);
+        res.status(400).json({
+          message: "Server error",
+        });
+        return;
+      }
+
+      const token = await Token.findOne({
+        userId: req.params.id,
+        token: req.params.token,
+      });
+      if (!token) return res.status(404).send({ message: "Invalid link" });
+
+      user.verified = true;
+      user.save(function (err) {
+        if (err) {
+          console.log(err);
+          return res.status(400).send({ message: "Server error" });
+        }
+      });
+      await token.remove();
+      res.status(200).send({ message: "Email verified successfully" });
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
 exports.getUsers = getUsers;
 exports.signup = signup;
 exports.login = login;
 exports.deleteUser = deleteUser;
 exports.updatePassword = updatePassword;
+exports.verifyEmail = verifyEmail;
