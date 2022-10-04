@@ -4,6 +4,7 @@ import React from "react";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/xq-light.css";
 import "codemirror/theme/elegant.css";
+import "codemirror/addon/selection/active-line";
 import "./editor.scss";
 
 import { Controlled as ControlledEditor } from "react-codemirror2-react-17";
@@ -44,6 +45,8 @@ export default function Editor(props) {
           mode: language,
           theme: "elegant",
           lineNumbers: true,
+          styleActiveLine: true,
+          styleActiveSelected: true,
         }}
       />
     </div>

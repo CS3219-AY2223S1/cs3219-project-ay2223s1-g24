@@ -12,7 +12,7 @@
             text-align: right;
 
             img {
-                transform: translateX(40px);
+                transform: translateX(30px);
                 width: 48px;
             }
         }
@@ -29,5 +29,24 @@
                 margin-right: 15px;
             }
         }
+    }
+
+    .leaving-page-msg {
+        position: absolute;
+        top: -10vh;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
+        transition: all 0.75s ease;
+    }
+    
+    .code-save-msg {
+        position: absolute;
+        top: -10vh;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
+        transition: all 0.75s ease;
+    }
+    
+    .show {
+        transform: translateY(10vh);
+        transition: all 0.75s ease;
     }
 }
