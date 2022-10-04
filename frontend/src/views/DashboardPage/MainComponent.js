@@ -110,7 +110,9 @@ function DashboardComponent() {
       loadRoom();
     }
     return () => {
-      navigate(`/coding/${cookies.roomID}`);
+      if (cookies.roomID) {
+        navigate(`/coding/${cookies.roomID}`);
+      }
     };
   }, [cookies]);
 
