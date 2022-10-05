@@ -49,5 +49,8 @@ export const deleteRoomInDB = async (roomID) => {
 export const retrieveCodeFromDB = async (roomID) => {
   const text = `SELECT code FROM code WHERE room_id='${roomID}'`;
   const res = await db.query(text);
+  if (res.rows.length == 0) {
+    return ""
+  }
   return res.rows[0].code;
 }

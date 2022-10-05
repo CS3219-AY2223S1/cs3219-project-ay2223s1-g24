@@ -21,6 +21,7 @@ import { useUsername } from "slices/usernameSlice";
 import { setRoom } from "slices/roomSlice";
 import { setMatching, useMatching } from "slices/matchingSlice";
 import { useDispatch } from "react-redux";
+import { useCookies } from "react-cookie";
 
 const RATIO = 100 / 30;
 
@@ -68,6 +69,16 @@ function DashboardComponent() {
   const location = useLocation();
   const dispatch = useDispatch();
   const username = useUsername();
+  const navigate = useNavigate();
+  const [cookies, setCookie] = useCookies([
+    "name",
+    "email",
+    "jwtToken",
+    "roomID",
+    "firstQuestionHash",
+    "secondQuestionHash",
+    "difficulty",
+  ]);
 
   const openEasyModal = () => {
     setEasyModal(true);
@@ -90,6 +101,29 @@ function DashboardComponent() {
       setProgress(100);
     }
   };
+  function loadRoom() {
+    dispatch(
+      setRoom({
+        roomID: cookies.roomID,
+        firstQuestionHash: cookies.firstQuestionHash,
+        secondQuestionHash: cookies.secondQuestionHash,
+        difficulty: cookies.difficulty,
+      })
+    );
+  }
+
+  useEffect(() => {
+    console.log("heya!");
+    if (cookies.roomId && cookies.roomID !== "" && roomId === "") {
+      loadRoom();
+    }
+    return () => {
+      if (cookies.roomID) {
+        navigate(`/coding/${cookies.roomID}`);
+      }
+    };
+    // eslint-disable-next-line
+  }, [cookies]);
 
   useEffect(() => {
     const socket = io.connect("http://localhost:8001");
@@ -97,6 +131,7 @@ function DashboardComponent() {
 
     socket.on("MATCHED", (roomID, firstHash, secondHash, difficulty) => {
       setMatchStatus(SUCCESS);
+      setIsQueueing(false);
       setTimeout(() => {
         console.log(
           "[FRONTEND] MATCHED with room ID: " +
@@ -116,7 +151,12 @@ function DashboardComponent() {
             difficulty,
           })
         );
+
         setRoomId(roomID);
+        setCookie("roomID", roomID, { path: `/` });
+        setCookie("firstQuestionHash", firstHash, { path: `/` });
+        setCookie("secondQuestionHash", secondHash, { path: `/` });
+        setCookie("difficulty", difficulty, { path: `/` });
         socket.disconnect();
       }, 3000);
     });
@@ -125,15 +165,6 @@ function DashboardComponent() {
     };
     // eslint-disable-next-line
   }, []);
-
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (roomId === "") {
-      return;
-    }
-    navigate(`/coding/${roomId}`);
-    // eslint-disable-next-line
-  }, [roomId]);
 
   useEffect(() => {
     if (location.pathname !== "/dashboard") {

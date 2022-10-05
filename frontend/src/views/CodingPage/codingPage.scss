@@ -1,3 +1,38 @@
+// codeNavBar
+.code-navbar {
+
+    display: flex;
+    max-height: fit-content;
+    background-color: white;
+    align-items: center;
+
+    .left {
+        flex: 0.5;
+
+        .img-container {
+            text-align: right;
+
+            img {
+                transform: translateX(40px);
+                width: 48px;
+            }
+        }
+    }
+
+    .right {
+        flex: 0.5;
+
+        .buttons {
+            text-align: right;
+            margin-right: 15px;
+
+            .save-button {
+                margin-right: 15px;
+            }
+        }
+    }
+}
+
 .navbar-top {
     position: sticky;
     top: 0;

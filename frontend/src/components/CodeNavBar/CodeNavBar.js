@@ -66,9 +66,10 @@ function CodeNavBar(props) {
   useEffect(() => {
     if (leaveSession === true) {
       console.log("Client 2 leaving the room...");
+      endSession();
       leaveRoom();
     }
-  }, [leaveSession, leaveRoom]);
+  }, [leaveSession, leaveRoom, endSession]);
 
   return (
     <div className="code-navbar">

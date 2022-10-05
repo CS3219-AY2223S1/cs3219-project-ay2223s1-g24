@@ -1,20 +1,22 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@mui/material";
-import "./codingPage.scss";
-import Editor from "components/Editor/Editor";
 import { io } from "socket.io-client";
-import { useUsername } from "slices/usernameSlice";
-import { useRoom, setRoom } from "slices/roomSlice";
 import { useCookies } from "react-cookie";
 import { useDispatch } from "react-redux";
-
+import { useNavigate } from "react-router-dom";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
+
+import { useUsername } from "slices/usernameSlice";
+import { useRoom, setRoom } from "slices/roomSlice";
+import Editor from "components/Editor/Editor";
+import "./codingPage.scss";
 import CodeNavBar from "components/CodeNavBar/CodeNavBar";
 
 function CodingPage() {
   const [language, setLanguage] = useState("python");
-  const [text, setText] = useState('print("hello world")');
+  // const [text, setText] = useState('print("hello world")');
+  const [text, setText] = useState("");
   const [question, setQuestion] = useState();
   const [currentSocket, setCurrentSocket] = useState(null);
   const [isSavingCode, setIsSavingCode] = useState(false);
@@ -27,6 +29,15 @@ function CodingPage() {
     medium: 388,
     hard: 424,
   };
+  const [cookies, setCookie] = useCookies([
+    "name",
+    "email",
+    "jwtToken",
+    "roomID",
+    "firstQuestionHash",
+    "secondQuestionHash",
+    "difficulty",
+  ]);
 
   const readNewQuestion = async (
     firstQuestionHash,
@@ -68,8 +79,8 @@ function CodingPage() {
 
   const username = useUsername();
   const room = useRoom();
-  const [cookies] = useCookies(["name"]);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const emitText = (text) => {
     currentSocket.emit("SET_TEXT", text, room.roomID);
@@ -82,10 +93,19 @@ function CodingPage() {
 
   const endSession = () => {
     console.log("Telling Client 2 to leave page...");
+    setCookie("roomID", "", { path: `/` });
+    setCookie("firstQuestionHash", "", { path: `/` });
+    setCookie("secondQuestionHash", "", { path: `/` });
+    setCookie("difficulty", "", { path: `/` });
+    // removeCookie("roomID", { path: "/" });
     currentSocket.emit("END_SESSION", room.roomID);
   };
 
   useEffect(() => {
+    // if (cookies.roomId === '' || cookies.roomId === null || !cookies.roomId || cookies.roomId === undefined) {
+    //   navigate('/')
+    //   return
+    // }
     const socket = io.connect("http://localhost:8080");
     setCurrentSocket(socket);
     if (
@@ -103,7 +123,8 @@ function CodingPage() {
         "RECEIVE_ROOM_DATA",
         (roomID, difficulty, firstQuestion, secondQuestion) => {
           if (!roomID || !difficulty || !firstQuestion || !secondQuestion) {
-            // TODO: room not found, redirect user back to dashboard
+            endSession();
+            navigate("/");
             console.log("Room not found! Redirecting back to main page...");
           } else {
             readNewQuestion(firstQuestion, secondQuestion, difficulty);
@@ -134,6 +155,7 @@ function CodingPage() {
         room.secondQuestionHash
       );
     }
+    socket.emit("RETRIEVE_CODE", room.roomID);
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
     });

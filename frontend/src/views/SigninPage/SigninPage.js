@@ -14,6 +14,8 @@ import {
   STATUS_CODE_WRONG_PASSWORD,
   STATUS_CODE_UNEXPECTED_ERROR,
 } from "constants";
+import { useDispatch } from "react-redux";
+import { setRoom } from "slices/roomSlice";
 
 function SigninPage() {
   const [email, setEmail] = useState("");
@@ -23,9 +25,9 @@ function SigninPage() {
   const [isPasswordInputTouched, setPasswordInputTouched] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken"]);
+  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID" ,"firstQuestionHash", "secondQuestionHash", "difficulty"]);
   const SINGLE_DAY_EXPIRY = 86400 * 1000;
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const navigateToSignup = () => {
@@ -40,8 +42,23 @@ function SigninPage() {
     navigate("/");
   };
 
+  function loadRoom() {
+    dispatch(
+      setRoom({
+        roomID: cookies.roomID,
+        firstQuestionHash: cookies.firstQuestionHash,
+        secondQuestionHash: cookies.secondQuestionHash,
+        difficulty: cookies.difficulty,
+      })
+    );
+    navigate(`/coding/${cookies.roomID}`);
+  }
+
   useEffect(() => {
-    if (cookies.jwtToken) {
+    if (cookies.roomId && cookies.roomID !== '') {
+      loadRoom();
+    }
+    else if (cookies.jwtToken) {
       navigateToDashboard();
     }
   });
@@ -96,6 +113,10 @@ function SigninPage() {
       setCookie("jwtToken", res.data.token, { path: "/", expires });
       setCookie("email", res.data.user.email, { path: "/", expires });
       setCookie("name", res.data.user.name, { path: "/", expires });
+      setCookie("roomID", "", { path: "/", expires });
+      setCookie("firstQuestionHash", "", { path: "/", expires });
+      setCookie("secondQuestionHash", "", { path: "/", expires });
+      setCookie("difficulty", "", { path: "/", expires });
       navigateToDashboard();
     }
   };
