@@ -70,7 +70,15 @@ function DashboardComponent() {
   const dispatch = useDispatch();
   const username = useUsername();
   const navigate = useNavigate();
-  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID" ,"firstQuestionHash", "secondQuestionHash", "difficulty"]);
+  const [cookies, setCookie] = useCookies([
+    "name",
+    "email",
+    "jwtToken",
+    "roomID",
+    "firstQuestionHash",
+    "secondQuestionHash",
+    "difficulty",
+  ]);
 
   const openEasyModal = () => {
     setEasyModal(true);
@@ -105,8 +113,8 @@ function DashboardComponent() {
   }
 
   useEffect(() => {
-    console.log("heya!")
-    if (cookies.roomId && cookies.roomID !== '' && roomId === "") {
+    console.log("heya!");
+    if (cookies.roomId && cookies.roomID !== "" && roomId === "") {
       loadRoom();
     }
     return () => {
@@ -114,12 +122,10 @@ function DashboardComponent() {
         navigate(`/coding/${cookies.roomID}`);
       }
     };
+    // eslint-disable-next-line
   }, [cookies]);
 
-
-
   useEffect(() => {
-
     const socket = io.connect("http://localhost:8001");
     setSocket(socket);
 

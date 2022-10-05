@@ -3,7 +3,7 @@ import { Button } from "@mui/material";
 import { io } from "socket.io-client";
 import { useCookies } from "react-cookie";
 import { useDispatch } from "react-redux";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
 
@@ -11,7 +11,6 @@ import { useUsername } from "slices/usernameSlice";
 import { useRoom, setRoom } from "slices/roomSlice";
 import Editor from "components/Editor/Editor";
 import "./codingPage.scss";
-import mainLogo from "assets/logo.png";
 import CodeNavBar from "components/CodeNavBar/CodeNavBar";
 
 function CodingPage() {
