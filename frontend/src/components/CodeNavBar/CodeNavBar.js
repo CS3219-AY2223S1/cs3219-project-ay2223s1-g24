@@ -20,16 +20,14 @@ function CodeNavBar(props) {
   const navigateDashboard = () => {
     navigate("/dashboard");
   };
-  const [errorMsgShown, setErrorMsgShown] = useState(false);
   const [saveMsgShown, setSaveMsgShown] = useState(false);
   const [leaveAlertOpen, setLeaveAlertOpen] = useState(false);
+  const [confirmLeavingRoom, setConfirmLeavingRoom] = useState(false);
 
   const leaveRoom = useCallback(() => {
-    setErrorMsgShown(true);
     setTimeout(() => {
-      setErrorMsgShown(false);
       navigateDashboard();
-    }, 3000);
+    }, 4000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -44,15 +42,17 @@ function CodeNavBar(props) {
     setLeaveAlertOpen(true);
   };
 
-  const handleClose = (confirmLeaveRoom) => {
-    if (confirmLeaveRoom === true) {
+  const handleClose = (isLeavingRoom) => {
+    if (isLeavingRoom === true) {
       console.log("Leaving room!");
       // Experimental
       endSession();
-      setLeaveAlertOpen(false);
+      // Render different text on the leaving alert
+      setConfirmLeavingRoom(true);
       leaveRoom();
+    } else {
+      setLeaveAlertOpen(false);
     }
-    setLeaveAlertOpen(false);
   };
 
   useEffect(() => {
@@ -66,8 +66,11 @@ function CodeNavBar(props) {
   useEffect(() => {
     if (leaveSession === true) {
       console.log("Client 2 leaving the room...");
+      setLeaveAlertOpen(true);
+      setConfirmLeavingRoom(true);
       endSession();
       leaveRoom();
+      // console.log(`Value of confirmLeavingRoom is: ${confirmLeavingRoom}`);
     }
   }, [leaveSession, leaveRoom, endSession]);
 
@@ -75,46 +78,52 @@ function CodeNavBar(props) {
     <div className="code-navbar">
       <Dialog
         open={leaveAlertOpen}
-        onClose={handleClose}
+        onClose={(_, reason) => {
+          if (reason !== "backdropClick") {
+            handleClose();
+          }
+        }}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Do you want to end the session?"}
+          {confirmLeavingRoom === false
+            ? "Do you want to end the session?"
+            : "Leaving session"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Ending the session will redirect you to the difficulty selection
-            page.
+            {confirmLeavingRoom === false
+              ? "Ending the session will redirect you to the difficulty selection page."
+              : "Being redirected to difficulty selection, please wait..."}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
-            color="error"
-            variant="outlined"
-            onClick={() => {
-              handleClose(true);
-            }}
-          >
-            Confirm
-          </Button>
-          <Button
-            color="primary"
-            variant="outlined"
-            autoFocus
-            onClick={() => {
-              handleClose(false);
-            }}
-          >
-            Cancel
-          </Button>
+          {confirmLeavingRoom === false && (
+            <Button
+              color="error"
+              variant="outlined"
+              onClick={() => {
+                handleClose(true);
+              }}
+            >
+              Confirm
+            </Button>
+          )}
+          {confirmLeavingRoom === false && (
+            <Button
+              color="primary"
+              variant="outlined"
+              autoFocus
+              onClick={() => {
+                handleClose(false);
+              }}
+            >
+              Cancel
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
-      <div className={`leaving-page-msg ${errorMsgShown ? "show" : ""}`}>
-        <Alert severity="error">
-          <strong>Leaving coding page... </strong>
-        </Alert>
-      </div>
       <div className={`code-save-msg ${saveMsgShown ? "show" : ""}`}>
         <Alert severity="success">
           <strong>Saving in progress... </strong>

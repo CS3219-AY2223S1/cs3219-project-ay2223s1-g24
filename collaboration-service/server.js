@@ -58,6 +58,7 @@ io.on("connection", (socket) => {
   socket.on("END_SESSION", (roomID) => {
     deleteRoomInDB(roomID);
     socket.to(roomID).emit("SESSION_ENDED");
+    console.log("Ending session for room: " + roomID);
   })
 
   socket.on("disconnect", () => {
