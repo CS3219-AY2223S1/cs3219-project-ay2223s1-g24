@@ -107,7 +107,6 @@ function CodingPage() {
     //   navigate('/')
     //   return
     // }
-
     const socket = io.connect("http://localhost:8080");
     setCurrentSocket(socket);
     if (

@@ -113,6 +113,10 @@ function SigninPage() {
       setCookie("jwtToken", res.data.token, { path: "/", expires });
       setCookie("email", res.data.user.email, { path: "/", expires });
       setCookie("name", res.data.user.name, { path: "/", expires });
+      setCookie("roomID", "", { path: "/", expires });
+      setCookie("firstQuestionHash", "", { path: "/", expires });
+      setCookie("secondQuestionHash", "", { path: "/", expires });
+      setCookie("difficulty", "", { path: "/", expires });
       navigateToDashboard();
     }
   };
