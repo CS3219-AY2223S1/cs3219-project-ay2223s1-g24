@@ -113,7 +113,6 @@ function DashboardComponent() {
   }
 
   useEffect(() => {
-    console.log("heya!");
     if (cookies.roomId && cookies.roomID !== "" && roomId === "") {
       loadRoom();
     }

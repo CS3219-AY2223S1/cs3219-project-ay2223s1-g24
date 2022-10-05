@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
 
-import { useUsername } from "slices/usernameSlice";
 import { useRoom, setRoom } from "slices/roomSlice";
 import Editor from "components/Editor/Editor";
 import "./codingPage.scss";
@@ -15,7 +14,6 @@ import CodeNavBar from "components/CodeNavBar/CodeNavBar";
 
 function CodingPage() {
   const [language, setLanguage] = useState("python");
-  // const [text, setText] = useState('print("hello world")');
   const [text, setText] = useState("");
   const [question, setQuestion] = useState();
   const [currentSocket, setCurrentSocket] = useState(null);
@@ -77,7 +75,6 @@ function CodingPage() {
     setQuestion(qnTwo.current);
   };
 
-  const username = useUsername();
   const room = useRoom();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -97,26 +94,13 @@ function CodingPage() {
     setCookie("firstQuestionHash", "", { path: `/` });
     setCookie("secondQuestionHash", "", { path: `/` });
     setCookie("difficulty", "", { path: `/` });
-    // removeCookie("roomID", { path: "/" });
     currentSocket.emit("END_SESSION", room.roomID);
   };
 
   useEffect(() => {
-    // if (cookies.roomId === '' || cookies.roomId === null || !cookies.roomId || cookies.roomId === undefined) {
-    //   navigate('/')
-    //   return
-    // }
     const socket = io.connect("http://localhost:8080");
     setCurrentSocket(socket);
-    if (
-      room.roomID === "" ||
-      room.difficulty === "" ||
-      room.firstQuestionHash === 0 ||
-      room.secondQuestionHash === 0
-    ) {
-      // case where user refreshes, sends a call to DB to check if username in room
-      // if in room: retrieve question hashes and rejoins the room
-      // TODO: cookies giving issue when multiple tabs of different usernames open
+    if (room.roomID === "" || room.difficulty === "" || room.firstQuestionHash === 0 || room.secondQuestionHash === 0) {
       console.log("retrieving for username: " + cookies.name);
       socket.emit("RETRIEVE_ROOM", cookies.name);
       socket.on(
@@ -141,27 +125,19 @@ function CodingPage() {
         }
       );
     } else {
-      readNewQuestion(
-        room.firstQuestionHash,
-        room.secondQuestionHash,
-        room.difficulty
-      );
-      socket.emit(
-        "JOIN_ROOM",
-        room.roomID,
-        username,
-        room.difficulty,
-        room.firstQuestionHash,
-        room.secondQuestionHash
-      );
+      readNewQuestion(room.firstQuestionHash, room.secondQuestionHash, room.difficulty);
+      socket.emit("JOIN_ROOM", room.roomID, cookies.name, room.difficulty, room.firstQuestionHash, room.secondQuestionHash);
+      socket.emit("RETRIEVE_CODE", room.roomID);
     }
-    socket.emit("RETRIEVE_CODE", room.roomID);
     socket.on("UPDATE_TEXT", (text) => {
       setText(text);
     });
     socket.on("SESSION_ENDED", () => {
       setLeaveSession(true);
     });
+    return () => {
+      socket.disconnect();
+    };
     // eslint-disable-next-line
   }, []);
 
