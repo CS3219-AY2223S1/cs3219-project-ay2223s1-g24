@@ -102,6 +102,13 @@ function DashboardComponent() {
   };
 
   useEffect(() => {
+    if (cookies.roomID && cookies.roomID !== "") {
+      navigate(`/coding/${cookies.roomID}`);
+    }
+    // eslint-disable-next-line
+  }, [cookies.roomID]);
+
+  useEffect(() => {
     // const socket = io.connect("http://localhost:8001");
     const socket = io.connect("http://matching-service-dev.ap-southeast-1.elasticbeanstalk.com/");
     setSocket(socket);
@@ -133,7 +140,6 @@ function DashboardComponent() {
         setCookie("firstQuestionHash", firstHash, { path: `/` });
         setCookie("secondQuestionHash", secondHash, { path: `/` });
         setCookie("difficulty", difficulty, { path: `/` });
-        navigate(`/coding/${cookies.roomID}`)
         socket.disconnect();
       }, 3000);
     });
