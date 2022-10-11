@@ -17,7 +17,8 @@ app.get('/', (req, res) => {
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
     cors: {
-        origin: ["http://localhost:3000"]
+        // origin: ["http://localhost:3000"]
+        origin: '*',
     }
 })
 
@@ -40,4 +41,4 @@ io.on("connection", (socket) => {
     });
 });
 
-httpServer.listen(8001);
+httpServer.listen(8080);

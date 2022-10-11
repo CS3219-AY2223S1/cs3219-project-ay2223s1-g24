@@ -58,7 +58,6 @@ function DashboardComponent() {
   const [EASY, MEDIUM, HARD] = ["easy", "medium", "hard"];
   const [DEFAULT, ERROR, SUCCESS] = ["", "ERROR", "SUCCESS"];
   const [socket, setSocket] = useState(null);
-  const [roomId, setRoomId] = useState("");
   const [roomDifficulty, setRoomDifficulty] = useState(EASY);
   const matching = useMatching();
   const [isQueueing, setIsQueueing] = useState(matching.isQueueing);
@@ -101,31 +100,17 @@ function DashboardComponent() {
       setProgress(100);
     }
   };
-  function loadRoom() {
-    dispatch(
-      setRoom({
-        roomID: cookies.roomID,
-        firstQuestionHash: cookies.firstQuestionHash,
-        secondQuestionHash: cookies.secondQuestionHash,
-        difficulty: cookies.difficulty,
-      })
-    );
-  }
 
   useEffect(() => {
-    if (cookies.roomId && cookies.roomID !== "" && roomId === "") {
-      loadRoom();
+    if (cookies.roomID && cookies.roomID !== "") {
+      navigate(`/coding/${cookies.roomID}`);
     }
-    return () => {
-      if (cookies.roomID) {
-        navigate(`/coding/${cookies.roomID}`);
-      }
-    };
     // eslint-disable-next-line
-  }, [cookies]);
+  }, [cookies.roomID]);
 
   useEffect(() => {
-    const socket = io.connect("http://localhost:8001");
+    // const socket = io.connect("http://localhost:8001");
+    const socket = io.connect("http://matching-service-dev.ap-southeast-1.elasticbeanstalk.com/");
     setSocket(socket);
 
     socket.on("MATCHED", (roomID, firstHash, secondHash, difficulty) => {
@@ -151,7 +136,6 @@ function DashboardComponent() {
           })
         );
 
-        setRoomId(roomID);
         setCookie("roomID", roomID, { path: `/` });
         setCookie("firstQuestionHash", firstHash, { path: `/` });
         setCookie("secondQuestionHash", secondHash, { path: `/` });

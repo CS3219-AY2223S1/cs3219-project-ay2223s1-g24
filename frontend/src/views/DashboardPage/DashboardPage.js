@@ -81,8 +81,7 @@ function DashboardPage() {
   },[cookies])
 
   useEffect(() => {
-    // const decodedToken = decodeToken(cookies?.jwtToken);
-    if (cookies.jwtToken && !isExpired(cookies.jwtToken) && (cookies.roomID !== null && cookies.roomID !== '')) {
+    if (cookies.roomID && cookies.roomID !== '') {
       navigate(`/coding/${cookies.roomID}`);
     }
     else if (!cookies.jwtToken || isExpired(cookies.jwtToken)) {
