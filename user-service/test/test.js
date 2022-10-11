@@ -5,6 +5,7 @@ var chaiHttp = require("chai-http");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
+const Token = require("../models/token");
 var server = require("../server");
 
 chai.should();
@@ -12,7 +13,15 @@ chai.use(chaiHttp);
 
 before((done) => {
   User.deleteMany({}).catch((err) => {
-    console.log("Some error trying to clean up test database BEFORE tests");
+    console.log(
+      "Some error trying to clean up test user database BEFORE tests"
+    );
+    console.log(err);
+  });
+  Token.deleteMany({}).catch((err) => {
+    console.log(
+      "Some error trying to clean up test token database BEFORE tests"
+    );
     console.log(err);
   });
   done();
@@ -20,13 +29,24 @@ before((done) => {
 
 after((done) => {
   User.deleteMany({}).catch((err) => {
-    console.log("Some error trying to clean up test database AFTER tests");
+    console.log("Some error trying to clean up test user database AFTER tests");
+    console.log(err);
+  });
+
+  Token.deleteMany({}).catch((err) => {
+    console.log(
+      "Some error trying to clean up test token database BEFORE tests"
+    );
     console.log(err);
   });
   done();
 });
 
 describe("Test API Routes", function () {
+  // To be used later during verification of email
+  let userId = null;
+  let token = null;
+
   // get users
   it("Verify that there are 0 users in the DB", (done) => {
     chai
@@ -53,18 +73,11 @@ describe("Test API Routes", function () {
       .send(newUser)
       .end((err, res) => {
         res.should.have.status(201);
-        res.body["result"].should.be.a("object");
-        res.body["result"]["name"].should.be.equal(newUser["name"]);
-        res.body["result"]["email"].should.be.equal(newUser["email"]);
-
-        const token = res.body["token"];
-        const decodedToken = jwt.verify(token, process.env.JWT_KEY);
-        const decodedUserData = {
-          email: decodedToken.email,
-          name: decodedToken.name,
-        };
-        decodedUserData["email"].should.be.equal(newUser["email"]);
-        decodedUserData["name"].should.be.equal(newUser["name"]);
+        res.body["message"].should.be.equal(
+          "An Email sent to your account please verify"
+        );
+        userId = res.body["userId"];
+        token = res.body["token"];
         done();
       });
   });
@@ -109,13 +122,54 @@ describe("Test API Routes", function () {
   });
 
   // login
-  it("Verify that existing user can log in", (done) => {
+  it("Verify that existing unverified user cannot log in", (done) => {
     const existingUser = {
       name: "Valverdo",
       email: "valverdo@alberto.com",
       password: "Mohammed",
     };
 
+    chai
+      .request(server)
+      .post("/api/users/login")
+      .send(existingUser)
+      .end((err, res) => {
+        res.should.have.status(401);
+        res.body["message"].should.be.equal(
+          "An email sent to your account please verify"
+        );
+        done();
+      });
+  });
+
+  // verify email
+  it("Verify that email verification of existing unverified user works", (done) => {
+    chai
+      .request(server)
+      .get(`/api/users/${userId}/verify/${token}/`)
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body["message"].should.be.equal("Email verified successfully");
+
+        // const token = res.body["token"];
+        // const decodedToken = jwt.verify(token, process.env.JWT_KEY);
+        // const decodedUserData = {
+        //   email: decodedToken.email,
+        //   name: decodedToken.name,
+        // };
+        // decodedUserData["email"].should.be.equal(existingUser["email"]);
+        // decodedUserData["name"].should.be.equal(existingUser["name"]);
+        done();
+      });
+  });
+
+  // verify that login works after verification
+  it("Verify that verified user can login", (done) => {
+    const existingUser = {
+      name: "Valverdo",
+      email: "valverdo@alberto.com",
+      password: "Mohammed",
+    };
     chai
       .request(server)
       .post("/api/users/login")
@@ -166,7 +220,7 @@ describe("Test API Routes", function () {
       .post("/api/users/login")
       .send(existingUser)
       .end((err, res) => {
-        res.should.have.status(401);
+        res.should.have.status(404);
         res.body.should.be.equal("No such account.");
         done();
       });

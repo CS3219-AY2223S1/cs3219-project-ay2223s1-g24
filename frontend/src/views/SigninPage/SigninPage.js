@@ -13,6 +13,7 @@ import {
   STATUS_CODE_ACCOUNT_DOES_NOT_EXIST,
   STATUS_CODE_WRONG_PASSWORD,
   STATUS_CODE_UNEXPECTED_ERROR,
+  STATUS_CODE_UNVERIFIED_EMAIL,
 } from "constants";
 import { useDispatch } from "react-redux";
 import { setRoom } from "slices/roomSlice";
@@ -97,6 +98,8 @@ function SigninPage() {
           setStatus(STATUS_CODE_WRONG_PASSWORD);
         } else if (err.response.status === STATUS_CODE_UNEXPECTED_ERROR) {
           setStatus(STATUS_CODE_UNEXPECTED_ERROR);
+        } else if (err.response.status === STATUS_CODE_UNVERIFIED_EMAIL) {
+          setStatus(STATUS_CODE_UNVERIFIED_EMAIL);
         } else {
           setUnexpectedError(true);
         }
@@ -104,7 +107,7 @@ function SigninPage() {
         return;
       });
 
-      console.log(res)
+    console.log(res);
 
     if (res && res.status === STATUS_CODE_SUCCESS) {
       setLoading(false);
@@ -239,6 +242,20 @@ function SigninPage() {
           }}
         >
           Something went wrong. Try again later!
+        </Alert>
+
+        <Alert
+          className={`alert ${
+            status === STATUS_CODE_UNVERIFIED_EMAIL ? "" : "hide"
+          }`}
+          severity="error"
+          marginbottom={"10px"}
+          onClose={() => {
+            setStatus("");
+          }}
+        >
+          This account has not been verified. An email has been sent for
+          verification.
         </Alert>
 
         <Box>

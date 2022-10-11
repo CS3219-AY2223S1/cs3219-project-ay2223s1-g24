@@ -23,6 +23,7 @@
     "mocha": "^10.0.0",
     "mongoose": "^5.7.8",
     "mongoose-unique-validator": "^2.0.3",
+    "nodemailer": "^6.8.0",
     "uuid": "^3.3.3"
   },
   "devDependencies": {

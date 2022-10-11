@@ -8,6 +8,7 @@ import {
 import usernameSlice from "slices/usernameSlice";
 import roomSlice from "slices/roomSlice";
 import matchingSlice from "slices/matchingSlice";
+import verificationSlice from "slices/verificationSlice";
 
 const reduxStateSyncConfig = { blacklist: ["persist/PERSIST"] };
 
@@ -30,6 +31,7 @@ const store = configureStore({
     username: usernameSlice,
     room: roomSlice,
     matching: matchingSlice,
+    verification: verificationSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

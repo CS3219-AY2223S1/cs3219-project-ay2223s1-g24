@@ -84,9 +84,14 @@
         }
     }
 
-    .alert {
+    .alert.red-border {
         margin-bottom: 20px;
         border: 1px solid red;
+    }
+
+    .alert.green-border {
+        margin-bottom: 20px;
+        border: 1px solid green;
     }
 
     .hide {
