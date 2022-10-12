@@ -75,15 +75,15 @@ function HomePage() {
             </div>
             <div className="tagline">
               {" "}
-              <span>Organize </span> and <span>Visualize</span> coding practice{" "}
+              <span>Collaborate </span> and <span>Visualize</span> coding
+              together{" "}
             </div>
             <div className="description">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-              pretium volutpat nunc sagittis ultrices. Donec vitae gravida
-              felis, id vestibulum velit. Nam imperdiet convallis commodo. Sed
-              convallis tempus lorem sed cursus. Nulla varius, dui vel accumsan
-              dictum, velit nunc condimentum enim, ac pretium augue est
-              fringilla neque.
+              PeerPrep is a platform for individuals to collaborate and code
+              together in real-time to prepare for technical interviews. We
+              cater for users of all levels through providing difficulties from
+              easy to hard and allow for matching between users of similar
+              experience.
             </div>
             <div className="signup-btn">
               <Button onClick={navigateSignup} text={"Sign Up Here"} />
