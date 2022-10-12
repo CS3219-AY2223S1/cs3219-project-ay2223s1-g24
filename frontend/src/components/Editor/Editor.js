@@ -2,8 +2,8 @@ import React, { useState } from "react";
 
 // The following imports is for the theme.
 import "codemirror/lib/codemirror.css";
-import "codemirror/theme/xq-light.css";
-import "codemirror/theme/xq-dark.css";
+import "codemirror/theme/base16-light.css";
+import "codemirror/theme/base16-dark.css";
 import "codemirror/addon/selection/active-line";
 import "./editor.scss";
 
@@ -20,7 +20,7 @@ export default function Editor(props) {
   ];
 
   const [language, setLanguage] = useState("python");
-  const [editorTheme, setEditorTheme] = useState("xq-dark");
+  const [editorTheme, setEditorTheme] = useState("base16-dark");
 
   const handleMode = (e) => {
     setLanguage(e.target.value);
@@ -31,10 +31,10 @@ export default function Editor(props) {
   }
 
   const toggleEditorTheme = () => {
-    if (editorTheme === "xq-light") {
-      setEditorTheme("xq-dark");
+    if (editorTheme === "base16-light") {
+      setEditorTheme("base16-dark");
     } else {
-      setEditorTheme("xq-light");
+      setEditorTheme("base16-light");
     }
   }
 
