@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setRoom } from "slices/roomSlice";
 import { resetVerification, useVerification } from "slices/verificationSlice";
-import { useDispatch } from "react-redux";
+import Transition from "utils/Transition";
 
 function HomePage() {
   const [cookies] = useCookies(["name", "email", "jwtToken"]);
@@ -38,12 +38,10 @@ function HomePage() {
   }
   const verificationStatus = useVerification();
 
-
   useEffect(() => {
-    if (cookies.roomId && cookies.roomID !== '') {
+    if (cookies.roomId && cookies.roomID !== "") {
       loadRoom();
-    }
-    else if (cookies.jwtToken) {
+    } else if (cookies.jwtToken) {
       navigateToDashboard();
     }
 
@@ -51,42 +49,52 @@ function HomePage() {
   });
 
   return (
-    <div className="homepage">
-      <div>
-        <Navbar />
-      </div>
-      <div className="main-body">
-        <div className={`msg ${verificationStatus === "ERROR" ? "hide" : ""}`}>
-          <Alert severity="error">
-            <strong>Verification link is invalid or has expired.</strong>
-          </Alert>
+    <Transition
+      timeout={2000}
+      children={
+        <div className="homepage">
+          <div>
+            <Navbar />
+          </div>
+          <div className="main-body">
+            <div
+              className={`msg ${verificationStatus === "ERROR" ? "hide" : ""}`}
+            >
+              <Alert severity="error">
+                <strong>Verification link is invalid or has expired.</strong>
+              </Alert>
+            </div>
+            <div
+              className={`msg ${
+                verificationStatus === "SUCCESS" ? "hide" : ""
+              }`}
+            >
+              <Alert severity="success">
+                <strong>Account has been successfully verified.</strong>
+              </Alert>
+            </div>
+            <div className="tagline">
+              {" "}
+              <span>Organize </span> and <span>Visualize</span> coding practice{" "}
+            </div>
+            <div className="description">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
+              pretium volutpat nunc sagittis ultrices. Donec vitae gravida
+              felis, id vestibulum velit. Nam imperdiet convallis commodo. Sed
+              convallis tempus lorem sed cursus. Nulla varius, dui vel accumsan
+              dictum, velit nunc condimentum enim, ac pretium augue est
+              fringilla neque.
+            </div>
+            <div className="signup-btn">
+              <Button onClick={navigateSignup} text={"Sign Up Here"} />
+              <Routes>
+                <Route path="/signup/*" element={<SignupPage />} />
+              </Routes>
+            </div>
+          </div>
         </div>
-        <div
-          className={`msg ${verificationStatus === "SUCCESS" ? "hide" : ""}`}
-        >
-          <Alert severity="success">
-            <strong>Account has been successfully verified.</strong>
-          </Alert>
-        </div>
-        <div className="tagline">
-          {" "}
-          <span>Organize </span> and <span>Visualize</span> coding practice{" "}
-        </div>
-        <div className="description">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pretium
-          volutpat nunc sagittis ultrices. Donec vitae gravida felis, id
-          vestibulum velit. Nam imperdiet convallis commodo. Sed convallis
-          tempus lorem sed cursus. Nulla varius, dui vel accumsan dictum, velit
-          nunc condimentum enim, ac pretium augue est fringilla neque.
-        </div>
-        <div className="signup-btn">
-          <Button onClick={navigateSignup} text={"Sign Up Here"} />
-          <Routes>
-            <Route path="/signup/*" element={<SignupPage />} />
-          </Routes>
-        </div>
-      </div>
-    </div>
+      }
+    />
   );
 }
 

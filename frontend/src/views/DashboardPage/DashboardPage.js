@@ -68,7 +68,7 @@ function DashboardPage() {
     "email",
     "jwtToken",
   ]);
-  
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -78,23 +78,18 @@ function DashboardPage() {
       dispatch(setUsername(cookies.name));
     }
     // eslint-disable-next-line
-  },[cookies])
+  }, [cookies]);
 
   useEffect(() => {
-    if (cookies.roomID && cookies.roomID !== '') {
+    if (cookies.roomID && cookies.roomID !== "") {
       navigate(`/coding/${cookies.roomID}`);
-    }
-    else if (!cookies.jwtToken || isExpired(cookies.jwtToken)) {
+    } else if (!cookies.jwtToken || isExpired(cookies.jwtToken)) {
       removeCookie("name", { path: "/" });
       removeCookie("email", { path: "/" });
       removeCookie("jwtToken", { path: "/" });
       navigate("/signin");
     }
   });
-
-  const sleep = (ms) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  };
 
   const resetAllFields = () => {
     setProfileDialogOpen(false);
@@ -158,11 +153,12 @@ function DashboardPage() {
     if (res && res.status === STATUS_CODE_SUCCESS) {
       setLoading(false);
       setActionSuccess(true);
-      removeCookie("name", { path: "/" });
-      removeCookie("email", { path: "/" });
-      removeCookie("jwtToken", { path: "/" });
-      await sleep(4000);
-      navigateHome();
+      setTimeout(() => {
+        removeCookie("name", { path: "/" });
+        removeCookie("email", { path: "/" });
+        removeCookie("jwtToken", { path: "/" });
+        navigateHome();
+      }, 4000);
     }
   };
 
