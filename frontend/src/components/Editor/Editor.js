@@ -7,6 +7,7 @@ import "codemirror/theme/xq-dark.css";
 import "codemirror/addon/selection/active-line";
 import "./editor.scss";
 
+import ThemeToggle from "./ThemeToggle";
 import { Controlled as ControlledEditor } from "react-codemirror2-react-17";
 import ControlDropdown from "../ControlDropdown/ControlDropdown";
 
@@ -46,6 +47,7 @@ export default function Editor(props) {
           options={modes}
           handleDropdown={handleMode}
         />
+        <ThemeToggle />
       </div>
       <ControlledEditor
         onBeforeChange={handleChange}
