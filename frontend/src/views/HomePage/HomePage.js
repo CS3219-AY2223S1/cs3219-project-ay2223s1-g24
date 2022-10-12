@@ -10,7 +10,6 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setRoom } from "slices/roomSlice";
 import { resetVerification, useVerification } from "slices/verificationSlice";
-import { useDispatch } from "react-redux";
 
 function HomePage() {
   const [cookies] = useCookies(["name", "email", "jwtToken"]);
