@@ -87,7 +87,12 @@ const signup = async (req, res, next) => {
       token: crypto.randomBytes(32).toString("hex"),
     }).save();
     const url = `${process.env.BASE_URL}users/${createdUser.id}/verify/${token.token}`;
-    await sendEmail(createdUser.email, "Verify Email", url);
+    await sendEmail(
+      createdUser.email,
+      "Welcome to PeerPrep!",
+      createdUser.name,
+      url
+    );
     res.status(201).send({
       message: "An Email sent to your account please verify",
       token: token.token,

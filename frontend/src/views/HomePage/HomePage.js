@@ -37,12 +37,10 @@ function HomePage() {
   }
   const verificationStatus = useVerification();
 
-
   useEffect(() => {
-    if (cookies.roomId && cookies.roomID !== '') {
+    if (cookies.roomId && cookies.roomID !== "") {
       loadRoom();
-    }
-    else if (cookies.jwtToken) {
+    } else if (cookies.jwtToken) {
       navigateToDashboard();
     }
 
