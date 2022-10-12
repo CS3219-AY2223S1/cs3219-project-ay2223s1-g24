@@ -12,12 +12,16 @@
     padding: 0.5rem;
 }
 
+.control-dropdown {
+    margin-right: 10px;
+}
+
 .CodeMirror {
     height: 100% !important;
 }
 
 .CodeMirror-focused .CodeMirror-activeline-background {
-    background: rgba(230, 225, 249, 0.6);
+    background: rgba(230, 225, 249, 0.3);
 }
 
 .code-mirror-wrapper {

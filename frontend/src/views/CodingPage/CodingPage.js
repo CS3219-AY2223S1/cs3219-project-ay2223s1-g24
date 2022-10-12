@@ -13,7 +13,6 @@ import "./codingPage.scss";
 import CodeNavBar from "components/CodeNavBar/CodeNavBar";
 
 function CodingPage() {
-  const [language, setLanguage] = useState("python");
   const [text, setText] = useState("");
   const [question, setQuestion] = useState();
   const [currentSocket, setCurrentSocket] = useState(null);
@@ -207,8 +206,6 @@ function CodingPage() {
 
         <div className="pane right-pane">
           <Editor
-            setLanguage={setLanguage}
-            language={language}
             value={text}
             onChange={(e) => {
               if (currentSocket) {
