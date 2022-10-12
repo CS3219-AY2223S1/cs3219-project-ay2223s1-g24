@@ -45,7 +45,7 @@ function SignupPage() {
   ]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const signupButton = useRef(null);
+  const usernameRef = useRef(null);
 
   function loadRoom() {
     dispatch(
@@ -59,10 +59,9 @@ function SignupPage() {
     navigate(`/coding/${cookies.roomID}`);
   }
   useEffect(() => {
-    if (cookies.roomId && cookies.roomID !== '') {
+    if (cookies.roomId && cookies.roomID !== "") {
       loadRoom();
-    }
-    else if (cookies.jwtToken) {
+    } else if (cookies.jwtToken) {
       navigate("/dashboard");
     }
   });
@@ -121,8 +120,8 @@ function SignupPage() {
         setLoading(false);
         console.log(err.response);
         if (err.response.status === STATUS_CODE_CONFLICT) {
-          setUsernameDuplicate(err.response.data.invalidEmail);
-          setEmailDuplicate(err.response.data.invalidUsername);
+          setUsernameDuplicate(err.response.data.invalidUsername);
+          setEmailDuplicate(err.response.data.invalidEmail);
         } else {
           setUnexpectedError(true);
         }
@@ -133,7 +132,7 @@ function SignupPage() {
       setLoading(false);
       resetFormFields();
       setSignupSuccess(true);
-      signupButton.current.focus();
+      usernameRef.current.focus();
     }
   };
 
@@ -154,6 +153,7 @@ function SignupPage() {
         </Typography>
         <div className="textfields">
           <TextField
+            ref={usernameRef}
             className="field"
             label="Username"
             error={
@@ -338,7 +338,6 @@ function SignupPage() {
         <Box>
           <Button
             className="signup-btn"
-            rootRef={signupButton}
             onClick={() => {
               setUserInputTouched(true);
               setEmailInputTouched(true);

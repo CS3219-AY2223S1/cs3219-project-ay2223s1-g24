@@ -10,7 +10,6 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setRoom } from "slices/roomSlice";
 import { resetVerification, useVerification } from "slices/verificationSlice";
-import { useDispatch } from "react-redux";
 
 function HomePage() {
   const [cookies] = useCookies(["name", "email", "jwtToken"]);
@@ -38,12 +37,10 @@ function HomePage() {
   }
   const verificationStatus = useVerification();
 
-
   useEffect(() => {
-    if (cookies.roomId && cookies.roomID !== '') {
+    if (cookies.roomId && cookies.roomID !== "") {
       loadRoom();
-    }
-    else if (cookies.jwtToken) {
+    } else if (cookies.jwtToken) {
       navigateToDashboard();
     }
 
