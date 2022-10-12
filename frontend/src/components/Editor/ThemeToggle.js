@@ -20,7 +20,8 @@ const updateTheme = (isDarkEnabled) => {
   }
 };
 
-function ThemeToggle() {
+function ThemeToggle(props) {
+  const { handleChange } = props;
   const [isEnabled, setIsEnabled] = useState(false);
 
   useEffect(() => {
@@ -28,6 +29,7 @@ function ThemeToggle() {
   }, [isEnabled]);
 
   const toggleState = () => {
+    handleChange();
     setIsEnabled((prevState) => !prevState);
   };
 
@@ -38,8 +40,8 @@ function ThemeToggle() {
           {isEnabled ? "Enable Light Mode" : "Enable Dark Mode"}
         </span>
         <div className="icons">
-          <SunIcon />
-          <MoonIcon />
+          <SunIcon className="sun"/>
+          <MoonIcon className="moon"/>
         </div>
         <input
           id="toggle"

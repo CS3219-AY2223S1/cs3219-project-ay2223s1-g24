@@ -1,6 +1,5 @@
 .toggle {
   box-sizing: border-box;
-  /* Make sure all elements are above the background */
   z-index: 1;
   position: relative;
 }
@@ -12,9 +11,6 @@
   --foreground: var(--black);
   --transition: 0.5s ease;
 }
-
-/* Demo only styling */
-
 
 
 .darkmode::before {
@@ -32,18 +28,17 @@
 }
 
 .toggle-wrapper {
-  width: 130px;
+  width: 70px;
   display: block;
   margin: auto;
-  /* Centering for demo */
 }
 
 .toggle {
-  height: 65px;
-  width: 130px;
+  height: 35px;
+  width: 70px;
   background: var(--foreground);
   border-radius: 40px;
-  padding: 12px;
+  padding: 9px;
   position: relative;
   transition: background var(--transition);
   cursor: pointer;
@@ -52,18 +47,19 @@
 .toggle::before {
   content: "";
   display: block;
-  height: 41px;
-  width: 41px;
+  height: 25px;
+  width: 25px;
   border-radius: 30px;
   background: var(--background);
   position: absolute;
+  top: 5px;
   z-index: 2;
   transform: translate(0);
   transition: transform var(--transition), background var(--transition);
 }
 
 .toggle.enabled::before {
-  transform: translateX(65px);
+  transform: translateX(28px);
 }
 
 .toggle input {
@@ -76,13 +72,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 100%;
-  margin: 0 5px;
+  height: 90%;
 }
 
 .toggle .icons svg {
   fill: var(--background);
-  height: 30px;
-  width: 30px;
+  height: 25px;
+  width: 25px;
   z-index: 0;
+}
+
+.sun {
+  margin-right: 5px;
+}
+
+.moon {
+  margin-left: 5px;
 }
