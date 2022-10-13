@@ -7,11 +7,16 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  IconButton,
 } from "@mui/material";
 import "./codenavbar.scss";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import DashboardPage from "views/DashboardPage/DashboardPage";
 import mainLogo from "assets/logo.png";
+import MicIcon from "@mui/icons-material/Mic";
+import MicOffIcon from "@mui/icons-material/MicOff";
+
+var conn;
 
 function CodeNavBar(props) {
   const { isSavingCode, saveCode, setIsSavingCode, leaveSession, endSession } =
@@ -23,6 +28,7 @@ function CodeNavBar(props) {
   const [saveMsgShown, setSaveMsgShown] = useState(false);
   const [leaveAlertOpen, setLeaveAlertOpen] = useState(false);
   const [confirmLeavingRoom, setConfirmLeavingRoom] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
 
   const leaveRoom = useCallback(() => {
     setTimeout(() => {
@@ -136,6 +142,17 @@ function CodeNavBar(props) {
       </div>
       <div className="right">
         <div className="buttons">
+          <Button
+            className="mute-button"
+            onClick={() => {
+              setIsMuted(!isMuted);
+              console.log(`I am muted - ${isMuted}`);
+            }}
+            color="primary"
+            variant="outlined"
+          >
+            {isMuted ? <MicOffIcon /> : <MicIcon />}
+          </Button>
           <Button
             className="save-button"
             onClick={() => {
