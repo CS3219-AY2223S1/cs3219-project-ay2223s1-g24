@@ -97,8 +97,8 @@ function CodingPage() {
   };
 
   useEffect(() => {
-    // const socket = io.connect("http://localhost:8080");
-    const socket = io.connect("http://collaboration-service-dev.ap-southeast-1.elasticbeanstalk.com/");
+    const socket = io.connect("http://localhost:8081");
+    // const socket = io.connect("http://collaboration-service-dev.ap-southeast-1.elasticbeanstalk.com/");
     setCurrentSocket(socket);
     if (room.roomID === "" || room.difficulty === "" || room.firstQuestionHash === 0 || room.secondQuestionHash === 0) {
       console.log("retrieving for username: " + cookies.name);

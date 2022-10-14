@@ -9,14 +9,14 @@
 
         .msg {
             position: absolute;
-            top: -10vh;
+            top: -30vh;
             box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
-            transition: all 0.75s ease;
+            transition: all 1s ease;
         }
 
         .hide {
-            transform: translateY(15vh);
-            transition: all 0.75s ease;
+            transform: translateY(32vh);
+            transition: all 1s ease;
         }
 
         .tagline {

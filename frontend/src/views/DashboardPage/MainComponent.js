@@ -109,8 +109,8 @@ function DashboardComponent() {
   }, [cookies.roomID]);
 
   useEffect(() => {
-    // const socket = io.connect("http://localhost:8001");
-    const socket = io.connect("http://matching-service-dev.ap-southeast-1.elasticbeanstalk.com/");
+    const socket = io.connect("http://localhost:8080");
+    // const socket = io.connect("http://matching-service-dev.ap-southeast-1.elasticbeanstalk.com/");
     setSocket(socket);
 
     socket.on("MATCHED", (roomID, firstHash, secondHash, difficulty) => {
