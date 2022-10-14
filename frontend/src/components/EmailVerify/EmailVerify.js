@@ -31,6 +31,7 @@ const EmailVerify = () => {
       }
     };
     verifyEmailUrl();
+    // eslint-disable-next-line
   }, [param]);
 
   return (

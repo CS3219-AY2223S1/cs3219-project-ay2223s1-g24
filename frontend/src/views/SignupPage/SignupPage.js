@@ -14,7 +14,6 @@ import {
   STATUS_CODE_CONFLICT,
   STATUS_CODE_CREATED,
   MIN_PASSWORD_LEN,
-  SINGLE_DAY_EXPIRY,
 } from "constants";
 import "./signup.scss";
 import { useCookies } from "react-cookie";
