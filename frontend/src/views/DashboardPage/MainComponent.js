@@ -55,10 +55,11 @@ function CircularProgressWithLabel(props) {
 }
 
 function DashboardComponent() {
+  const DEFAULT = "";
   const [EASY, MEDIUM, HARD] = ["easy", "medium", "hard"];
-  const [DEFAULT, ERROR, SUCCESS] = ["", "ERROR", "SUCCESS"];
+  const [ERROR, SUCCESS] = ["ERROR", "SUCCESS"];
   const [socket, setSocket] = useState(null);
-  const [roomDifficulty, setRoomDifficulty] = useState(EASY);
+  const [roomDifficulty, setRoomDifficulty] = useState(DEFAULT);
   const matching = useMatching();
   const [isQueueing, setIsQueueing] = useState(matching.isQueueing);
   const [matchStatus, setMatchStatus] = useState(false);
@@ -372,6 +373,7 @@ function DashboardComponent() {
         </Grid>
       </div>
       <Button
+        disabled={roomDifficulty === DEFAULT}
         className="find-room-btn"
         size="small"
         variant="contained"
