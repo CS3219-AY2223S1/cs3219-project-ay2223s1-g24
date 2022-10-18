@@ -91,7 +91,8 @@ const signup = async (req, res, next) => {
       createdUser.email,
       "Welcome to PeerPrep!",
       createdUser.name,
-      url
+      url,
+      "verification"
     );
     res.status(201).send({
       message: "An Email sent to your account please verify",
@@ -124,7 +125,7 @@ const updatePassword = async (req, res, next) => {
     res
       .status(503)
       .json(
-        "Something went wrong (likely network issue). Could not user update user password."
+        "Something went wrong (likely network issue). Could not update user password."
       );
     return;
   }
@@ -163,6 +164,7 @@ const updatePassword = async (req, res, next) => {
     name: existingUser.name,
     email: existingUser.email,
     password: hashedPassword,
+    verified: true,
   });
 
   let updateResult;
@@ -258,7 +260,13 @@ const login = async (req, res, next) => {
         token: crypto.randomBytes(32).toString("hex"),
       }).save();
       const url = `${process.env.BASE_URL}users/${existingUser.id}/verify/${token.token}`;
-      await sendEmail(existingUser.email, "Verify Email", url);
+      await sendEmail(
+        existingUser.email,
+        "Welcome to PeerPrep!",
+        existingUser.name,
+        url,
+        "verification"
+      );
     }
     return res
       .status(401)
@@ -392,9 +400,136 @@ const verifyEmail = async (req, res, next) => {
   }
 };
 
+const sendPasswordChangeEmail = async (req, res, next) => {
+  // Find user by email
+  // If it exists => send verification email
+  // If error comes, send error
+
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: req.body.email });
+  } catch (err) {
+    res
+      .status(503)
+      .json(
+        "Something went wrong (likely network issue). Could not find user."
+      );
+    return;
+  }
+
+  if (!existingUser) {
+    res.status(404).json("User not found in database");
+    return;
+  }
+
+  if (!existingUser.verified) {
+    res.status(401).json("User has not been verified yet");
+    return;
+  }
+
+  try {
+    let token = await Token.findOne({ userId: existingUser._id });
+    if (!token) {
+      token = await new Token({
+        userId: existingUser._id,
+        token: crypto.randomBytes(32).toString("hex"),
+      }).save();
+      const url = `${process.env.BASE_URL}signin/recovery/${token.token}`;
+      // User exists, send email for password change
+      await sendEmail(
+        existingUser.email,
+        "Account Recovery",
+        existingUser.name,
+        url,
+        "account-recovery"
+      );
+      res.status(200).send({ message: "Password Reset Email sent" });
+      return;
+    }
+  } catch (err) {
+    res
+      .status(503)
+      .json(
+        "Something went wrong (likely network issue). Could not delete user."
+      );
+    return;
+  }
+};
+
+const resetPasswordViaEmail = async (req, res, next) => {
+  try {
+    const token = await Token.findOne({
+      token: req.body.token,
+    });
+
+    if (!token) {
+      res.status(404).json("Token not found");
+      return;
+    }
+
+    const existingUser = await User.findOne({ _id: token.userId });
+
+    if (!existingUser) {
+      res.status(404).json("User not found");
+      return;
+    }
+
+    // Change password
+
+    let hashedPassword;
+    try {
+      hashedPassword = await bcrypt.hash(req.body.password, 10);
+    } catch (err) {
+      console.log(err);
+      res.status(503).json("Error trying to hash password");
+      return;
+    }
+
+    const updatedUser = new User({
+      _id: existingUser.id,
+      name: existingUser.name,
+      email: existingUser.email,
+      password: hashedPassword,
+      verified: true,
+    });
+
+    let updateResult;
+    try {
+      updateResult = await User.updateOne(
+        { _id: existingUser.id, email: existingUser.email },
+        updatedUser
+      );
+      await token.remove();
+      res.status(200).json("Changed Password Successfully");
+    } catch (err) {
+      console.log(err);
+      res
+        .status(503)
+        .json("Error trying update user's password. Likely network error.");
+      return;
+    }
+
+    if (!updateResult) {
+      res
+        .status(503)
+        .json("Unable to update user password. Service unavailable.");
+      return;
+    }
+  } catch (err) {
+    res
+      .status(503)
+      .json(
+        "Something went wrong (likely network issue). Could not delete user."
+      );
+    return;
+  }
+};
+
 exports.getUsers = getUsers;
 exports.signup = signup;
 exports.login = login;
 exports.deleteUser = deleteUser;
 exports.updatePassword = updatePassword;
 exports.verifyEmail = verifyEmail;
+exports.sendPasswordChangeEmail = sendPasswordChangeEmail;
+exports.resetPasswordViaEmail = resetPasswordViaEmail;

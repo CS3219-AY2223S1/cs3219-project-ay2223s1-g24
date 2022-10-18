@@ -48,4 +48,8 @@ router.put(
 
 router.get("/:id/verify/:token/", [], usersController.verifyEmail);
 
+router.post("/sendPasswordChange", [], usersController.sendPasswordChangeEmail);
+
+router.post("/resetPassword", [], usersController.resetPasswordViaEmail);
+
 module.exports = router;
