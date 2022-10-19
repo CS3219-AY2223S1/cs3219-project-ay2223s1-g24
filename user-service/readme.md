@@ -40,6 +40,25 @@ Retrieves all users in database
 - `404`: User is not found in database
 - `503`: Server error / Network error / Error hashing the password / Error creating JWT Token
 
+
+### POST `/sendPasswordChange`:
+#### Body Parameters:
+- `email`: Email of user requesting to change password
+#### Status codes:
+- `200`: Email sent successfully
+- `401`: User is not verified
+- `404`: User is not found in database
+- `503`: Server error / Network error / Error hashing the password / Error creating JWT Token
+
+### POST `/resetPassword`:
+#### Body Parameters:
+- `token`: Verification token from email
+- `password`: New password
+#### Status codes:
+- `200`: Password resetted successfully
+- `404`: User or Token is not found in database
+- `503`: Server error / Network error / Error hashing the password / Error creating JWT Token
+
 ### DELETE `/deleteUser`:
 #### Body Parameters:
 - `email`: Email of user to be deleted
