@@ -1,0 +1,24 @@
+{
+  "name": "team-project",
+  "version": "1.0.0",
+  "description": "PeerPrep is a platform for individuals to collaborate and code together in real-time to prepare for technical interviews. We cater for users of all levels through providing difficulties from easy to hard and allow for matching between users of similar experience.",
+  "main": "index.js",
+  "scripts": {
+    "devStart": "concurrently \"cd frontend && npm start\" \"cd user-service && npm run devStart\" \"cd matching-service && npm run devStart\" \"cd collaboration-service && npm run devStart\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CS3219-AY2223S1/cs3219-project-ay2223s1-g24.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CS3219-AY2223S1/cs3219-project-ay2223s1-g24/issues"
+  },
+  "homepage": "https://github.com/CS3219-AY2223S1/cs3219-project-ay2223s1-g24#readme",
+  "dependencies": {
+    "concurrently": "^7.4.0"
+  }
+}

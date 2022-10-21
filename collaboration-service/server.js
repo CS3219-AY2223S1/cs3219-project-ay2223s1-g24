@@ -94,8 +94,6 @@ io.on("connection", (socket) => {
     console.log("Ending session for room: " + roomID);
   });
 
-  socket.emit("yourID", socket.id);
-  io.sockets.emit("allUsers", users);
   socket.on("disconnect", () => {
     delete users[socket.id];
   });
