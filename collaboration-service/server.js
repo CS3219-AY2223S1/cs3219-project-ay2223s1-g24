@@ -1,8 +1,15 @@
-import express from 'express';
-import cors from 'cors';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
-import { addUserToRoomDB, removeUserFromRoomDB, saveCodeToDB, retrieveCodeFromDB, retrieveRoomDataFromDB, deleteRoomInDB } from './db/db.js';
+import express from "express";
+import cors from "cors";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import {
+  addUserToRoomDB,
+  removeUserFromRoomDB,
+  saveCodeToDB,
+  retrieveCodeFromDB,
+  retrieveRoomDataFromDB,
+  deleteRoomInDB,
+} from "./db/db.js";
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -22,24 +29,49 @@ const io = new Server(httpServer, {
   },
 });
 
+const users = {};
+
 io.on("connection", (socket) => {
   console.log("Client connected with id: " + socket.id);
 
-  socket.on("JOIN_ROOM", (roomID, username, difficulty, firstQuestion, secondQuestion) => {
-    socket.join(roomID);
-    addUserToRoomDB(roomID, username, difficulty, firstQuestion, secondQuestion);
-    console.log("User with username: " + username + " has joined room: " + roomID);
-  })
+  if (!users[socket.id]) {
+    users[socket.id] = socket.id;
+  }
+  socket.emit("yourID", socket.id);
+  io.sockets.emit("allUsers", users);
+
+  socket.on(
+    "JOIN_ROOM",
+    (roomID, username, difficulty, firstQuestion, secondQuestion) => {
+      socket.join(roomID);
+      addUserToRoomDB(
+        roomID,
+        username,
+        difficulty,
+        firstQuestion,
+        secondQuestion
+      );
+      console.log(
+        "User with username: " + username + " has joined room: " + roomID
+      );
+    }
+  );
 
   socket.on("RETRIEVE_ROOM", async (username) => {
     const roomData = await retrieveRoomDataFromDB(username);
     if (roomData) {
       socket.join(roomData.room_id);
-      socket.emit("RECEIVE_ROOM_DATA", roomData.room_id, roomData.difficulty, roomData.first_question, roomData.second_question);
+      socket.emit(
+        "RECEIVE_ROOM_DATA",
+        roomData.room_id,
+        roomData.difficulty,
+        roomData.first_question,
+        roomData.second_question
+      );
     } else {
       socket.emit("RECEIVE_ROOM_DATA");
     }
-  })
+  });
 
   socket.on("SET_TEXT", (text, roomID) => {
     socket.to(roomID).emit("UPDATE_TEXT", text);
@@ -60,7 +92,24 @@ io.on("connection", (socket) => {
     deleteRoomInDB(roomID);
     socket.to(roomID).emit("SESSION_ENDED");
     console.log("Ending session for room: " + roomID);
-  })
+  });
+
+  socket.emit("yourID", socket.id);
+  io.sockets.emit("allUsers", users);
+  socket.on("disconnect", () => {
+    delete users[socket.id];
+  });
+
+  socket.on("callUser", (data) => {
+    io.to(data.userToCall).emit("hey", {
+      signal: data.signalData,
+      from: data.from,
+    });
+  });
+
+  socket.on("acceptCall", (data) => {
+    io.to(data.to).emit("callAccepted", data.signal);
+  });
 
   socket.on("disconnect", () => {
     console.log("Client disconnected with id: " + socket.id);

@@ -11,6 +11,27 @@ import { useRoom, setRoom } from "slices/roomSlice";
 import Editor from "components/Editor/Editor";
 import "./codingPage.scss";
 import CodeNavBar from "components/CodeNavBar/CodeNavBar";
+import Peer from "simple-peer";
+
+import styled from "styled-components";
+
+const Container = styled.div`
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Row = styled.div`
+  display: flex;
+  width: 100%;
+`;
+
+const Video = styled.video`
+  border: 1px solid blue;
+  width: 50%;
+  height: 50%;
+`;
 
 function CodingPage() {
   const [text, setText] = useState("");
@@ -21,6 +42,17 @@ function CodingPage() {
   const questionNumber = useRef(1);
   const qnOne = useRef();
   const qnTwo = useRef();
+
+  const [yourID, setYourID] = useState("");
+  const [users, setUsers] = useState({});
+  const [stream, setStream] = useState();
+  const [receivingCall, setReceivingCall] = useState(false);
+  const [caller, setCaller] = useState("");
+  const [callerSignal, setCallerSignal] = useState();
+  const [callAccepted, setCallAccepted] = useState(false);
+  const userVideo = useRef();
+  const partnerVideo = useRef();
+
   const questionSize = {
     easy: 456,
     medium: 388,
@@ -96,12 +128,96 @@ function CodingPage() {
     currentSocket.emit("END_SESSION", room.roomID);
   };
 
+  function callPeer(id) {
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      config: {
+        iceServers: [
+          {
+            urls: "stun:numb.viagenie.ca",
+            username: "sultan1640@gmail.com",
+            credential: "98376683",
+          },
+          {
+            urls: "turn:numb.viagenie.ca",
+            username: "sultan1640@gmail.com",
+            credential: "98376683",
+          },
+        ],
+      },
+      stream: stream,
+    });
+
+    peer.on("signal", (data) => {
+      currentSocket.emit("callUser", {
+        userToCall: id,
+        signalData: data,
+        from: yourID,
+      });
+    });
+
+    peer.on("stream", (stream) => {
+      if (partnerVideo.current) {
+        partnerVideo.current.srcObject = stream;
+      }
+    });
+
+    currentSocket.on("callAccepted", (signal) => {
+      setCallAccepted(true);
+      peer.signal(signal);
+    });
+  }
+
+  function acceptCall() {
+    setCallAccepted(true);
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: stream,
+    });
+    peer.on("signal", (data) => {
+      currentSocket.emit("acceptCall", { signal: data, to: caller });
+    });
+
+    peer.on("stream", (stream) => {
+      partnerVideo.current.srcObject = stream;
+    });
+
+    peer.signal(callerSignal);
+  }
+
+  let UserVideo;
+  if (stream) {
+    UserVideo = <Video playsInline muted ref={userVideo} autoPlay />;
+  }
+
+  let PartnerVideo;
+  if (callAccepted) {
+    PartnerVideo = <Video playsInline ref={partnerVideo} autoPlay />;
+  }
+
+  let incomingCall;
+  if (receivingCall) {
+    incomingCall = (
+      <div>
+        <h1>{caller} is calling you</h1>
+        <button onClick={acceptCall}>Accept</button>
+      </div>
+    );
+  }
+
   useEffect(() => {
     const socket = io.connect(COLLABORATION_SERVICE_SOCKET_ENDPOINT);
     // const socket = io.connect("http://localhost:8081");
     // const socket = io.connect("http://collaboration-service-dev.ap-southeast-1.elasticbeanstalk.com/");
     setCurrentSocket(socket);
-    if (room.roomID === "" || room.difficulty === "" || room.firstQuestionHash === 0 || room.secondQuestionHash === 0) {
+    if (
+      room.roomID === "" ||
+      room.difficulty === "" ||
+      room.firstQuestionHash === 0 ||
+      room.secondQuestionHash === 0
+    ) {
       console.log("retrieving for username: " + cookies.name);
       socket.emit("RETRIEVE_ROOM", cookies.name);
       socket.on(
@@ -126,8 +242,19 @@ function CodingPage() {
         }
       );
     } else {
-      readNewQuestion(room.firstQuestionHash, room.secondQuestionHash, room.difficulty);
-      socket.emit("JOIN_ROOM", room.roomID, cookies.name, room.difficulty, room.firstQuestionHash, room.secondQuestionHash);
+      readNewQuestion(
+        room.firstQuestionHash,
+        room.secondQuestionHash,
+        room.difficulty
+      );
+      socket.emit(
+        "JOIN_ROOM",
+        room.roomID,
+        cookies.name,
+        room.difficulty,
+        room.firstQuestionHash,
+        room.secondQuestionHash
+      );
       socket.emit("RETRIEVE_CODE", room.roomID);
     }
     socket.on("UPDATE_TEXT", (text) => {
@@ -136,6 +263,29 @@ function CodingPage() {
     socket.on("SESSION_ENDED", () => {
       setLeaveSession(true);
     });
+
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((stream) => {
+        setStream(stream);
+        if (userVideo.current) {
+          userVideo.current.srcObject = stream;
+        }
+      });
+
+    socket.on("yourID", (id) => {
+      setYourID(id);
+    });
+    socket.on("allUsers", (users) => {
+      setUsers(users);
+    });
+
+    socket.on("hey", (data) => {
+      setReceivingCall(true);
+      setCaller(data.from);
+      setCallerSignal(data.signal);
+    });
+
     return () => {
       socket.disconnect();
     };
@@ -179,6 +329,27 @@ function CodingPage() {
       <div className="code-container">
         <div className="pane left-pane">
           <div dangerouslySetInnerHTML={{ __html: question }}></div>
+          <div>
+            VOICECALL
+            {/* {console.log(currentSocket)} */}
+            <Container>
+              <Row>
+                {UserVideo}
+                {PartnerVideo}
+              </Row>
+              <Row>
+                {Object.keys(users).map((key) => {
+                  if (key === yourID) {
+                    return null;
+                  }
+                  return (
+                    <button onClick={() => callPeer(key)}>Call {key}</button>
+                  );
+                })}
+              </Row>
+              <Row>{incomingCall}</Row>
+            </Container>
+          </div>
           <div className="button-container">
             {questionNumber.current === 2 && (
               <Button
