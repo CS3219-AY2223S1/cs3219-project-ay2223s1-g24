@@ -406,14 +406,15 @@ function CodingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [callPeer, peerID]);
 
-  // Setup auto accepting call for audio call
+  // Setup auto accepting call
   useEffect(() => {
-    // Auto-accepting call
-    setTimeout(() => {
-      console.log("Accepting call now...");
-      acceptCall();
-    }, 3000);
-  }, [acceptCall, caller, callerSignal]);
+    if (receivingCall) {
+      setTimeout(() => {
+        console.log("Received call. Accepting now...");
+        acceptCall();
+      }, 3000);
+    }
+  }, [acceptCall, receivingCall]);
 
   return (
     <div>
