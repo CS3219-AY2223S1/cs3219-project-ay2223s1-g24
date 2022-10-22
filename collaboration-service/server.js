@@ -54,6 +54,8 @@ io.on("connection", (socket) => {
       console.log(
         "User with username: " + username + " has joined room: " + roomID
       );
+      socket.broadcast.emit("peerID", socket.id);
+      console.log("Socket id: " + socket.id);
     }
   );
 
@@ -99,6 +101,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("callUser", (data) => {
+    console.log("Calling Peer socket id: " + data.from);
     io.to(data.userToCall).emit("hey", {
       signal: data.signalData,
       from: data.from,

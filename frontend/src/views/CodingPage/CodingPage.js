@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { Button } from "@mui/material";
 import { io } from "socket.io-client";
 import { useCookies } from "react-cookie";
@@ -44,6 +44,7 @@ function CodingPage() {
   const qnTwo = useRef();
 
   const [yourID, setYourID] = useState("");
+  const [peerID, setPeerID] = useState("");
   const [users, setUsers] = useState({});
   const [stream, setStream] = useState();
   const [receivingCall, setReceivingCall] = useState(false);
@@ -128,48 +129,99 @@ function CodingPage() {
     currentSocket.emit("END_SESSION", room.roomID);
   };
 
-  function callPeer(id) {
-    const peer = new Peer({
-      initiator: true,
-      trickle: false,
-      config: {
-        iceServers: [
-          {
-            urls: "stun:numb.viagenie.ca",
-            username: "sultan1640@gmail.com",
-            credential: "98376683",
+  const callPeer = useCallback(
+    (id) => {
+      // Execute only if socket initialised and socket IDs are present
+      if (currentSocket && peerID !== "" && yourID !== "") {
+        // console.log("Current socket: " + currentSocket.id);
+        const peer = new Peer({
+          initiator: true,
+          trickle: false,
+          config: {
+            iceServers: [
+              {
+                urls: "stun:numb.viagenie.ca",
+                username: "sultan1640@gmail.com",
+                credential: "98376683",
+              },
+              {
+                urls: "turn:numb.viagenie.ca",
+                username: "sultan1640@gmail.com",
+                credential: "98376683",
+              },
+            ],
           },
-          {
-            urls: "turn:numb.viagenie.ca",
-            username: "sultan1640@gmail.com",
-            credential: "98376683",
-          },
-        ],
-      },
-      stream: stream,
-    });
+          stream: stream,
+        });
 
-    peer.on("signal", (data) => {
-      currentSocket.emit("callUser", {
-        userToCall: id,
-        signalData: data,
-        from: yourID,
-      });
-    });
+        peer.on("signal", (data) => {
+          console.log(
+            "Calling Peer socket id: " + id + ", current socket id: " + yourID
+          );
+          currentSocket.emit("callUser", {
+            userToCall: id,
+            signalData: data,
+            from: yourID,
+          });
+        });
 
-    peer.on("stream", (stream) => {
-      if (partnerVideo.current) {
-        partnerVideo.current.srcObject = stream;
+        peer.on("stream", (stream) => {
+          if (partnerVideo.current) {
+            partnerVideo.current.srcObject = stream;
+          }
+        });
+
+        currentSocket.on("callAccepted", (signal) => {
+          setCallAccepted(true);
+          peer.signal(signal);
+        });
       }
-    });
+    },
+    [currentSocket, peerID, stream, yourID]
+  );
 
-    currentSocket.on("callAccepted", (signal) => {
-      setCallAccepted(true);
-      peer.signal(signal);
-    });
-  }
+  // function callPeer(id) {
+  //   const peer = new Peer({
+  //     initiator: true,
+  //     trickle: false,
+  //     config: {
+  //       iceServers: [
+  //         {
+  //           urls: "stun:numb.viagenie.ca",
+  //           username: "sultan1640@gmail.com",
+  //           credential: "98376683",
+  //         },
+  //         {
+  //           urls: "turn:numb.viagenie.ca",
+  //           username: "sultan1640@gmail.com",
+  //           credential: "98376683",
+  //         },
+  //       ],
+  //     },
+  //     stream: stream,
+  //   });
 
-  function acceptCall() {
+  //   peer.on("signal", (data) => {
+  //     currentSocket.emit("callUser", {
+  //       userToCall: id,
+  //       signalData: data,
+  //       from: yourID,
+  //     });
+  //   });
+
+  //   peer.on("stream", (stream) => {
+  //     if (partnerVideo.current) {
+  //       partnerVideo.current.srcObject = stream;
+  //     }
+  //   });
+
+  //   currentSocket.on("callAccepted", (signal) => {
+  //     setCallAccepted(true);
+  //     peer.signal(signal);
+  //   });
+  // }
+
+  const acceptCall = useCallback(() => {
     setCallAccepted(true);
     const peer = new Peer({
       initiator: false,
@@ -185,7 +237,25 @@ function CodingPage() {
     });
 
     peer.signal(callerSignal);
-  }
+  }, [caller, callerSignal, currentSocket, stream]);
+
+  // function acceptCall() {
+  //   setCallAccepted(true);
+  //   const peer = new Peer({
+  //     initiator: false,
+  //     trickle: false,
+  //     stream: stream,
+  //   });
+  //   peer.on("signal", (data) => {
+  //     currentSocket.emit("acceptCall", { signal: data, to: caller });
+  //   });
+
+  //   peer.on("stream", (stream) => {
+  //     partnerVideo.current.srcObject = stream;
+  //   });
+
+  //   peer.signal(callerSignal);
+  // }
 
   let UserVideo;
   if (stream) {
@@ -202,7 +272,7 @@ function CodingPage() {
     incomingCall = (
       <div>
         <h1>{caller} is calling you</h1>
-        <button onClick={acceptCall}>Accept</button>
+        <button onClick={() => acceptCall()}>Accept</button>
       </div>
     );
   }
@@ -221,7 +291,7 @@ function CodingPage() {
       socket.emit("RETRIEVE_ROOM", cookies.name);
       socket.on(
         "RECEIVE_ROOM_DATA",
-        (roomID, difficulty, firstQuestion, secondQuestion) => {
+        (roomID, difficulty, firstQuestion, secondQuestion, id) => {
           if (!roomID || !difficulty || !firstQuestion || !secondQuestion) {
             endSession();
             navigate("/");
@@ -237,6 +307,7 @@ function CodingPage() {
                 difficulty: difficulty,
               })
             );
+            console.log(`Socket id received: ${id}`);
           }
         }
       );
@@ -275,6 +346,12 @@ function CodingPage() {
     socket.on("yourID", (id) => {
       setYourID(id);
     });
+
+    socket.on("peerID", (id) => {
+      setPeerID(id);
+      // console.log("Peer ID: " + id);
+    });
+
     socket.on("allUsers", (users) => {
       setUsers(users);
     });
@@ -283,6 +360,8 @@ function CodingPage() {
       setReceivingCall(true);
       setCaller(data.from);
       setCallerSignal(data.signal);
+      console.log("Calling Peer socket id: " + data.from);
+      console.log("Calling Peer socket signal: " + data.signal);
     });
 
     return () => {
@@ -313,6 +392,19 @@ function CodingPage() {
     };
     // eslint-disable-next-line
   }, [text]);
+
+  // Setup auto initiation for audio call
+  useEffect(() => {
+    // Execute only if socket initialised and socket IDs are present
+    if (currentSocket && peerID !== "" && yourID !== "") {
+      // Initiate call to other peer
+      console.log("My ID: " + yourID);
+      console.log("Peer ID: " + peerID);
+      console.log("Current socket: " + currentSocket.id);
+      callPeer(peerID);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callPeer, peerID]);
 
   return (
     <div>
@@ -345,6 +437,11 @@ function CodingPage() {
                     <button onClick={() => callPeer(key)}>Call {key}</button>
                   );
                 })}
+              </Row>
+              <Row>
+                <button onClick={() => console.log(stream)}>
+                  Print stream
+                </button>
               </Row>
               <Row>{incomingCall}</Row>
             </Container>
