@@ -406,6 +406,15 @@ function CodingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [callPeer, peerID]);
 
+  // Setup auto accepting call for audio call
+  useEffect(() => {
+    // Auto-accepting call
+    setTimeout(() => {
+      console.log("Accepting call now...");
+      acceptCall();
+    }, 3000);
+  }, [acceptCall, caller, callerSignal]);
+
   return (
     <div>
       <div className="navbar-top">
