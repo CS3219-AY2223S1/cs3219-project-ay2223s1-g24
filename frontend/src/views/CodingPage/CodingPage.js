@@ -44,8 +44,8 @@ function CodingPage() {
   const qnTwo = useRef();
 
   const [yourID, setYourID] = useState("");
-  const [peerID, setPeerID] = useState("");
-  const [users, setUsers] = useState({});
+  // const [peerID, setPeerID] = useState("");
+  // const [users, setUsers] = useState({});
   const [stream, setStream] = useState();
   const [receivingCall, setReceivingCall] = useState(false);
   const [caller, setCaller] = useState("");
@@ -130,10 +130,12 @@ function CodingPage() {
   };
 
   const callPeer = useCallback(
-    (id) => {
+    (socket, id) => {
       // Execute only if socket initialised and socket IDs are present
-      if (currentSocket && peerID !== "" && yourID !== "") {
-        // console.log("Current socket: " + currentSocket.id);
+      console.log(
+        `Socket: ${socket}, Current socket ID: ${yourID}, Peer ID: ${id}`
+      );
+      if (socket && id !== "" && yourID !== "") {
         const peer = new Peer({
           initiator: true,
           trickle: false,
@@ -158,7 +160,7 @@ function CodingPage() {
           console.log(
             "Calling Peer socket id: " + id + ", current socket id: " + yourID
           );
-          currentSocket.emit("callUser", {
+          socket.emit("callUser", {
             userToCall: id,
             signalData: data,
             from: yourID,
@@ -171,13 +173,13 @@ function CodingPage() {
           }
         });
 
-        currentSocket.on("callAccepted", (signal) => {
+        socket.on("callAccepted", (signal) => {
           setCallAccepted(true);
           peer.signal(signal);
         });
       }
     },
-    [currentSocket, peerID, stream, yourID]
+    [stream, yourID]
   );
 
   // function callPeer(id) {
@@ -222,6 +224,9 @@ function CodingPage() {
   // }
 
   const acceptCall = useCallback(() => {
+    console.log(
+      `Caller signal: ${callerSignal}, currentSocket: ${currentSocket}`
+    );
     setCallAccepted(true);
     const peer = new Peer({
       initiator: false,
@@ -276,6 +281,26 @@ function CodingPage() {
       </div>
     );
   }
+
+  const retrievePeerId = () => {
+    currentSocket.emit("RETRIEVE_PEER_ID", room.roomID);
+  };
+
+  const handleCall = useCallback(
+    (socket, peerId) => {
+      console.log(`Current socket: ${socket}`);
+      callPeer(socket, peerId);
+    },
+    [callPeer]
+  );
+
+  const muteAudio = () => {
+    stream.getAudioTracks()[0].enabled = false;
+  };
+
+  const unmuteAudio = () => {
+    stream.getAudioTracks()[0].enabled = true;
+  };
 
   useEffect(() => {
     const socket = io.connect("http://localhost:8081");
@@ -347,21 +372,12 @@ function CodingPage() {
       setYourID(id);
     });
 
-    socket.on("peerID", (id) => {
-      setPeerID(id);
-      // console.log("Peer ID: " + id);
-    });
-
-    socket.on("allUsers", (users) => {
-      setUsers(users);
-    });
-
     socket.on("hey", (data) => {
       setReceivingCall(true);
       setCaller(data.from);
       setCallerSignal(data.signal);
-      console.log("Calling Peer socket id: " + data.from);
-      console.log("Calling Peer socket signal: " + data.signal);
+      // console.log("Calling Peer socket id: " + data.from);
+      // console.log("Calling Peer socket signal: " + data.signal);
     });
 
     return () => {
@@ -393,28 +409,15 @@ function CodingPage() {
     // eslint-disable-next-line
   }, [text]);
 
-  // Setup auto initiation for audio call
   useEffect(() => {
-    // Execute only if socket initialised and socket IDs are present
-    if (currentSocket && peerID !== "" && yourID !== "") {
-      // Initiate call to other peer
-      console.log("My ID: " + yourID);
-      console.log("Peer ID: " + peerID);
-      console.log("Current socket: " + currentSocket.id);
-      callPeer(peerID);
+    if (currentSocket) {
+      currentSocket.on("RECEIVE_PEER_ID", (id) => {
+        // setPeerID(id);
+        console.log(`Current socket ${currentSocket}, Peer ID: ${id}`);
+        handleCall(currentSocket, id);
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [callPeer, peerID]);
-
-  // Setup auto accepting call
-  useEffect(() => {
-    if (receivingCall) {
-      setTimeout(() => {
-        console.log("Received call. Accepting now...");
-        acceptCall();
-      }, 3000);
-    }
-  }, [acceptCall, receivingCall]);
+  }, [currentSocket, handleCall]);
 
   return (
     <div>
@@ -425,6 +428,9 @@ function CodingPage() {
           setIsSavingCode={setIsSavingCode}
           leaveSession={leaveSession}
           endSession={endSession}
+          retrievePeerId={retrievePeerId}
+          muteAudio={muteAudio}
+          unmuteAudio={unmuteAudio}
         />
       </div>
       <div className="code-container">
@@ -437,21 +443,6 @@ function CodingPage() {
               <Row>
                 {UserVideo}
                 {PartnerVideo}
-              </Row>
-              <Row>
-                {Object.keys(users).map((key) => {
-                  if (key === yourID) {
-                    return null;
-                  }
-                  return (
-                    <button onClick={() => callPeer(key)}>Call {key}</button>
-                  );
-                })}
-              </Row>
-              <Row>
-                <button onClick={() => console.log(stream)}>
-                  Print stream
-                </button>
               </Row>
               <Row>{incomingCall}</Row>
             </Container>

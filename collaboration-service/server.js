@@ -29,16 +29,21 @@ const io = new Server(httpServer, {
   },
 });
 
-const users = {};
+const usersList = {};
+
+function addUserIntoCallRoom(roomId, socketId) {
+  // Store socket id in dictionary
+  if (!usersList[roomId]) {
+    usersList[roomId] = [socketId];
+  } else if (!usersList[roomId].includes(socketId)) {
+    usersList[roomId].push(socketId);
+  }
+}
 
 io.on("connection", (socket) => {
   console.log("Client connected with id: " + socket.id);
 
-  if (!users[socket.id]) {
-    users[socket.id] = socket.id;
-  }
   socket.emit("yourID", socket.id);
-  io.sockets.emit("allUsers", users);
 
   socket.on(
     "JOIN_ROOM",
@@ -54,8 +59,11 @@ io.on("connection", (socket) => {
       console.log(
         "User with username: " + username + " has joined room: " + roomID
       );
-      socket.broadcast.emit("peerID", socket.id);
-      console.log("Socket id: " + socket.id);
+
+      addUserIntoCallRoom(roomID, socket.id);
+      // console.log(
+      //   `List of sockets for room ID ${roomID}: ${usersList[roomID]}`
+      // );
     }
   );
 
@@ -86,7 +94,10 @@ io.on("connection", (socket) => {
 
   socket.on("RETRIEVE_CODE", async (roomID) => {
     const code = await retrieveCodeFromDB(roomID);
+    // Add user back into call upon reconnecting
+    addUserIntoCallRoom(roomID, socket.id);
     console.log("Retrieved code for room: " + roomID);
+    console.log("Retrieved code: " + code);
     socket.emit("UPDATE_TEXT", code);
   });
 
@@ -97,15 +108,50 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    delete users[socket.id];
+    console.log("This is being called!");
+    for (let rooms in usersList) {
+      if (
+        usersList[rooms].includes(socket.id) &&
+        usersList[rooms].length == 1
+      ) {
+        // console.log(
+        //   `Deleting room id: ${rooms} with users: ${usersList[rooms]}`
+        // );
+        delete usersList[rooms];
+      } else {
+        const index = usersList[rooms].indexOf(socket.id);
+        // console.log(`Removing socket id: ${socket.id} from room: ${rooms}`);
+        usersList[rooms].splice(index, 1);
+      }
+    }
   });
 
+  // Socket calling events
   socket.on("callUser", (data) => {
     console.log("Calling Peer socket id: " + data.from);
     io.to(data.userToCall).emit("hey", {
       signal: data.signalData,
       from: data.from,
     });
+  });
+
+  socket.on("RETRIEVE_PEER_ID", (roomID) => {
+    console.log("Room ID to retrieve peer ID: " + roomID);
+    let userList;
+    userList = usersList[roomID];
+    console.log(`Hi ${userList}`);
+    let peerID;
+    if (!userList) {
+      return;
+    }
+    userList.forEach((user) => {
+      if (user !== socket.id) {
+        peerID = user;
+      }
+    });
+
+    console.log(`Socket id: ${socket.id}, peer ID: ${peerID}`);
+    socket.emit("RECEIVE_PEER_ID", peerID);
   });
 
   socket.on("acceptCall", (data) => {

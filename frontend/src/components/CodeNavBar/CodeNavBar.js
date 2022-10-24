@@ -14,10 +14,19 @@ import DashboardPage from "views/DashboardPage/DashboardPage";
 import mainLogo from "assets/logo.png";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
+import CallIcon from "@mui/icons-material/Call";
 
 function CodeNavBar(props) {
-  const { isSavingCode, saveCode, setIsSavingCode, leaveSession, endSession } =
-    props;
+  const {
+    isSavingCode,
+    saveCode,
+    setIsSavingCode,
+    leaveSession,
+    endSession,
+    retrievePeerId,
+    muteAudio,
+    unmuteAudio,
+  } = props;
   const navigate = useNavigate();
   const navigateDashboard = () => {
     navigate("/dashboard");
@@ -25,7 +34,7 @@ function CodeNavBar(props) {
   const [saveMsgShown, setSaveMsgShown] = useState(false);
   const [leaveAlertOpen, setLeaveAlertOpen] = useState(false);
   const [confirmLeavingRoom, setConfirmLeavingRoom] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
 
   const leaveRoom = useCallback(() => {
     setTimeout(() => {
@@ -133,17 +142,30 @@ function CodeNavBar(props) {
         </Alert>
       </div>
       <div className="left">
-        <div className="img-container">
-          <img src={mainLogo} alt="main-logo" />
-        </div>
-      </div>
-      <div className="right">
-        <div className="buttons">
+        <div className="call-container">
+          <Button
+            className="call-button"
+            onClick={() => {
+              retrievePeerId();
+            }}
+            color="primary"
+            variant="outlined"
+            size="small"
+          >
+            <CallIcon />
+          </Button>
           <Button
             className="mute-button"
             onClick={() => {
               setIsMuted(!isMuted);
-              console.log(`I am muted - ${isMuted}`);
+              if (isMuted) {
+                unmuteAudio();
+                // console.log(`Unmute audio`);
+              } else {
+                muteAudio();
+                // console.log(`Mute audio`);
+              }
+              // console.log(`I am muted - ${!isMuted}`);
             }}
             color="primary"
             variant="outlined"
@@ -151,6 +173,13 @@ function CodeNavBar(props) {
           >
             {isMuted ? <MicOffIcon /> : <MicIcon />}
           </Button>
+        </div>
+        <div className="img-container">
+          <img src={mainLogo} alt="main-logo" />
+        </div>
+      </div>
+      <div className="right">
+        <div className="buttons">
           <Button
             className="save-button"
             onClick={() => {
