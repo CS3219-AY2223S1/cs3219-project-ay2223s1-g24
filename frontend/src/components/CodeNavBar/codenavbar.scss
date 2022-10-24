@@ -6,8 +6,23 @@
     align-items: center;
 
     .left {
+        display: flex;
         flex: 0.5;
+        justify-content: space-between;
 
+        .call-container {
+            margin-top: 10px;
+            text-align: left;
+            
+            .call-button {
+                margin-left: 10px;
+            }
+            
+            .mute-button {
+                margin-left: 15px;
+            }
+        }
+        
         .img-container {
             text-align: right;
 
@@ -29,9 +44,6 @@
                 margin-right: 15px;
             }
 
-            .mute-button {
-                margin-right: 15px;
-            }
         }
     }
 
