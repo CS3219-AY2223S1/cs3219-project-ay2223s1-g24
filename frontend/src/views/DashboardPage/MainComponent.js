@@ -22,6 +22,7 @@ import { setRoom } from "slices/roomSlice";
 import { setMatching, useMatching } from "slices/matchingSlice";
 import { useDispatch } from "react-redux";
 import { useCookies } from "react-cookie";
+import { MATCHING_SERVICE_SOCKET_ENDPOINT } from "configs";
 
 const RATIO = 100 / 30;
 
@@ -110,7 +111,8 @@ function DashboardComponent() {
   }, [cookies.roomID]);
 
   useEffect(() => {
-    const socket = io.connect("http://localhost:8080");
+    const socket = io.connect(MATCHING_SERVICE_SOCKET_ENDPOINT);
+    // const socket = io.connect("http://localhost:8080");
     // const socket = io.connect("http://matching-service-dev.ap-southeast-1.elasticbeanstalk.com/");
     setSocket(socket);
 

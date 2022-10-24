@@ -26,13 +26,25 @@ function SigninPage() {
   const [isPasswordInputTouched, setPasswordInputTouched] = useState(false);
   const [hasUnexpectedError, setUnexpectedError] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [cookies, setCookie] = useCookies(["name", "email", "jwtToken", "roomID" ,"firstQuestionHash", "secondQuestionHash", "difficulty"]);
+  const [cookies, setCookie] = useCookies([
+    "name",
+    "email",
+    "jwtToken",
+    "roomID",
+    "firstQuestionHash",
+    "secondQuestionHash",
+    "difficulty",
+  ]);
   const SINGLE_DAY_EXPIRY = 86400 * 1000;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const navigateToSignup = () => {
     navigate("/signup");
+  };
+
+  const navigateToAccountRecovery = () => {
+    navigate("/signin/identity");
   };
 
   const navigateToDashboard = () => {
@@ -56,10 +68,9 @@ function SigninPage() {
   }
 
   useEffect(() => {
-    if (cookies.roomId && cookies.roomID !== '') {
+    if (cookies.roomId && cookies.roomID !== "") {
       loadRoom();
-    }
-    else if (cookies.jwtToken) {
+    } else if (cookies.jwtToken) {
       navigateToDashboard();
     }
   });
@@ -277,8 +288,11 @@ function SigninPage() {
         </Box>
 
         <Box className="text-center">
-          Don't have an account yet?{" "}
-          <span onClick={navigateToSignup}> Sign up.</span>
+          <span onClick={navigateToAccountRecovery}> Forgot Password? </span>
+          <br />
+          <br />
+          New to PeerPrep?
+          <span onClick={navigateToSignup}> Sign up here</span>.
           <Routes>
             <Route path="/signup/*" element={<SignupPage />} />
           </Routes>

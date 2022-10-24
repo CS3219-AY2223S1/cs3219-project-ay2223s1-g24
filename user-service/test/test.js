@@ -142,6 +142,22 @@ describe("Test API Routes", function () {
       });
   });
 
+  it("Verify that an unverified user cannot request for password reset email", (done) => {
+    const payload = {
+      email: "valverdo@alberto.com",
+    };
+
+    chai
+      .request(server)
+      .post(`/api/users/sendPasswordChange`)
+      .send(payload)
+      .end((err, res) => {
+        res.should.have.status(401);
+        res.body.should.be.equal("User has not been verified yet");
+        done();
+      });
+  });
+
   // verify email
   it("Verify that email verification of existing unverified user works", (done) => {
     chai
@@ -169,6 +185,7 @@ describe("Test API Routes", function () {
       name: "Valverdo",
       email: "valverdo@alberto.com",
       password: "Mohammed",
+      verified: true,
     };
     chai
       .request(server)
@@ -332,6 +349,58 @@ describe("Test API Routes", function () {
         res.body.should.be.equal(
           "User not found in database to update password."
         );
+        done();
+      });
+  });
+
+  // update password via email
+
+  // verify that if email does not exist in database, email for password change is not sent
+  it("Verify that an if user does not exist in database, password reset email is not sent", (done) => {
+    const payload = {
+      email: "strong@woman.com",
+    };
+
+    chai
+      .request(server)
+      .post(`/api/users/sendPasswordChange`)
+      .send(payload)
+      .end((err, res) => {
+        res.should.have.status(404);
+        res.body.should.be.equal("User not found in database");
+        done();
+      });
+  });
+
+  // verify that email can be sent via sendPasswordChange endpoint
+  it("Verify that password reset email will be sent", (done) => {
+    const payload = {
+      email: "valverdo@alberto.com",
+    };
+
+    chai
+      .request(server)
+      .post(`/api/users/sendPasswordChange`)
+      .send(payload)
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body["message"].should.be.equal("Password Reset Email sent");
+        done();
+      });
+  });
+
+  it("Verify that update password via email does not work given invalid token", (done) => {
+    const payload = {
+      password: "newP@ssword",
+      token: "INVALID_TOKEN",
+    };
+
+    chai
+      .request(server)
+      .post(`/api/users/resetPassword`)
+      .send(payload)
+      .end((err, res) => {
+        res.should.have.status(404);
         done();
       });
   });

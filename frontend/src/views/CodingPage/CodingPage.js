@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
-
+import { COLLABORATION_SERVICE_SOCKET_ENDPOINT } from "configs";
 import { useRoom, setRoom } from "slices/roomSlice";
 import Editor from "components/Editor/Editor";
 import "./codingPage.scss";
@@ -97,7 +97,8 @@ function CodingPage() {
   };
 
   useEffect(() => {
-    const socket = io.connect("http://localhost:8081");
+    const socket = io.connect(COLLABORATION_SERVICE_SOCKET_ENDPOINT);
+    // const socket = io.connect("http://localhost:8081");
     // const socket = io.connect("http://collaboration-service-dev.ap-southeast-1.elasticbeanstalk.com/");
     setCurrentSocket(socket);
     if (room.roomID === "" || room.difficulty === "" || room.firstQuestionHash === 0 || room.secondQuestionHash === 0) {

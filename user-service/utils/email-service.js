@@ -10,7 +10,7 @@ const handlebarOptions = {
   viewPath: path.resolve("./utils"),
 };
 
-module.exports = async (email, subject, name, url) => {
+module.exports = async (email, subject, name, url, format) => {
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.HOST,
@@ -26,21 +26,21 @@ module.exports = async (email, subject, name, url) => {
     transporter.use("compile", hbs(handlebarOptions));
 
     var mailOptions = {
-      from: email, // sender address
-      to: email, // list of receivers
+      from: process.env.USER,
+      to: email,
       subject: subject,
-      template: "email", // the name of the template file i.e email.handlebars
+      template: format,
       context: {
-        name: name, // replace {{name}} with Adebola
-        company: "PeerPrep", // replace {{company}} with My Company
+        name: name,
+        company: "PeerPrep",
         url: url,
       },
     };
 
     await transporter.sendMail(mailOptions);
-    console.log("email sent successfully");
+    // console.log("email sent successfully");
   } catch (error) {
-    console.log("email not sent!");
+    // console.log("email not sent!");
     console.log(error);
     return error;
   }
