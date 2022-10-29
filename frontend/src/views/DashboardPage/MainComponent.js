@@ -275,6 +275,7 @@ function DashboardComponent() {
                 closeEasyModal();
                 setIsQueueing(false);
               }}
+              disabled={matchStatus === SUCCESS}
             >
               Cancel
             </Button>
