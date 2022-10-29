@@ -61,9 +61,19 @@ function CodingPage() {
   const [DEFAULT, CONNECTED] = ["", "CONNECTED"];
   const [callStatus, setCallStatus] = useState(DEFAULT);
   const [hasPartnerDisconnect, setHasPartnerDisconnect] = useState(false);
+  const [areUsersConnected, setAreUsersConnected] = useState(false);
+  const [reconnectMsgShown, setReconnectMsgShown] = useState(false);
+  const [welcomeMsgShown, setWelcomeMsgShown] = useState(false);
 
   const userVideo = useRef();
   const partnerVideo = useRef();
+
+  const resetFields = () => {
+    setHasPartnerDisconnect(false);
+    setAreUsersConnected(false);
+    setReconnectMsgShown(false);
+    setWelcomeMsgShown(false);
+  };
 
   const questionSize = {
     easy: 456,
@@ -186,8 +196,8 @@ function CodingPage() {
 
         socket.on("callAccepted", (signal) => {
           setCallAccepted(true);
-          peer.signal(signal);
           setCallStatus(CONNECTED);
+          peer.signal(signal);
         });
       }
     },
@@ -316,6 +326,7 @@ function CodingPage() {
     });
     socket.on("SESSION_ENDED", () => {
       setLeaveSession(true);
+      resetFields();
     });
 
     navigator.mediaDevices
@@ -335,6 +346,14 @@ function CodingPage() {
       setReceivingCall(true);
       setCaller(data.from);
       setCallerSignal(data.signal);
+    });
+
+    socket.on("USERS_CONNECTED", () => {
+      setWelcomeMsgShown(true);
+    });
+
+    socket.on("USER_RECONNECTED_SUCCESS", () => {
+      setReconnectMsgShown(true);
     });
 
     socket.on("PARTNER_DISCONNECT", () => {
@@ -383,6 +402,34 @@ function CodingPage() {
 
   return (
     <div>
+      <div className={`call-alert ${welcomeMsgShown ? "hide" : ""}`}>
+        <Alert severity="success" className="alert">
+          The match was a success! Have fun coding!
+          <Button
+            color="inherit"
+            onClick={() => {
+              setWelcomeMsgShown(false);
+            }}
+          >
+            Close
+          </Button>
+        </Alert>
+      </div>
+
+      <div className={`call-alert ${reconnectMsgShown ? "hide" : ""}`}>
+        <Alert severity="success" className="alert">
+          Your partner has reconnected!
+          <Button
+            color="inherit"
+            onClick={() => {
+              setReconnectMsgShown(false);
+            }}
+          >
+            Close
+          </Button>
+        </Alert>
+      </div>
+
       <div className={`call-alert ${hasPartnerDisconnect ? "hide" : ""}`}>
         <Alert severity="error" className="alert">
           Your partner has disconnected.

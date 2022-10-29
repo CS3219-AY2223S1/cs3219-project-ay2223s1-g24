@@ -61,6 +61,7 @@ io.on("connection", (socket) => {
       );
 
       addUserIntoCallRoom(roomID, socket.id);
+      socket.emit("USERS_CONNECTED", socket.id);
 
       // console.log(
       //   `List of sockets for room ID ${roomID}: ${usersList[roomID]}`
@@ -79,6 +80,7 @@ io.on("connection", (socket) => {
         roomData.first_question,
         roomData.second_question
       );
+      socket.broadcast.to(roomData.room_id).emit("USER_RECONNECTED_SUCCESS");
     } else {
       socket.emit("RECEIVE_ROOM_DATA");
     }
