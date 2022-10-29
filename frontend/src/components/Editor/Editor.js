@@ -20,7 +20,7 @@ export default function Editor(props) {
   ];
 
   const [language, setLanguage] = useState("python");
-  const [editorTheme, setEditorTheme] = useState("base16-dark");
+  const [editorTheme, setEditorTheme] = useState("base16-light");
 
   const handleMode = (e) => {
     setLanguage(e.target.value);
@@ -28,7 +28,7 @@ export default function Editor(props) {
 
   const handleChange = (editor, data, value) => {
     onChange(value);
-  }
+  };
 
   const toggleEditorTheme = () => {
     if (editorTheme === "base16-light") {
@@ -36,7 +36,7 @@ export default function Editor(props) {
     } else {
       setEditorTheme("base16-light");
     }
-  }
+  };
 
   return (
     <div className="editor-container">
@@ -47,7 +47,7 @@ export default function Editor(props) {
           options={modes}
           handleDropdown={handleMode}
         />
-        <ThemeToggle 
+        <ThemeToggle
           className="theme-toggle"
           handleChange={toggleEditorTheme}
         />
