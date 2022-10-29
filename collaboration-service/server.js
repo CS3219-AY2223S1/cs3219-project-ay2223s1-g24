@@ -25,7 +25,7 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
     // origin: ["http://localhost:3000"],
-    origin: '*',
+    origin: "*",
   },
 });
 
@@ -61,6 +61,7 @@ io.on("connection", (socket) => {
       );
 
       addUserIntoCallRoom(roomID, socket.id);
+
       // console.log(
       //   `List of sockets for room ID ${roomID}: ${usersList[roomID]}`
       // );
@@ -108,7 +109,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("This is being called!");
     for (let rooms in usersList) {
       if (
         usersList[rooms].includes(socket.id) &&
@@ -118,10 +118,11 @@ io.on("connection", (socket) => {
         //   `Deleting room id: ${rooms} with users: ${usersList[rooms]}`
         // );
         delete usersList[rooms];
-      } else {
+      } else if (usersList[rooms].includes(socket.id)) {
         const index = usersList[rooms].indexOf(socket.id);
         // console.log(`Removing socket id: ${socket.id} from room: ${rooms}`);
         usersList[rooms].splice(index, 1);
+        socket.to(rooms).emit("PARTNER_DISCONNECT");
       }
     }
   });
@@ -129,7 +130,8 @@ io.on("connection", (socket) => {
   // Socket calling events
   socket.on("callUser", (data) => {
     console.log("Calling Peer socket id: " + data.from);
-    io.to(data.userToCall).emit("hey", {
+    console.log("Calling user: " + data.userToCall);
+    io.to(data.userToCall).emit("CALLING", {
       signal: data.signalData,
       from: data.from,
     });
@@ -139,7 +141,6 @@ io.on("connection", (socket) => {
     console.log("Room ID to retrieve peer ID: " + roomID);
     let userList;
     userList = usersList[roomID];
-    console.log(`Hi ${userList}`);
     let peerID;
     if (!userList) {
       return;
@@ -159,10 +160,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Client disconnected with id: " + socket.id);
+    console.log(`Client disconnected with id: ${socket.id}`);
   });
 });
 
-const port = process.env.PORT || 8081
+const port = process.env.PORT || 8081;
 httpServer.listen(port);
 // httpServer.listen(8081);

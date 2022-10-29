@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -12,8 +13,6 @@ import "./codenavbar.scss";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import DashboardPage from "views/DashboardPage/DashboardPage";
 import mainLogo from "assets/logo.png";
-import MicIcon from "@mui/icons-material/Mic";
-import MicOffIcon from "@mui/icons-material/MicOff";
 import CallIcon from "@mui/icons-material/Call";
 
 function CodeNavBar(props) {
@@ -24,8 +23,8 @@ function CodeNavBar(props) {
     leaveSession,
     endSession,
     retrievePeerId,
-    muteAudio,
-    unmuteAudio,
+    setCallStatus,
+    callStatus,
   } = props;
   const navigate = useNavigate();
   const navigateDashboard = () => {
@@ -34,7 +33,7 @@ function CodeNavBar(props) {
   const [saveMsgShown, setSaveMsgShown] = useState(false);
   const [leaveAlertOpen, setLeaveAlertOpen] = useState(false);
   const [confirmLeavingRoom, setConfirmLeavingRoom] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [DEFAULT, CONNECTED, PENDING] = ["", "CONNECTED", "PENDING"];
 
   const leaveRoom = useCallback(() => {
     setTimeout(() => {
@@ -142,44 +141,58 @@ function CodeNavBar(props) {
         </Alert>
       </div>
       <div className="left">
-        <div className="call-container">
-          <Button
-            className="call-button"
-            onClick={() => {
-              retrievePeerId();
-            }}
-            color="primary"
-            variant="outlined"
-            size="small"
-          >
-            <CallIcon />
-          </Button>
-          <Button
-            className="mute-button"
-            onClick={() => {
-              setIsMuted(!isMuted);
-              if (isMuted) {
-                unmuteAudio();
-                // console.log(`Unmute audio`);
-              } else {
-                muteAudio();
-                // console.log(`Mute audio`);
-              }
-              // console.log(`I am muted - ${!isMuted}`);
-            }}
-            color="primary"
-            variant="outlined"
-            size="small"
-          >
-            {isMuted ? <MicOffIcon /> : <MicIcon />}
-          </Button>
-        </div>
         <div className="img-container">
           <img src={mainLogo} alt="main-logo" />
         </div>
       </div>
       <div className="right">
         <div className="buttons">
+          {callStatus === DEFAULT && (
+            <Button
+              className="call-button"
+              onClick={() => {
+                retrievePeerId();
+                setCallStatus(PENDING);
+              }}
+              color="primary"
+              variant="outlined"
+              size="small"
+            >
+              <CallIcon />
+              <div className="call-desc">START CALL</div>
+            </Button>
+          )}
+
+          {callStatus === CONNECTED && (
+            <Button
+              className="call-button"
+              color="primary"
+              variant="outlined"
+              size="small"
+              disabled
+            >
+              <CallIcon />
+              <div className="call-desc">CONNECTED</div>
+            </Button>
+          )}
+
+          {callStatus === PENDING && (
+            <Button
+              className="call-button"
+              color="primary"
+              variant="outlined"
+              size="small"
+              disabled
+            >
+              <CallIcon />
+              <div className="call-desc">CALLING</div>
+
+              <div className="progress">
+                <CircularProgress color="inherit" size="14px" />
+              </div>
+            </Button>
+          )}
+
           <Button
             className="save-button"
             onClick={() => {

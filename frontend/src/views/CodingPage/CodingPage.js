@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import { Button } from "@mui/material";
+import { Alert, Button, Dialog } from "@mui/material";
+import MicOffIcon from "@mui/icons-material/MicOff";
 import { io } from "socket.io-client";
 import { useCookies } from "react-cookie";
 import { useDispatch } from "react-redux";
@@ -12,15 +13,12 @@ import Editor from "components/Editor/Editor";
 import "./codingPage.scss";
 import CodeNavBar from "components/CodeNavBar/CodeNavBar";
 import Peer from "simple-peer";
+import Draggable from "react-draggable";
+import MicIcon from "@mui/icons-material/Mic";
+import VideocamIcon from "@mui/icons-material/Videocam";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 
 import styled from "styled-components";
-
-const Container = styled.div`
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-`;
 
 const Row = styled.div`
   display: flex;
@@ -28,9 +26,16 @@ const Row = styled.div`
 `;
 
 const Video = styled.video`
-  border: 1px solid blue;
-  width: 50%;
-  height: 50%;
+  border: 1px solid darkgray;
+  width: 100%;
+  height: 100%;
+`;
+
+const PlaceholderVideo = styled.div`
+  border: 1px solid darkgray;
+  background-color: black;
+  width: 100%;
+  height: 100%;
 `;
 
 function CodingPage() {
@@ -51,6 +56,12 @@ function CodingPage() {
   const [caller, setCaller] = useState("");
   const [callerSignal, setCallerSignal] = useState();
   const [callAccepted, setCallAccepted] = useState(false);
+  const [isMuted, setMuted] = useState(false);
+  const [isVideoOff, setVideoOff] = useState(false);
+  const [DEFAULT, CONNECTED] = ["", "CONNECTED"];
+  const [callStatus, setCallStatus] = useState(DEFAULT);
+  const [hasPartnerDisconnect, setHasPartnerDisconnect] = useState(false);
+
   const userVideo = useRef();
   const partnerVideo = useRef();
 
@@ -176,58 +187,20 @@ function CodingPage() {
         socket.on("callAccepted", (signal) => {
           setCallAccepted(true);
           peer.signal(signal);
+          setCallStatus(CONNECTED);
         });
       }
     },
+    // eslint-disable-next-line
     [stream, yourID]
   );
-
-  // function callPeer(id) {
-  //   const peer = new Peer({
-  //     initiator: true,
-  //     trickle: false,
-  //     config: {
-  //       iceServers: [
-  //         {
-  //           urls: "stun:numb.viagenie.ca",
-  //           username: "sultan1640@gmail.com",
-  //           credential: "98376683",
-  //         },
-  //         {
-  //           urls: "turn:numb.viagenie.ca",
-  //           username: "sultan1640@gmail.com",
-  //           credential: "98376683",
-  //         },
-  //       ],
-  //     },
-  //     stream: stream,
-  //   });
-
-  //   peer.on("signal", (data) => {
-  //     currentSocket.emit("callUser", {
-  //       userToCall: id,
-  //       signalData: data,
-  //       from: yourID,
-  //     });
-  //   });
-
-  //   peer.on("stream", (stream) => {
-  //     if (partnerVideo.current) {
-  //       partnerVideo.current.srcObject = stream;
-  //     }
-  //   });
-
-  //   currentSocket.on("callAccepted", (signal) => {
-  //     setCallAccepted(true);
-  //     peer.signal(signal);
-  //   });
-  // }
 
   const acceptCall = useCallback(() => {
     console.log(
       `Caller signal: ${callerSignal}, currentSocket: ${currentSocket}`
     );
     setCallAccepted(true);
+    setCallStatus(CONNECTED);
     const peer = new Peer({
       initiator: false,
       trickle: false,
@@ -242,44 +215,21 @@ function CodingPage() {
     });
 
     peer.signal(callerSignal);
+    // eslint-disable-next-line
   }, [caller, callerSignal, currentSocket, stream]);
-
-  // function acceptCall() {
-  //   setCallAccepted(true);
-  //   const peer = new Peer({
-  //     initiator: false,
-  //     trickle: false,
-  //     stream: stream,
-  //   });
-  //   peer.on("signal", (data) => {
-  //     currentSocket.emit("acceptCall", { signal: data, to: caller });
-  //   });
-
-  //   peer.on("stream", (stream) => {
-  //     partnerVideo.current.srcObject = stream;
-  //   });
-
-  //   peer.signal(callerSignal);
-  // }
 
   let UserVideo;
   if (stream) {
     UserVideo = <Video playsInline muted ref={userVideo} autoPlay />;
+  } else {
+    UserVideo = <PlaceholderVideo />;
   }
 
   let PartnerVideo;
   if (callAccepted) {
     PartnerVideo = <Video playsInline ref={partnerVideo} autoPlay />;
-  }
-
-  let incomingCall;
-  if (receivingCall) {
-    incomingCall = (
-      <div>
-        <h1>{caller} is calling you</h1>
-        <button onClick={() => acceptCall()}>Accept</button>
-      </div>
-    );
+  } else {
+    PartnerVideo = <PlaceholderVideo />;
   }
 
   const retrievePeerId = () => {
@@ -300,6 +250,14 @@ function CodingPage() {
 
   const unmuteAudio = () => {
     stream.getAudioTracks()[0].enabled = true;
+  };
+
+  const pauseVideo = () => {
+    stream.getVideoTracks()[0].enabled = false;
+  };
+
+  const unpauseVideo = () => {
+    stream.getVideoTracks()[0].enabled = true;
   };
 
   useEffect(() => {
@@ -373,12 +331,16 @@ function CodingPage() {
       setYourID(id);
     });
 
-    socket.on("hey", (data) => {
+    socket.on("CALLING", (data) => {
       setReceivingCall(true);
       setCaller(data.from);
       setCallerSignal(data.signal);
-      // console.log("Calling Peer socket id: " + data.from);
-      // console.log("Calling Peer socket signal: " + data.signal);
+    });
+
+    socket.on("PARTNER_DISCONNECT", () => {
+      setCallStatus(DEFAULT);
+      setCallAccepted(false);
+      setHasPartnerDisconnect(true);
     });
 
     return () => {
@@ -413,7 +375,6 @@ function CodingPage() {
   useEffect(() => {
     if (currentSocket) {
       currentSocket.on("RECEIVE_PEER_ID", (id) => {
-        // setPeerID(id);
         console.log(`Current socket ${currentSocket}, Peer ID: ${id}`);
         handleCall(currentSocket, id);
       });
@@ -422,6 +383,36 @@ function CodingPage() {
 
   return (
     <div>
+      <div className={`call-alert ${hasPartnerDisconnect ? "hide" : ""}`}>
+        <Alert severity="error" className="alert">
+          Your partner has disconnected.
+          <Button
+            color="inherit"
+            onClick={() => {
+              setHasPartnerDisconnect(false);
+            }}
+          >
+            Close
+          </Button>
+        </Alert>
+      </div>
+
+      <div className={`call-alert ${receivingCall ? "hide" : ""}`}>
+        <Alert severity="success" className="alert">
+          {/* {caller} is calling you */}
+          Your partner is calling you.
+          <Button
+            color="inherit"
+            onClick={() => {
+              acceptCall();
+              setReceivingCall(false);
+            }}
+          >
+            Accept
+          </Button>
+        </Alert>
+      </div>
+
       <div className="navbar-top">
         <CodeNavBar
           isSavingCode={isSavingCode}
@@ -430,24 +421,57 @@ function CodingPage() {
           leaveSession={leaveSession}
           endSession={endSession}
           retrievePeerId={retrievePeerId}
-          muteAudio={muteAudio}
-          unmuteAudio={unmuteAudio}
+          setCallStatus={setCallStatus}
+          callStatus={callStatus}
         />
       </div>
       <div className="code-container">
         <div className="pane left-pane">
+          <Draggable>
+            <Dialog
+              className="video-panel"
+              open={true}
+              hideBackdrop
+              disableEnforceFocus
+              disableScrollLock
+            >
+              <div className="videos">
+                <Row>{UserVideo}</Row>
+                <Row>{PartnerVideo}</Row>
+              </div>
+              <div className="btn-container">
+                <div>
+                  <Button
+                    onClick={() => {
+                      if (isVideoOff) {
+                        unpauseVideo();
+                      } else {
+                        pauseVideo();
+                      }
+                      setVideoOff(!isVideoOff);
+                    }}
+                  >
+                    {isVideoOff ? <VideocamOffIcon /> : <VideocamIcon />}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (isMuted) {
+                        unmuteAudio();
+                      } else {
+                        muteAudio();
+                      }
+                      setMuted(!isMuted);
+                    }}
+                  >
+                    {isMuted ? <MicOffIcon /> : <MicIcon />}
+                  </Button>
+                </div>
+              </div>
+            </Dialog>
+          </Draggable>
+
           <div dangerouslySetInnerHTML={{ __html: question }}></div>
-          <div>
-            VOICECALL
-            {/* {console.log(currentSocket)} */}
-            <Container>
-              <Row>
-                {UserVideo}
-                {PartnerVideo}
-              </Row>
-              <Row>{incomingCall}</Row>
-            </Container>
-          </div>
+          <div></div>
           <div className="button-container">
             {questionNumber.current === 2 && (
               <Button

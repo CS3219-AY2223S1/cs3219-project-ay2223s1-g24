@@ -240,12 +240,6 @@ function DashboardPage() {
               label="Main"
               onClick={() => setTabNumber(0)}
             />
-            <Tab
-              value="two"
-              sx={tabStyling}
-              label="Dashboard"
-              onClick={() => setTabNumber(1)}
-            />
           </Tabs>
         </div>
         <div className="logo item">
