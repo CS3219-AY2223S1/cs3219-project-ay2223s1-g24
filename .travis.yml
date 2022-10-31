@@ -1,8 +1,0 @@
-language: node_js
-node_js:
-  - 14.15.3
-cache: npm
-install: # Hook provided by Travis CI
-  - npm install
-script:
-  - npm test
