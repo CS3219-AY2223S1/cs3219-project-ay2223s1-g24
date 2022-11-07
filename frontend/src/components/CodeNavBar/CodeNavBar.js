@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -12,10 +13,19 @@ import "./codenavbar.scss";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import DashboardPage from "views/DashboardPage/DashboardPage";
 import mainLogo from "assets/logo.png";
+import CallIcon from "@mui/icons-material/Call";
 
 function CodeNavBar(props) {
-  const { isSavingCode, saveCode, setIsSavingCode, leaveSession, endSession } =
-    props;
+  const {
+    isSavingCode,
+    saveCode,
+    setIsSavingCode,
+    leaveSession,
+    endSession,
+    retrievePeerId,
+    setCallStatus,
+    callStatus,
+  } = props;
   const navigate = useNavigate();
   const navigateDashboard = () => {
     navigate("/dashboard");
@@ -23,6 +33,7 @@ function CodeNavBar(props) {
   const [saveMsgShown, setSaveMsgShown] = useState(false);
   const [leaveAlertOpen, setLeaveAlertOpen] = useState(false);
   const [confirmLeavingRoom, setConfirmLeavingRoom] = useState(false);
+  const [DEFAULT, CONNECTED, PENDING] = ["", "CONNECTED", "PENDING"];
 
   const leaveRoom = useCallback(() => {
     setTimeout(() => {
@@ -136,6 +147,52 @@ function CodeNavBar(props) {
       </div>
       <div className="right">
         <div className="buttons">
+          {callStatus === DEFAULT && (
+            <Button
+              className="call-button"
+              onClick={() => {
+                retrievePeerId();
+                setCallStatus(PENDING);
+              }}
+              color="primary"
+              variant="outlined"
+              size="small"
+            >
+              <CallIcon />
+              <div className="call-desc">START CALL</div>
+            </Button>
+          )}
+
+          {callStatus === CONNECTED && (
+            <Button
+              className="call-button"
+              color="primary"
+              variant="outlined"
+              size="small"
+              disabled
+            >
+              <CallIcon />
+              <div className="call-desc">CONNECTED</div>
+            </Button>
+          )}
+
+          {callStatus === PENDING && (
+            <Button
+              className="call-button"
+              color="primary"
+              variant="outlined"
+              size="small"
+              disabled
+            >
+              <CallIcon />
+              <div className="call-desc">CALLING</div>
+
+              <div className="progress">
+                <CircularProgress color="inherit" size="14px" />
+              </div>
+            </Button>
+          )}
+
           <Button
             className="save-button"
             onClick={() => {

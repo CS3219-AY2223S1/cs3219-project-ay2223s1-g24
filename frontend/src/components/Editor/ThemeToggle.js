@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./themetoggle.scss";
-import { ReactComponent as MoonIcon } from "../../assets/moon.svg"
+import { ReactComponent as MoonIcon } from "../../assets/moon.svg";
 import { ReactComponent as SunIcon } from "../../assets/sun.svg";
 
 const updateTheme = (isDarkEnabled) => {
@@ -22,7 +22,7 @@ const updateTheme = (isDarkEnabled) => {
 
 function ThemeToggle(props) {
   const { handleChange } = props;
-  const [isEnabled, setIsEnabled] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(true);
 
   useEffect(() => {
     updateTheme(isEnabled);
@@ -35,13 +35,13 @@ function ThemeToggle(props) {
 
   return (
     <label className="toggle-wrapper" htmlFor="toggle">
-      <div className={`toggle ${isEnabled ? "enabled" : "disabled"}`}>
+      <div className={`toggle ${isEnabled ? "disabled" : "enabled"}`}>
         <span className="hidden">
           {isEnabled ? "Enable Light Mode" : "Enable Dark Mode"}
         </span>
         <div className="icons">
-          <SunIcon className="sun"/>
-          <MoonIcon className="moon"/>
+          <MoonIcon className="moon" />
+          <SunIcon className="sun" />
         </div>
         <input
           id="toggle"

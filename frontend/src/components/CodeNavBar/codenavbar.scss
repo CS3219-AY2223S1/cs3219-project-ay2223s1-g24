@@ -6,7 +6,18 @@
     align-items: center;
 
     .left {
+        display: flex;
         flex: 0.5;
+        justify-content: space-between;
+
+        .call-container {
+            margin-top: 10px;
+            text-align: left;
+
+            .mute-button {
+                margin-left: 15px;
+            }
+        }
 
         .img-container {
             text-align: right;
@@ -28,6 +39,23 @@
             .save-button {
                 margin-right: 15px;
             }
+
+            .call-button {
+                margin-right: 15px;
+                justify-content: center;
+                align-items: center;
+
+                .call-desc {
+                    margin-left: 5px;
+                }
+
+                .progress {
+                    display: flex;
+                    align-items: center;
+                    margin-left: 5px;
+                }
+            }
+
         }
     }
 
@@ -37,14 +65,16 @@
         box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
         transition: all 0.75s ease;
     }
-    
+
     .code-save-msg {
         position: absolute;
+        z-index: 100;
         top: -10vh;
+        left: 46%;
         box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
         transition: all 0.75s ease;
     }
-    
+
     .show {
         transform: translateY(10vh);
         transition: all 0.75s ease;
