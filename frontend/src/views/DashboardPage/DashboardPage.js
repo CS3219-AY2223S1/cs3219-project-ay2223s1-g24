@@ -439,7 +439,7 @@ function DashboardPage() {
         </Dialog>
 
         <Dialog open={isProfileDialogOpen}>
-          <DialogTitle>Account</DialogTitle>
+          <DialogTitle>Delete Account</DialogTitle>
           <DialogContent
             sx={{ display: "flex", flexDirection: "column", width: "300px" }}
           >
