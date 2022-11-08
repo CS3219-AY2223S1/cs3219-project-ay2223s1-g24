@@ -1,0 +1,148 @@
+// codeNavBar
+.code-navbar {
+
+    display: flex;
+    max-height: fit-content;
+    background-color: white;
+    align-items: center;
+
+    .left {
+        flex: 0.5;
+
+        .img-container {
+            text-align: right;
+
+            img {
+                transform: translateX(40px);
+                width: 48px;
+            }
+        }
+    }
+
+    .right {
+        flex: 0.5;
+
+        .buttons {
+            text-align: right;
+            margin-right: 15px;
+
+            .save-button {
+                margin-right: 15px;
+            }
+        }
+    }
+}
+
+.navbar-top {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    border-bottom: .5px solid lightgray;
+    z-index: 1;
+}
+
+.code-container {
+    display: flex;
+    flex-direction: row;
+    height: 92.5vh;
+    justify-content: space-between;
+}
+
+.pane {
+    display: flex;
+    width: 50vw;
+}
+
+.left-pane {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    color: black;
+    padding: 10px 15px;
+    overflow: auto;
+    max-width: 49%;
+
+}
+
+.right-pane {
+    max-width: 49%;
+}
+
+.video-panel.css-zw3mfo-MuiModal-root-MuiDialog-root {
+    height: 12rem;
+    width: 20rem;
+    left: 75%;
+    top: 70%;
+
+    .css-hz1bth-MuiDialog-container {
+        .css-1t1j96h-MuiPaper-root-MuiDialog-paper {
+            overflow: hidden;
+        }
+    }
+
+    .videos {
+        display: flex;
+    }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+    }
+}
+
+.button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    .prev-question-button {
+        width: fit-content;
+    }
+
+    .next-question-button {
+        margin-left: 15px;
+        margin-right: 35px;
+        width: fit-content;
+    }
+
+    .prev-question-button:hover {
+        animation: shake 0.7s;
+        background-color: rgb(11, 108, 236);
+    }
+
+    .next-question-button:hover {
+        animation: shake 0.5s;
+        background-color: rgb(11, 108, 236);
+    }
+}
+
+@keyframes shake {
+
+    10%,
+    90% {
+        transform: translatey(0px, -8px, -8px);
+    }
+
+    50% {
+        transform: translate3d(0px, -4px, -4px);
+    }
+}
+
+.call-alert {
+    position: absolute;
+    top: -30vh;
+    left: 35%;
+    z-index: 2000;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
+    transition: all 1s ease;
+
+    .alert {
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.hide {
+    transform: translateY(32vh);
+    transition: all 1s ease;
+}

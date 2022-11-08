@@ -1,0 +1,26 @@
+.button {
+    color: #2c7be5;
+    width: fit-content;
+    padding: 15px 20px;
+    border: 1px solid #2c7be5;
+    border-radius: .375rem;
+}
+
+.button:hover {
+    cursor: pointer;
+    animation: shake 0.7s;
+    color: white;
+    background-color: #2c7be5;
+}
+
+@keyframes shake {
+
+    10%,
+    90% {
+        transform: translatey(0px, -10px, -10px);
+    }
+
+    50% {
+        transform: translate3d(0px, -5px, -5px);
+    }
+}

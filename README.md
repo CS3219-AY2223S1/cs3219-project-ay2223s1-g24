@@ -1,14 +1,13 @@
-# CS3219-AY22-23-Project-Skeleton
+# PeerPrep 
 
-This is a template repository for CS3219 project.
+PeerPrep is a platform for individuals to collaborate and code together in real-time to prepare for technical interviews. We cater for users of all levels through providing difficulties from easy to hard and allow for matching between users of similar experience.
 
-## User Service
-1. Rename `.env.sample` file to `.env`.
-2. Create a Cloud DB URL using Mongo Atlas.
-3. Enter the DB URL created as `DB_CLOUD_URI` in `.env` file.
-4. Install npm packages using `npm i`.
-5. Run User Service using `npm run dev`.
 
-## Frontend
-1. Install npm packages using `npm i`.
-2. Run Frontend using `npm start`.
+## Quickstart
+1. Clone the repository using `git clone https://github.com/CS3219-AY2223S1/cs3219-project-ay2223s1-g24.git`
+2. Change your current directory to the frontend folder using `cd frontend`
+3. Install the required node module packages using `npm install`
+4. Start up the server using `npm start`
+
+The website should launch in your default browser at http://localhost:3000/.
+

@@ -1,0 +1,63 @@
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 6rem;
+    padding-bottom: 1rem;
+
+    .error-msg {
+        position: absolute;
+        top: -10vh;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
+        transition: all 0.75s ease;
+    }
+
+    .hide {
+        transform: translateY(15vh);
+        transition: all 0.75s ease;
+    }
+
+
+
+    .flexbox-container-main {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        margin-top: 0px;
+
+        .glow-green,
+        .glow-red,
+        .glow-yellow {
+            cursor: pointer;
+            transition: 0.5s ease all;
+        }
+
+        .glow-green:hover,
+        .selected.glow-green {
+            transform: translateY(-15px);
+            transition: 0.5s ease all;
+            -webkit-box-shadow: 0px 0px 28px 3px green;
+            box-shadow: 0px 0px 28px 3px green;
+        }
+
+        .glow-yellow:hover,
+        .selected.glow-yellow {
+            transform: translateY(-15px);
+            transition: 0.5s ease all;
+            -webkit-box-shadow: 0px 0px 28px 3px yellow;
+            box-shadow: 0px 0px 28px 3px yellow;
+        }
+
+        .glow-red:hover,
+        .selected.glow-red {
+            transform: translateY(-15px);
+            transition: 0.5s ease all;
+            -webkit-box-shadow: 0px 0px 28px 3px red;
+            box-shadow: 0px 0px 28px 3px red;
+        }
+    }
+
+    .find-room-btn {
+        margin-top: 3rem;
+    }
+}
