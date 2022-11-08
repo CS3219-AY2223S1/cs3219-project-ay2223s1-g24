@@ -67,11 +67,11 @@ export default function BasicMenu({
           "aria-labelledby": "basic-button",
         }}
       >
-        <MenuItem fontSize="small" onClick={openProfile}>
-          <Typography fontSize="small">Profile</Typography>
-        </MenuItem>
         <MenuItem fontSize="small" onClick={changePassword}>
           <Typography fontSize="small">Change Password</Typography>
+        </MenuItem>
+        <MenuItem fontSize="small" onClick={openProfile}>
+          <Typography fontSize="small">Delete Account</Typography>
         </MenuItem>
         <MenuItem onClick={logout}>
           <Typography fontSize="small">Logout</Typography>
